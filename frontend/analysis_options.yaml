@@ -1,0 +1,12 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  errors:
+    deprecated_member_use: ignore
+    unnecessary_underscores: ignore
+    unnecessary_brace_in_string_interps: ignore
+
+linter:
+  rules:
+    avoid_print: true
+    prefer_const_constructors: false

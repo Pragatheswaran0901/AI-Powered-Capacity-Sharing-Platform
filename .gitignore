@@ -37,7 +37,7 @@ venv.bak/
 .env.test.local
 .env.production.local
 
-# Logs
+# Logs & Dev Mailbox
 logs
 *.log
 npm-debug.log*
@@ -45,6 +45,8 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+dev_mailbox.json
+scratch_*.py
 
 # Editor & OS files
 .vscode/*

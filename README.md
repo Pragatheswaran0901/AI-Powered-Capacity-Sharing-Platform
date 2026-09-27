@@ -1,115 +1,246 @@
-# Mach-Hunt 🚀
+# Mach-Hunt — Production Application Specification & Guide
 
-> **From Idle Machines to Shared Manufacturing Capacity**
-
-Mach-Hunt is an AI-assisted MSME manufacturing capacity-sharing platform focused on **Tamil Nadu, India** (Coimbatore Industrial Cluster Pilot). It connects manufacturing MSMEs that own machinery with unused capacity (Machine Owners / Providers) to MSMEs requiring manufacturing capacity (Machine Seekers).
-
----
-
-## 1. Problem & Solution
-
-### The Problem
-* **Machine Owners**: Own expensive CNC, VMC, Lathe, Laser, or Welding machines that sit idle for 8+ hours a day, leading to lost ROI and unmonetized overhead.
-* **Machine Seekers**: Face sudden order spikes or lack specific high-precision machinery, resulting in rejected orders or unnecessary capital expenditure.
-
-### The Solution
-Mach-Hunt provides **Manufacturing Capacity-as-a-Service**:
-> *"We don't just help MSMEs find machines. We help them find the right manufacturing capacity."*
+> **AI-Powered Manufacturing Capacity-Sharing Platform for MSMEs**  
+> *Connecting Idle Manufacturing Machinery to Industrial Demand*
 
 ---
 
-## 2. Key Features
+## 1. Product Purpose & Overview
 
-1. **Smart Capacity Matching Engine**:
-   Evaluates machines using a transparent weighted scoring formula:
-   $$\text{Match Score} = \text{Capability (40\%)} + \text{Availability (20\%)} + \text{Distance (15\%)} + \text{Cost (15\%)} + \text{Reliability (10\%)}$$
-2. **Natural Language Requirement Assistant**:
-   Extracts process, material, quantity, deadline, and target city from prompts like:
-   > *"I need 500 aluminium brackets machined within 3 days in Coimbatore with ₹25,000 budget."*
-3. **Side-by-Side Machine Comparison Tool**:
-   Compare 2–3 capacity options on hourly rates, location distance (km), ratings, and verification status.
-4. **Tamil Nadu & Coimbatore Map View**:
-   Interactive map pins across Coimbatore, Chennai, Hosur, Salem, Tiruppur, Erode, Madurai, and Trichy.
-5. **End-to-End Booking & Escrow Workflow**:
-   Requirement submission → Capacity matching → Request booking → Owner acceptance → Confirmed → Job completion → Rating & review.
-6. **Role-Based Portals**:
-   * **Seeker**: Create requirements, view recommendations, compare, book, rate.
-   * **Owner**: Machine inventory, available hours, earnings tracking, accept/decline requests.
-   * **Admin**: Verification queue (Approve/Reject MSMEs & machines), GMV analytics, platform revenue.
-7. **Phase 2 IoT Hardware Sensor Roadmap**:
-   Simulated telemetry drawer showcasing ESP32 microcontrollers with CT current transformers and ADXL345 vibration sensors for live active hour tracking.
+Mach-Hunt is a production-ready, AI-driven manufacturing capacity-sharing platform engineered specifically for Micro, Small, and Medium Enterprises (MSMEs). 
+
+Rather than functioning as a standard machinery rental marketplace, Mach-Hunt operates on the principle of **Capacity-as-a-Service**:
+
+$$\text{Requirement} \longrightarrow \text{AI Interpretation} \longrightarrow \text{Capacity Matching} \longrightarrow \text{Comparison} \longrightarrow \text{Booking} \longrightarrow \text{Production} \longrightarrow \text{Completion} \longrightarrow \text{Rating}$$
+
+### Capacity Provider (Machine Owner)
+An MSME that owns capital-intensive manufacturing machinery (e.g., 3-Axis / 5-Axis CNC Milling, CNC Turning, Fiber Laser Cutting, Industrial Lathes, Fabrication, Welding) with idle hours between job runs. Providers list machinery, verify capabilities, manage hourly availability slots, and monetize excess production capacity.
+
+### Capacity Seeker (Component Buyer)
+An MSME or tier-2 supplier with component production requirements (e.g., "500 aluminium flange brackets within 4 days near Coimbatore"). Seekers submit technical specifications in plain English or structured parameters without needing to know specific machine models. Mach-Hunt discovers, ranks, and books verified capacity.
 
 ---
 
-## 3. Demo Credentials
+## 2. Technology Stack & Architecture
 
-Evaluators can test the prototype immediately using these pre-seeded demo accounts:
+```text
+mach-hunt/
+├── frontend/                     # Flutter Cross-Platform Client (Web, Android, Desktop)
+│   ├── lib/
+│   │   ├── core/                 # Constants, Dio API client, token storage, themes, widgets
+│   │   ├── models/               # Strongly-typed immutable JSON data models
+│   │   ├── state/                # StateNotifiers (Auth, Provider, Seeker, Admin)
+│   │   ├── router/               # GoRouter declarative navigation with shell routing
+│   │   └── screens/              # Feature-based modular UI screens
+│   ├── test/                     # Flutter widget and unit test suites
+│   └── Dockerfile                # Multi-stage release build with Nginx
+├── backend/                      # FastAPI Modular Production Backend
+│   ├── app/
+│   │   ├── core/                 # Config (Pydantic Settings), Bcrypt security, SQLAlchemy engine
+│   │   ├── models/               # Normalized PostgreSQL database ORM entities
+│   │   ├── schemas/              # Pydantic v2 validation and transfer schemas
+│   │   ├── repositories/         # Database persistence layer (Repository Pattern)
+│   │   ├── services/             # Business logic layer (Thin controllers)
+│   │   ├── matching/             # 5-Component deterministic scoring & Haversine distance engine
+│   │   ├── api/                  # Versioned REST routers (/api/v1/...)
+│   │   ├── seed_data.py          # Development seed generator (realistic Tamil Nadu MSMEs)
+│   │   └── main.py               # Production entrypoint with CORS, Request ID & Health probes
+│   ├── tests/                    # Pytest test suite (11 comprehensive integration tests)
+│   └── Dockerfile                # Production Python 3.11 image with healthcheck
+├── docs/                         # Technical Architecture & API Documentation
+│   ├── architecture.md           # System design, data flow diagrams & security architecture
+│   ├── matching-engine.md        # Mathematical scoring formula & reason synthesis
+│   ├── api.md                    # REST endpoint catalog & request/response schemas
+│   └── deployment.md             # Production hosting, Docker & CI/CD deployment guide
+├── docker-compose.yml            # Multi-container orchestration (PostgreSQL + Backend + Flutter)
+├── .env.example                  # Environment configuration template
+└── README.md
+```
 
-| Role | Name | Email | Password | Company |
-| :--- | :--- | :--- | :--- | :--- |
-| **Admin** | Pragatheswaran | `admin@machhunt.demo` | `password123` | Mach-Hunt Admin |
-| **Machine Owner** | Janika | `janika@machhunt.demo` | `password123` | Kovai Precision Works |
-| **Machine Seeker** | Karthikeyan | `karthikeyan@machhunt.demo` | `password123` | TamilTech Components |
+### Key Technologies
+* **Frontend**: Flutter 3.41, Dart 3.11, Material 3, GoRouter, Dio (HTTP/2 with JWT interceptor), StateNotifier.
+* **Backend**: Python 3.11+, FastAPI, SQLAlchemy 2.0 ORM, Pydantic v2, Bcrypt 5.0, PyJWT.
+* **Database**: PostgreSQL 16 (production) with SQLite zero-setup dev fallback (`machhunt_v2.db`).
+* **Security**: SHA-256 salted bcrypt password hashing, 60-min JWT access tokens with rotation, role-based authorization (`PROVIDER`, `SEEKER`, `ADMIN`).
 
 ---
 
-## 4. Critical Demo Flow (Evaluator Walkthrough)
+## 3. Explainable 5-Component Matching Algorithm
 
-1. **Login as Karthikeyan (Seeker)**:
-   * View active requirement: *"500 Aluminium Components, CNC Milling, Coimbatore"*.
-   * Mach-Hunt matching engine displays **Janika — Kovai Precision Works** at **95% Match** (4.2 km away).
-   * Click **"95% Match"** chip to inspect transparent score breakdown.
-   * Click **"Compare"** to view side-by-side comparison matrix against other CNC providers.
-   * Click **"Book Capacity"** → Authorize escrow payment.
-2. **Switch to Janika (Owner)**:
-   * View **"Incoming Capacity Requests"** on Owner Dashboard.
-   * Click **"Accept Request"** → Status becomes **Confirmed**.
-3. **Switch back to Karthikeyan (Seeker)**:
-   * Navigate to **Bookings** → Click **"Mark Production Complete"**.
-   * Submit a **5-Star Rating & Review**.
-4. **Switch to Pragatheswaran (Admin)**:
-   * Open **Admin Dashboard** → See real-time metrics update for total GMV, platform revenue (5%), and completed jobs.
+The Mach-Hunt matching engine computes a deterministic, explainable percentage score for every candidate machine relative to an active requirement:
+
+$$\text{Match Score} = (\text{Capability} \times 0.40) + (\text{Availability} \times 0.20) + (\text{Distance} \times 0.15) + (\text{Cost} \times 0.15) + (\text{Reliability} \times 0.10)$$
+
+```text
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                           5-COMPONENT SCORING ENGINE                           │
+├─────────────────────┬────────┬─────────────────────────────────────────────────┤
+│ Component           │ Weight │ Evaluation Logic                                │
+├─────────────────────┼────────┼─────────────────────────────────────────────────┤
+│ Capability Match    │  40%   │ Process exact match (0.50), Material supported │
+│                     │        │ (0.25), Tolerance & envelope capacity (0.25)    │
+├─────────────────────┼────────┼─────────────────────────────────────────────────┤
+│ Availability Match  │  20%   │ Server-side slot checks before delivery deadline │
+│                     │        │ (1.0 = available, 0.2 = limited, 0.0 = booked)  │
+├─────────────────────┼────────┼─────────────────────────────────────────────────┤
+│ Distance Score      │  15%   │ Haversine formula: 1.0 if ≤5km, decaying to 0.0 │
+│                     │        │ if distance exceeds max search radius           │
+├─────────────────────┼────────┼─────────────────────────────────────────────────┤
+│ Cost Alignment      │  15%   │ Hourly rate × required hours vs seeker budget   │
+│                     │        │ (1.0 = under budget, decays if over budget)     │
+├─────────────────────┼────────┼─────────────────────────────────────────────────┤
+│ MSME Reliability    │  10%   │ Historical rating (0.0 to 5.0) normalized       │
+│                     │        │ + verified business & machine badges            │
+└─────────────────────┴────────┴─────────────────────────────────────────────────┘
+```
+
+For every recommended machine, human-readable explainable reasons are generated:
+* `✓ Capability matches requirement: CNC Milling in Aluminium 6061`
+* `✓ Available capacity before target deadline (24 hrs open)`
+* `✓ Located 4.2 km away in Ganapathy industrial area (within 50 km radius)`
+* `✓ Within budget: ₹1,500/hr yields estimated ₹24,000 vs ₹25,000 budget`
+* `✓ High MSME reliability: 4.9★ rating with 42 verified jobs completed`
 
 ---
 
-## 5. Technology Stack
+## 4. End-to-End 8-State Booking Lifecycle
 
-* **Frontend**: React.js + TypeScript, Vite, Tailwind CSS, Lucide Icons, Leaflet Maps.
-* **Backend**: Python 3.10+, FastAPI, SQLAlchemy ORM, Pydantic v2, PyJWT.
-* **Database**: SQLite (`machhunt.db` default for zero-setup instant local running) & PostgreSQL supported via `DATABASE_URL`.
+Mach-Hunt enforces a strict server-side state machine with escrow simulation:
+
+```
+[PENDING] ──── Provider Declines ────► [REJECTED]
+    │
+Provider Accepts
+    ▼
+[ACCEPTED] ─── Seeker Funds Escrow ──► [CONFIRMED] (Slots Locked)
+                                            │
+                                    Provider Starts Machine
+                                            ▼
+                                      [IN_PROGRESS]
+                                            │
+                                     Production Finished
+                                            ▼
+                                       [COMPLETED] (Escrow Released)
+                                            │
+                                     Review & Rating
+                                            ▼
+                                        [REVIEWED]
+```
 
 ---
 
-## 6. How to Run Locally
+## 5. Pre-Seeded Development Accounts
+
+To facilitate instant testing, realistic industrial MSMEs based in the **Coimbatore, Tamil Nadu manufacturing cluster** are pre-seeded:
+
+| Persona | Name | Email | Password | Business Name | Machine Fleet |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Admin** | Pragatheswaran | `admin@machhunt.demo` | `password123` | Mach-Hunt Compliance Admin | Platform oversight |
+| **Provider 1** | Janika | `janika@machhunt.demo` | `password123` | Kovai Precision Works | HAAS VF-2 VMC (3-Axis) |
+| **Provider 2** | Senthil | `senthil@machhunt.demo` | `password123` | TexCity Laser & Fabrication | TRUMPF TruLaser 3030 Fiber |
+| **Provider 3** | Murugan | `murugan@machhunt.demo` | `password123` | Annur Auto Components | Mazak Quick Turn 250 Lathe |
+| **Seeker** | Karthikeyan | `karthikeyan@machhunt.demo` | `password123` | TamilTech Aerospace Subassemblies | Procurement |
+
+---
+
+## 6. Local Setup & Execution Guide
 
 ### Prerequisites
-* Python 3.10+
-* Node.js v18+ & npm
+* **Python 3.10+** (tested on Python 3.11 & Python 3.14)
+* **Flutter SDK 3.24+** (tested on Flutter 3.41 / Dart 3.11)
+* **Docker & Docker Compose** (optional for containerized deployment)
 
-### 1. Run Backend
+### 1. Backend Setup & Run
+
+```bash
+# Navigate to backend directory
+cd backend
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run seed data script (populates SQLite/PostgreSQL with MSMEs, machines, and past reviews)
+python -m app.seed_data
+
+# Launch FastAPI development server with auto-reload
+python -m uvicorn app.main:app --port 8000 --reload
+```
+
+* **Interactive API Documentation (Swagger)**: `http://localhost:8000/docs`
+* **Alternative OpenAPI Redoc**: `http://localhost:8000/redoc`
+* **System Health Liveness Probe**: `http://localhost:8000/api/v1/health`
+
+### 2. Run Backend Pytest Suite
+
 ```bash
 cd backend
-py -m pip install -r requirements.txt
-py -m app.seed_data
-py -m uvicorn app.main:app --port 8000 --reload
+python -m pytest tests/test_backend.py -v
 ```
-API Documentation will be available at: `http://localhost:8000/docs`
+*Executes 11 automated test suites covering Bcrypt hashing, JWT issuance/validation, Haversine geographic calculation, NLP requirement interpretation, machine catalog filters, 5-component matching engine, side-by-side comparison matrix, booking state machine transitions, and admin metrics.*
 
-### 2. Run Frontend
+### 3. Frontend Setup & Run
+
 ```bash
+# Navigate to frontend directory
 cd frontend
-npm install
-npm run dev
+
+# Install Flutter dependencies
+flutter pub get
+
+# Verify codebase health
+flutter analyze
+
+# Run Flutter tests
+flutter test
+
+# Run Flutter Web application
+flutter run -d chrome
 ```
-Application will be live at: `http://localhost:3000`
 
 ---
 
-## 7. Limitations & Demo Disclaimer
+## 7. Multi-Container Docker Deployment
 
-* **Fictional Demo Data**: All company names, personal names, phone numbers, and addresses are fictional representation of Tamil Nadu manufacturing clusters.
-* **Phase 2 IoT Integration**: IoT sensor monitoring (ESP32) is simulated in Phase 2 drawer modal.
+Run the entire production stack (PostgreSQL 16 + FastAPI + Flutter Web on Nginx):
+
+```bash
+# From repository root
+docker-compose up --build
+```
+
+Services exposed:
+* **Flutter Web Application**: `http://localhost:3000`
+* **FastAPI Backend Server**: `http://localhost:8000`
+* **PostgreSQL Database**: `localhost:5432`
 
 ---
 
-*Mach-Hunt — Access manufacturing capacity when you need it.*
+## 8. Complete User Journey Walkthrough
+
+1. **Sign In**: Launch Flutter app → Click quick-demo chip for **Karthikeyan (Seeker)**.
+2. **AI Requirement**: Type `"Need 500 aluminium brackets, CNC machined, delivery within 4 days near Coimbatore, tolerance 0.05mm"` → Click **Interpret**.
+3. **Verify AI Extraction**: Inspect parsed Process, Material, Quantity, and Budget → Click **Use & Create Requirement**.
+4. **Discover Matches**: The 5-component algorithm ranks **Kovai Precision Works (HAAS VF-2)** at 95% match.
+5. **Compare**: Check boxes on Kovai Precision and Annur Auto Components → Click **Compare (2)** to benchmark tolerances and hourly rates side-by-side.
+6. **Request Booking**: Click **Request Booking** → Select dates (16 hours) → Send request.
+7. **Provider Acceptance**: Sign in as **Janika (Provider)** → View **Incoming Bookings** → Click **Accept Order**.
+8. **Escrow Guarantee**: Sign back in as **Karthikeyan** → Click **Lock & Deposit Escrow** (₹24,000 + 5% platform fee).
+9. **Production & Delivery**: Janika starts machine (**In Production**) → Job completes.
+10. **Review**: Karthikeyan submits 5-star rating with quality feedback.
+11. **Admin Oversight**: Sign in as **Pragatheswaran (Admin)** → View real-time platform GMV updates, completed job counts, and verification queue.
+
+---
+
+## 9. Security & Production Standards
+
+* **No Hardcoded Credentials**: Configured via `.env` with Pydantic Settings validation.
+* **SQL Injection Prevention**: 100% parameterized queries via SQLAlchemy 2.0 ORM.
+* **Double Booking Prevention**: Checked server-side at database transaction level.
+* **Audit Trail**: Every verification and state transition logged to `audit_logs` table.
+* **CORS & Headers**: Production headers with unique `X-Request-ID` and execution timing.
+
+---
+
+## 10. License
+
+Mach-Hunt is licensed under the Apache 2.0 License.
