@@ -107,6 +107,11 @@ class MatchingEngine:
             verification_status=machine.verification_status.value if hasattr(machine.verification_status, 'value') else str(machine.verification_status),
             latitude=machine.latitude,
             longitude=machine.longitude,
+            company_id=getattr(machine, 'company_id', None),
+            company_name=machine.company.name if (hasattr(machine, 'company') and machine.company) else getattr(machine, 'company_name', None),
+            industry=machine.company.industry if (hasattr(machine, 'company') and machine.company) else getattr(machine, 'industry', None),
+            google_maps_link=getattr(machine, 'google_maps_link', None) or (machine.company.google_maps_link if (hasattr(machine, 'company') and machine.company) else None),
+            city=machine.company.city if (hasattr(machine, 'company') and machine.company) else getattr(machine, 'city', None),
         )
 
     def rank_matches(

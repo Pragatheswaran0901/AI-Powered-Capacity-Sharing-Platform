@@ -77,6 +77,11 @@ class MachineModel {
   final String locationAddress;
   final double latitude;
   final double longitude;
+  final String? companyId;
+  final String? companyName;
+  final String? industry;
+  final String? googleMapsLink;
+  final String? city;
   final List<String> photos;
   final String status;
   final String verificationStatus;
@@ -103,6 +108,11 @@ class MachineModel {
     required this.locationAddress,
     required this.latitude,
     required this.longitude,
+    this.companyId,
+    this.companyName,
+    this.industry,
+    this.googleMapsLink,
+    this.city,
     this.photos = const [],
     this.status = 'ACTIVE',
     this.verificationStatus = 'PENDING',
@@ -146,6 +156,11 @@ class MachineModel {
       locationAddress: json['location_address'] ?? '',
       latitude: (json['latitude'] as num?)?.toDouble() ?? 11.0168,
       longitude: (json['longitude'] as num?)?.toDouble() ?? 76.9558,
+      companyId: json['company_id'],
+      companyName: json['company_name'],
+      industry: json['industry'],
+      googleMapsLink: json['google_maps_link'],
+      city: json['city'],
       photos: photosList,
       status: json['status'] ?? 'ACTIVE',
       verificationStatus: json['verification_status'] ?? 'PENDING',

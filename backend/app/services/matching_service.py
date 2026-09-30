@@ -28,8 +28,11 @@ class MatchingService:
         if not requirement:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Requirement not found")
 
-        # Gather active candidate machines (filtered by location if specified)
-        candidates = self.machine_repo.search_active_machines(location=location)
+        # Gather active candidate machines (excluding seeker's own machines)
+        candidates = self.machine_repo.search_active_machines(
+            location=location,
+            exclude_user_id=requirement.seeker_id,
+        )
         if not candidates:
             return []
 

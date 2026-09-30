@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:machhunt/core/constants/app_colors.dart';
 import 'package:machhunt/core/utils/formatters.dart';
 import 'package:machhunt/core/design_system/mach_button.dart';
@@ -24,6 +25,9 @@ class MachMachineCard extends StatelessWidget {
   final double? rating;
   final int? utilizationPercentage;
   final List<MachineCapabilityModel> capabilities;
+  final String? companyName;
+  final String? industry;
+  final String? googleMapsLink;
   final VoidCallback? onManageAvailability;
   final VoidCallback? onEdit;
   final VoidCallback? onViewDetails;
@@ -44,6 +48,9 @@ class MachMachineCard extends StatelessWidget {
     this.rating,
     this.utilizationPercentage,
     this.capabilities = const [],
+    this.companyName,
+    this.industry,
+    this.googleMapsLink,
     this.onManageAvailability,
     this.onEdit,
     this.onViewDetails,
@@ -72,6 +79,9 @@ class MachMachineCard extends StatelessWidget {
       rating: machine.averageRating,
       utilizationPercentage: machine.utilizationPercentage,
       capabilities: machine.capabilities,
+      companyName: machine.companyName,
+      industry: machine.industry,
+      googleMapsLink: machine.googleMapsLink,
       onEdit: onEdit,
       onManageAvailability: onManageAvailability,
       onViewDetails: onViewDetails,
@@ -300,7 +310,34 @@ class MachMachineCard extends StatelessWidget {
                     ),
                   ),
                 ],
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
+
+                // 2.5 REAL-WORLD INDUSTRIAL FACILITY (DEMO CAPACITY)
+                if (companyName != null && companyName!.isNotEmpty) ...[
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.business_rounded,
+                        size: 14,
+                        color: AppColors.machBlue,
+                      ),
+                      const SizedBox(width: 5),
+                      Expanded(
+                        child: Text(
+                          '$companyName • ${industry ?? category}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryNavy,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                ],
 
                 // 3. LOCATION + RATING ROW
                 if (hasLocation || hasRating) ...[
@@ -509,10 +546,27 @@ class MachMachineCard extends StatelessWidget {
                       ],
                     ),
 
-                    // Right: Edit + Availability Action Buttons
+                    // Right: Edit + Availability + Google Maps Action Buttons
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        if (googleMapsLink != null &&
+                            googleMapsLink!.isNotEmpty) ...[
+                          _CardActionIconButton(
+                            tooltip: 'Open in Google Maps',
+                            icon: Icons.map_outlined,
+                            onPressed: () async {
+                              final uri = Uri.parse(googleMapsLink!);
+                              if (await canLaunchUrl(uri)) {
+                                await launchUrl(
+                                  uri,
+                                  mode: LaunchMode.externalApplication,
+                                );
+                              }
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                        ],
                         if (onEdit != null)
                           _CardActionIconButton(
                             tooltip: 'Edit machine',
@@ -611,6 +665,9 @@ class MachMatchCard extends StatefulWidget {
   final String status;
   final double? rating;
   final int? completedJobs;
+  final String? companyName;
+  final String? industry;
+  final String? googleMapsLink;
   final bool isSelectedForComparison;
   final ValueChanged<bool?>? onToggleComparison;
   final VoidCallback? onViewDetails;
@@ -640,6 +697,9 @@ class MachMatchCard extends StatefulWidget {
     this.status = 'ACTIVE',
     this.rating,
     this.completedJobs,
+    this.companyName,
+    this.industry,
+    this.googleMapsLink,
     this.isSelectedForComparison = false,
     this.onToggleComparison,
     this.onViewDetails,
@@ -678,6 +738,9 @@ class MachMatchCard extends StatefulWidget {
       status: match.status,
       rating: match.averageRating,
       completedJobs: match.completedJobs,
+      companyName: match.companyName,
+      industry: match.industry,
+      googleMapsLink: match.googleMapsLink,
       isSelectedForComparison: isSelectedForComparison,
       onToggleComparison: onToggleComparison,
       onViewDetails: onViewDetails,
@@ -1099,28 +1162,63 @@ class _MachMatchCardState extends State<MachMatchCard> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.domain_rounded,
-                            size: 14,
-                            color: AppColors.machBlue,
-                          ),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              widget.businessName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.inter(
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.secondarySlate,
+                      if (widget.companyName != null &&
+                          widget.companyName!.isNotEmpty) ...[
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.business_rounded,
+                              size: 14,
+                              color: AppColors.machBlue,
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                '${widget.companyName!} (${widget.industry ?? "Industrial Facility"})',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.primaryNavy,
+                                ),
                               ),
                             ),
+                          ],
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          'Marketplace Provider: ${widget.businessName}',
+                          style: GoogleFonts.inter(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.secondarySlate,
                           ),
-                        ],
-                      ),
+                        ),
+                      ] else ...[
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.domain_rounded,
+                              size: 14,
+                              color: AppColors.machBlue,
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                widget.businessName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.inter(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.secondarySlate,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                       if (hasLocation || widget.distanceKm > 0) ...[
                         const SizedBox(height: 4),
                         Row(
@@ -1441,6 +1539,42 @@ class _MachMatchCardState extends State<MachMatchCard> {
                       const SizedBox(height: 10),
                       Row(
                         children: [
+                          if (widget.googleMapsLink != null &&
+                              widget.googleMapsLink!.isNotEmpty) ...[
+                            Tooltip(
+                              message: 'Open in Google Maps',
+                              child: InkWell(
+                                onTap: () async {
+                                  final uri = Uri.parse(widget.googleMapsLink!);
+                                  if (await canLaunchUrl(uri)) {
+                                    await launchUrl(
+                                      uri,
+                                      mode: LaunchMode.externalApplication,
+                                    );
+                                  }
+                                },
+                                borderRadius: BorderRadius.circular(8),
+                                child: Container(
+                                  width: 38,
+                                  height: 38,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: AppColors.lightBorder,
+                                      width: 1.2,
+                                    ),
+                                  ),
+                                  child: const Icon(
+                                    Icons.map_outlined,
+                                    size: 16,
+                                    color: AppColors.machBlue,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                          ],
                           if (widget.onToggleComparison != null) ...[
                             Expanded(
                               flex: 4,

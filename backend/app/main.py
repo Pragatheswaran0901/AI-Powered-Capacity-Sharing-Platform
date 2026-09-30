@@ -12,18 +12,10 @@ from app import models  # Ensures all models are registered
 Base.metadata.create_all(bind=engine)
 run_migrations(engine)
 
-app = FastAPI(
-    title=settings.PROJECT_NAME,
-    version=settings.VERSION,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json",
-    docs_url="/docs",
-    redoc_url="/redoc",
-    description="Mach-Hunt: AI-powered manufacturing capacity-sharing platform for MSMEs.",
-)
+from contextlib import asynccontextmanager
 
-
-@app.on_event("startup")
-def startup_diagnostics():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     is_smtp_host = bool(settings.SMTP_HOST)
     is_user_set = bool(settings.SMTP_USER)
     is_pw_set = bool(settings.SMTP_PASSWORD and len(settings.SMTP_PASSWORD) > 0)
@@ -42,6 +34,17 @@ def startup_diagnostics():
     if settings.AUTH_MODE == "otp" and not is_smtp_ready and settings.EMAIL_PROVIDER == "smtp":
         print("[CONFIGURATION ERROR] OTP mode active with SMTP provider, but SMTP_PASSWORD is empty.", flush=True)
         print("                      Please set your 16-character Google App Password in .env as SMTP_PASSWORD=...", flush=True)
+    yield
+
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    version=settings.VERSION,
+    openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    description="Mach-Hunt: AI-powered manufacturing capacity-sharing platform for MSMEs.",
+    lifespan=lifespan,
+)
 
 # CORS Middleware
 app.add_middleware(

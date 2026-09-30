@@ -3,7 +3,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.api.deps import get_current_user, require_role
+from app.api.deps import get_current_user, get_current_user_optional, require_role
 from app.models.user import User, UserRole
 from app.schemas.machine import (
     MachineCreate, MachineUpdate, MachineOut, MachineDetail,
@@ -31,19 +31,28 @@ def search_machines(
     category: Optional[str] = Query(None, description="e.g. CNC Milling, Laser"),
     process: Optional[str] = Query(None, description="e.g. Turning, Milling"),
     material: Optional[str] = Query(None, description="e.g. Aluminium, Steel"),
+    industry: Optional[str] = Query(None, description="Filter machines by industry"),
     max_rate: Optional[float] = Query(None, description="Maximum hourly rate in INR"),
     verified_only: bool = Query(False, description="Filter only verified machines"),
     location: Optional[str] = Query(None, description="Filter machines by location e.g. Coimbatore, Tiruppur"),
+    exclude_user_id: Optional[str] = Query(None, description="Exclude machines belonging to this user"),
+    current_user: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db),
 ):
     """Search and filter machines across the platform."""
+    eff_exclude_user_id = exclude_user_id
+    if not eff_exclude_user_id and current_user:
+        eff_exclude_user_id = current_user.id
+
     return MachineService(db).search_machines(
         category=category,
         process=process,
         material=material,
+        industry=industry,
         max_rate=max_rate,
         verified_only=verified_only,
         location=location,
+        exclude_user_id=eff_exclude_user_id,
     )
 
 

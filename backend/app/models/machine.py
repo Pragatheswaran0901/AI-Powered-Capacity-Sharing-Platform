@@ -40,6 +40,8 @@ class Machine(Base):
     location_address = Column(Text, nullable=False)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
+    company_id = Column(String(50), ForeignKey("companies.id", ondelete="SET NULL"), nullable=True, index=True)
+    google_maps_link = Column(String(500), nullable=True)
     photos = Column(Text, nullable=True)  # JSON-encoded list of image URLs
     status = Column(SQLEnum(MachineStatus), default=MachineStatus.ACTIVE, nullable=False)
     verification_status = Column(SQLEnum(VerificationStatus), default=VerificationStatus.PENDING, nullable=False)
@@ -48,6 +50,7 @@ class Machine(Base):
 
     # Relationships
     business = relationship("Business", back_populates="machines")
+    company = relationship("Company", back_populates="machines")
     capabilities = relationship("MachineCapability", back_populates="machine", cascade="all, delete-orphan")
     availabilities = relationship("MachineAvailability", back_populates="machine", cascade="all, delete-orphan")
     bookings = relationship("Booking", back_populates="machine")

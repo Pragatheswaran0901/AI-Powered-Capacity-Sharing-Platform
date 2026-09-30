@@ -48,83 +48,6 @@ class _BookingsListScreenState extends State<BookingsListScreen>
     if (mounted) setState(() => _isLoading = false);
   }
 
-  List<BookingModel> _getFallbackDemoBookings(bool isProvider) {
-    return [
-      BookingModel(
-        id: 'ord-9021',
-        requirementId: 'req-1',
-        requirementTitle: '150 Aluminium 6061 Enclosures (VMC 4-Axis)',
-        machineId: 'm-1',
-        machineName: 'HAAS VF-2SS Super-Speed 4-Axis VMC',
-        providerId: 'p-1',
-        providerName: 'Kovai Precision Works',
-        businessName: 'Kovai Precision Works',
-        seekerId: 's-1',
-        seekerName: 'AeroTech Dynamics Ltd',
-        startDate: '2026-10-02',
-        endDate: '2026-10-06',
-        totalHours: 24.0,
-        unitPrice: 950.0,
-        totalAmount: 22800.0,
-        commissionAmount: 1140.0,
-        providerPayout: 21660.0,
-        status: 'IN_PROGRESS',
-        escrowStatus: 'HELD_IN_ESCROW',
-        notes:
-            'Tooling setup complete. First article inspection (FAI) report verified against CMM ±0.005mm.',
-        createdAt: '2026-09-24',
-      ),
-      BookingModel(
-        id: 'ord-8842',
-        requirementId: 'req-2',
-        requirementTitle: '500 Stainless Steel Flanges (CNC Turning)',
-        machineId: 'm-2',
-        machineName: 'Mazak Quick Turn 250MSY Turning Center',
-        providerId: 'p-1',
-        providerName: 'Coimbatore CNC AutoTech',
-        businessName: 'Coimbatore CNC AutoTech',
-        seekerId: 's-1',
-        seekerName: 'AeroTech Dynamics Ltd',
-        startDate: '2026-10-08',
-        endDate: '2026-10-12',
-        totalHours: 35.0,
-        unitPrice: 850.0,
-        totalAmount: 29750.0,
-        commissionAmount: 1487.5,
-        providerPayout: 28262.5,
-        status: isProvider ? 'PENDING' : 'ACCEPTED',
-        escrowStatus: 'PENDING_DEPOSIT',
-        notes:
-            'SS316 material supplied by seeker. Awaiting final tooling schedule verification.',
-        createdAt: '2026-09-25',
-      ),
-      BookingModel(
-        id: 'ord-7612',
-        requirementId: 'req-3',
-        requirementTitle: '120 Mild Steel Machine Guards (6kW Laser Cut)',
-        machineId: 'm-3',
-        machineName: 'Bystronic BySprint 6kW Fiber Laser',
-        providerId: 'p-1',
-        providerName: 'Apex Laser Tech',
-        businessName: 'Apex Laser Tech',
-        seekerId: 's-1',
-        seekerName: 'AeroTech Dynamics Ltd',
-        startDate: '2026-09-18',
-        endDate: '2026-09-20',
-        totalHours: 16.0,
-        unitPrice: 1200.0,
-        totalAmount: 19200.0,
-        commissionAmount: 960.0,
-        providerPayout: 18240.0,
-        status: 'COMPLETED',
-        escrowStatus: 'RELEASED_TO_PROVIDER',
-        notes:
-            'Nitrogen clean cutting delivered. Batch inspected and signed off by quality lead.',
-        createdAt: '2026-09-17',
-      ),
-    ];
-  }
-
   void _showReviewDialog(BookingModel booking) {
     int rating = 5;
     final reviewController = TextEditingController(
@@ -483,9 +406,7 @@ class _BookingsListScreenState extends State<BookingsListScreen>
     final List<BookingModel> rawBookings = isProvider
         ? providerState.incomingRequests
         : seekerState.myBookings;
-    final List<BookingModel> allBookings = rawBookings.isNotEmpty
-        ? rawBookings
-        : _getFallbackDemoBookings(isProvider);
+    final List<BookingModel> allBookings = rawBookings;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),

@@ -6,6 +6,8 @@ import 'package:machhunt/core/network/api_exception.dart';
 import 'package:machhunt/core/storage/token_storage.dart';
 import 'package:machhunt/models/user_model.dart';
 import 'package:machhunt/models/business_model.dart';
+import 'package:machhunt/state/seeker_state.dart';
+import 'package:machhunt/state/provider_state.dart';
 
 class AuthState extends ChangeNotifier {
   @override
@@ -257,6 +259,8 @@ class AuthState extends ChangeNotifier {
     notifyListeners();
 
     try {
+      seekerState.clear();
+      providerState.clear();
       final res = await apiClient.post(
         ApiEndpoints.login,
         data: {'email': email.trim().toLowerCase(), 'password': password},
@@ -354,6 +358,8 @@ class AuthState extends ChangeNotifier {
     _currentUser = null;
     _currentBusiness = null;
     _pendingEmail = null;
+    seekerState.clear();
+    providerState.clear();
     notifyListeners();
   }
 

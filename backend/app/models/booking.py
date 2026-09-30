@@ -47,3 +47,26 @@ class Booking(Base):
     provider = relationship("User", back_populates="bookings_as_provider", foreign_keys=[provider_id])
     payment = relationship("Payment", back_populates="booking", uselist=False, cascade="all, delete-orphan")
     reviews = relationship("Review", back_populates="booking", cascade="all, delete-orphan")
+
+    @property
+    def requirement_title(self):
+        return self.requirement.title if self.requirement else None
+
+    @property
+    def machine_name(self):
+        return self.machine.name if self.machine else None
+
+    @property
+    def seeker_name(self):
+        return self.seeker.full_name if self.seeker else None
+
+    @property
+    def provider_name(self):
+        return self.provider.full_name if self.provider else None
+
+    @property
+    def business_name(self):
+        if self.machine and self.machine.business:
+            return self.machine.business.name
+        return None
+

@@ -30,141 +30,13 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   }
 
   List<MachineModel> _getEffectiveMachines(List<MachineModel> apiMachines) {
-    if (apiMachines.isNotEmpty) {
-      return apiMachines;
-    }
-
-    // High fidelity realistic demo machines matching seeded MSMEs
-    return [
-      MachineModel(
-        id: 'mach-1',
-        businessId: 'biz-1',
-        name: 'HAAS VF-4SS Super-Speed 4-Axis VMC',
-        category: 'CNC Milling',
-        manufacturer: 'HAAS Automation',
-        model: 'VF-4SS',
-        year: 2023,
-        dimensionsCapacity: '1270 x 508 x 635 mm',
-        precisionTolerance: '±0.005 mm',
-        hourlyPrice: 1200.0,
-        operatorAvailable: true,
-        locationAddress: 'Plot 14, SIDCO Kurichi, Coimbatore',
-        latitude: 10.9412,
-        longitude: 76.9723,
-        status: 'AVAILABLE',
-        verificationStatus: 'VERIFIED',
-      ),
-      MachineModel(
-        id: 'mach-2',
-        businessId: 'biz-1',
-        name: 'BFW Chakra BMV 60+ Heavy Duty VMC',
-        category: 'CNC Milling',
-        manufacturer: 'Bharat Fritz Werner (BFW)',
-        model: 'Chakra BMV 60+',
-        year: 2022,
-        dimensionsCapacity: '1050 x 610 x 610 mm',
-        precisionTolerance: '±0.010 mm',
-        hourlyPrice: 850.0,
-        operatorAvailable: true,
-        locationAddress: 'Plot 14, SIDCO Kurichi, Coimbatore',
-        latitude: 10.9412,
-        longitude: 76.9723,
-        status: 'BUSY',
-        verificationStatus: 'VERIFIED',
-      ),
-      MachineModel(
-        id: 'mach-3',
-        businessId: 'biz-1',
-        name: 'Trumpf TruLaser 3030 4kW Fiber Laser',
-        category: 'Laser Cutting',
-        manufacturer: 'Trumpf',
-        model: 'TruLaser 3030',
-        year: 2023,
-        dimensionsCapacity: '3000 x 1500 mm',
-        precisionTolerance: '±0.050 mm',
-        hourlyPrice: 1500.0,
-        operatorAvailable: true,
-        locationAddress: 'Plot 14, SIDCO Kurichi, Coimbatore',
-        latitude: 10.9412,
-        longitude: 76.9723,
-        status: 'AVAILABLE',
-        verificationStatus: 'VERIFIED',
-      ),
-      MachineModel(
-        id: 'mach-4',
-        businessId: 'biz-1',
-        name: 'Mazak Quick Turn 250MSY CNC Turning',
-        category: 'CNC Turning',
-        manufacturer: 'Mazak',
-        model: 'QT-250MSY',
-        year: 2022,
-        dimensionsCapacity: 'Ø380 x 500 mm',
-        precisionTolerance: '±0.008 mm',
-        hourlyPrice: 950.0,
-        operatorAvailable: true,
-        locationAddress: 'Plot 14, SIDCO Kurichi, Coimbatore',
-        latitude: 10.9412,
-        longitude: 76.9723,
-        status: 'AVAILABLE',
-        verificationStatus: 'VERIFIED',
-      ),
-    ];
+    return apiMachines;
   }
 
   List<BookingModel> _getEffectiveRequests(List<BookingModel> apiRequests) {
-    final pending = apiRequests
+    return apiRequests
         .where((b) => b.status == 'PENDING' || b.status == 'REQUESTED')
         .toList();
-    if (pending.isNotEmpty) return pending;
-
-    // Realistic demo requests matching hackathon demo
-    return [
-      BookingModel(
-        id: 'req-order-1',
-        requirementId: 'req-1',
-        requirementTitle: '150 Aluminium 6061 Enclosures',
-        machineId: 'mach-1',
-        machineName: 'HAAS VF-4SS 4-Axis VMC',
-        seekerId: 'seeker-1',
-        seekerName: 'TamilTech Components Pvt Ltd',
-        providerId: 'provider-1',
-        providerName: 'Janika',
-        businessName: 'Kovai Precision Works',
-        status: 'PENDING',
-        startDate: '2026-09-28',
-        endDate: '2026-10-02',
-        totalHours: 16.0,
-        unitPrice: 1200.0,
-        totalAmount: 19200.0,
-        commissionAmount: 960.0,
-        providerPayout: 18240.0,
-        notes:
-            'Aluminium 6061 enclosures, CMM inspection certificate requested.',
-        createdAt: '2026-09-24',
-      ),
-      BookingModel(
-        id: 'req-order-2',
-        requirementId: 'req-2',
-        requirementTitle: '50 Mild Steel Enclosures 3mm',
-        machineId: 'mach-3',
-        machineName: 'Trumpf TruLaser 3030 Fiber Laser',
-        seekerId: 'seeker-2',
-        seekerName: 'Apex Sub-assemblies',
-        providerId: 'provider-1',
-        providerName: 'Janika',
-        businessName: 'Kovai Precision Works',
-        status: 'PENDING',
-        startDate: '2026-09-29',
-        endDate: '2026-10-01',
-        totalHours: 10.0,
-        unitPrice: 1500.0,
-        totalAmount: 15000.0,
-        commissionAmount: 750.0,
-        providerPayout: 14250.0,
-        notes: 'Laser cut & edge deburring.',
-        createdAt: '2026-09-24',
-      ),
-    ];
   }
 
   @override
@@ -175,7 +47,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
         biz?.name ??
         (user?.fullName.isNotEmpty ?? false
             ? user!.fullName
-            : "ABC Manufacturing");
+            : "MSME Provider");
 
     return ListenableBuilder(
       listenable: providerState,
@@ -190,10 +62,9 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
         final ongoingJobs = rawRequests
             .where((b) => b.status == 'IN_PROGRESS' || b.status == 'CONFIRMED')
             .length;
-        final displayJobs = ongoingJobs > 0 ? ongoingJobs : 3;
-        final totalEarned = providerState.totalEarnings > 0
-            ? Formatters.currency(providerState.totalEarnings)
-            : '₹12.5L';
+        final displayJobs = ongoingJobs;
+        final totalEarned = Formatters.currency(providerState.totalEarnings);
+
 
         return RefreshIndicator(
           onRefresh: _loadData,
@@ -408,17 +279,43 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Your Machinery Fleet',
-                          style: GoogleFonts.inter(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.primaryNavy,
-                          ),
+                        Row(
+                          children: [
+                            Text(
+                              'Demo Marketplace Capacity Fleet',
+                              style: GoogleFonts.inter(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.primaryNavy,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEFF6FF),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: const Color(0xFFBFDBFE),
+                                ),
+                              ),
+                              child: Text(
+                                '$totalMachines Listings',
+                                style: GoogleFonts.inter(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.machBlue,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'Active manufacturing equipment available for capacity sharing.',
+                          'Assigned demo manufacturing capacity listings linked to real Tamil Nadu industrial facilities.',
                           style: GoogleFonts.inter(
                             fontSize: 12.5,
                             fontWeight: FontWeight.w400,
@@ -436,42 +333,38 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-
                 // Machines Grid
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final columns = constraints.maxWidth > 900 ? 2 : 1;
-                    return Wrap(
-                      spacing: 16,
-                      runSpacing: 16,
-                      children: [
-                        for (var m in machines)
-                          SizedBox(
-                            width:
-                                (constraints.maxWidth - (columns - 1) * 16) /
-                                columns,
-                            child: MachMachineCard(
-                              name: m.name,
-                              category: m.category,
-                              manufacturer: m.manufacturer,
-                              model: m.model,
-                              hourlyPrice: m.hourlyPrice,
-                              location: m.locationAddress,
-                              dimensions: m.dimensionsCapacity,
-                              tolerance: m.precisionTolerance,
-                              status: m.status,
-                              isVerified: m.verificationStatus == 'VERIFIED',
-                              onManageAvailability: () => context.go(
-                                '/machine-availability/${m.id}?name=${Uri.encodeComponent(m.name)}',
-                              ),
-                              onViewDetails: () => context.go(
-                                '/machine-availability/${m.id}?name=${Uri.encodeComponent(m.name)}',
+                if (machines.isEmpty)
+                  const MachEmptyState(
+                    title: 'No machinery listed',
+                    message:
+                        'Add your first manufacturing machine to start publishing capacity to the marketplace.',
+                  )
+                else
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final columns = constraints.maxWidth > 900 ? 2 : 1;
+                      return Wrap(
+                        spacing: 16,
+                        runSpacing: 16,
+                        children: [
+                          for (var m in machines)
+                            SizedBox(
+                              width:
+                                  (constraints.maxWidth - (columns - 1) * 16) /
+                                  columns,
+                              child: MachMachineCard.fromModel(
+                                machine: m,
+                                onManageAvailability: () => context.go(
+                                  '/machine-availability/${m.id}?name=${Uri.encodeComponent(m.name)}',
+                                ),
+                                onViewDetails: () => context.go(
+                                  '/machine-availability/${m.id}?name=${Uri.encodeComponent(m.name)}',
+                                ),
                               ),
                             ),
-                          ),
-                      ],
-                    );
+                        ],
+                      );
                   },
                 ),
               ],

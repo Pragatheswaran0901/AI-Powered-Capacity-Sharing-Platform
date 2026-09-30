@@ -39,6 +39,11 @@ class MatchResultOut(BaseModel):
     verification_status: str = "VERIFIED"
     latitude: Optional[float] = None
     longitude: Optional[float] = None
+    company_id: Optional[str] = None
+    company_name: Optional[str] = None
+    industry: Optional[str] = None
+    google_maps_link: Optional[str] = None
+    city: Optional[str] = None
 
 
 class CompareRequest(BaseModel):

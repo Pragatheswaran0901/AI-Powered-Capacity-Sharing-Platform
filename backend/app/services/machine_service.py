@@ -30,6 +30,21 @@ class MachineService:
             .count()
         )
         m.completed_jobs = completed
+
+        # Attach real company location metadata if available
+        if hasattr(m, 'company') and m.company:
+            m.company_id = m.company.id
+            m.company_name = m.company.name
+            m.industry = m.company.industry
+            m.google_maps_link = m.google_maps_link or m.company.google_maps_link
+            m.city = m.company.city
+        else:
+            m.company_id = getattr(m, 'company_id', None)
+            m.company_name = getattr(m, 'company_name', None)
+            m.industry = getattr(m, 'industry', None)
+            m.google_maps_link = getattr(m, 'google_maps_link', None)
+            m.city = getattr(m, 'city', None)
+
         return m
 
     def create_machine(self, user_id: str, machine_in: MachineCreate) -> Machine:
@@ -40,6 +55,7 @@ class MachineService:
                 detail="You must create a business profile before listing manufacturing machinery.",
             )
 
+        biz_verified = (biz.verification_status == VerificationStatus.VERIFIED)
         new_machine = Machine(
             business_id=biz.id,
             name=machine_in.name,
@@ -59,7 +75,7 @@ class MachineService:
             longitude=machine_in.longitude,
             photos=json.dumps(machine_in.photos) if machine_in.photos else None,
             status=MachineStatus.ACTIVE,
-            verification_status=VerificationStatus.PENDING,
+            verification_status=VerificationStatus.VERIFIED if biz_verified else VerificationStatus.PENDING,
         )
         saved = self.machine_repo.create(new_machine)
 
@@ -133,16 +149,20 @@ class MachineService:
         category: Optional[str] = None,
         process: Optional[str] = None,
         material: Optional[str] = None,
+        industry: Optional[str] = None,
         max_rate: Optional[float] = None,
         verified_only: bool = False,
         location: Optional[str] = None,
+        exclude_user_id: Optional[str] = None,
     ) -> List[Machine]:
         machines = self.machine_repo.search_active_machines(
             category=category,
             process=process,
             material=material,
+            industry=industry,
             max_rate=max_rate,
             verified_only=verified_only,
             location=location,
+            exclude_user_id=exclude_user_id,
         )
         return [self._enrich_machine(m) for m in machines]

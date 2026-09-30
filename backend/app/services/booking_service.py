@@ -13,6 +13,7 @@ from app.repositories.requirement_repo import RequirementRepository
 from app.repositories.payment_repo import PaymentRepository
 from app.repositories.notification_repo import NotificationRepository
 from app.models.notification import Notification
+from app.models.user import User
 
 
 class BookingService:
@@ -26,6 +27,21 @@ class BookingService:
 
     def create_booking_request(self, seeker_id: str, booking_in: BookingCreate) -> Booking:
         req = self.req_repo.get(booking_in.requirement_id)
+        machine = self.machine_repo.get_with_details(booking_in.machine_id)
+        user = self.db.query(User).filter(User.id == seeker_id).first()
+        machine_provider_id = machine.business.user_id if machine and machine.business else None
+
+        print("\n" + "="*50)
+        print("BOOKING DEBUG")
+        print(f"current_user_id = {seeker_id}")
+        print(f"current_user_email = {user.email if user else 'Unknown'}")
+        print(f"current_user_role = {user.role if user else 'Unknown'}")
+        print(f"requirement_id = {booking_in.requirement_id}")
+        print(f"requirement_seeker_id = {req.seeker_id if req else None}")
+        print(f"machine_id = {booking_in.machine_id}")
+        print(f"machine_provider_id = {machine_provider_id}")
+        print("="*50 + "\n", flush=True)
+
         if not req:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Requirement not found")
         if req.seeker_id != seeker_id:

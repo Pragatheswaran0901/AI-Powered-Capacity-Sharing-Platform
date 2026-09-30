@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -102,8 +103,63 @@ void main() {
       );
 
       // Verify bounded rendering and loading indicator/text
-      expect(find.text('Loading capacity in Coimbatore...'), findsOneWidget);
+      expect(find.text('Updating Geospatial Capacity...'), findsOneWidget);
       expect(find.text('Capacity in Coimbatore'), findsOneWidget);
+    });
+
+    testWidgets('MachHuntMap renders graceful Windows desktop fallback without crashing and never instantiates GoogleMap', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.windows;
+      try {
+        const marker = MachMapMarker(
+          id: 'mach-1',
+          title: 'CNC Vertical Machining Center',
+          subtitle: 'Kovai Precision Works',
+          category: 'CNC Milling',
+          hourlyPrice: 1500.0,
+          latitude: 11.0168,
+          longitude: 76.9558,
+          matchPercentage: 92,
+        );
+
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: SizedBox(
+                height: 500,
+                child: MachHuntMap(
+                  initialCenter: LatLng(11.0168, 76.9558),
+                  markers: [marker],
+                  locationName: 'Coimbatore',
+                ),
+              ),
+            ),
+          ),
+        );
+
+        // 1. Verify GoogleMap is NEVER instantiated on Windows
+        expect(find.byType(GoogleMap), findsNothing);
+
+        // 2. Verify WindowsMapFallback is instantiated instead
+        expect(find.byType(WindowsMapFallback), findsOneWidget);
+
+        // 3. Verify user requested texts on Windows fallback
+        expect(find.text('Manufacturing Capacity'), findsOneWidget);
+        expect(
+          find.text('Interactive map is available in\nChrome, Android and iOS.'),
+          findsOneWidget,
+        );
+        expect(find.text('1 Capacity Units'), findsOneWidget);
+        expect(find.text('View Capacity List'), findsOneWidget);
+        expect(find.text('Open in Google Maps'), findsWidgets);
+        expect(find.text('Available Capacity in Coimbatore'), findsOneWidget);
+        expect(find.textContaining('Capacity/Process: CNC Vertical Machining Center'), findsOneWidget);
+        expect(find.text('₹1500/hr'), findsOneWidget);
+
+        // 4. Verify technical error is NOT displayed to the user
+        expect(find.textContaining('TargetPlatform windows is not yet supported'), findsNothing);
+      } finally {
+        debugDefaultTargetPlatformOverride = null;
+      }
     });
   });
 }

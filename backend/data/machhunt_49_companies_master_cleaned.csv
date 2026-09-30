@@ -1,0 +1,50 @@
+company_id,company_name,city,state,address,latitude,longitude,industry,google_maps_link
+TPR001,Network Clothing Company Pvt Ltd,Tiruppur,Tamil Nadu,"NCC House, 2/641, Mangalam Rd, Andipalayam, Tamil Nadu 641687",11.0995423,77.3185847,Textile / Garment,https://maps.app.goo.gl/2HujaSvo7rPRGuRN6
+TPR002,Knit Gallery,Tiruppur,Tamil Nadu,"LRG Layout, Iduvampalayam, Andipalayam, Tamil Nadu 641687",11.0847677,77.3240681,Textile / Garment,https://maps.app.goo.gl/zNB9q9iEWxEZ5TmW6
+TPR003,MICRO COLOUR MAKERS,Tiruppur,Tamil Nadu,"LRG Layout, Iduvampalayam, Murugampalayam, Andipalayam, Tamil Nadu 641687",11.080786,77.3268244,Textile / Garment,https://maps.app.goo.gl/6Vy8F8Fu5TgfUF3YA
+TPR004,Edison Clothing Inc Industries,Tiruppur,Tamil Nadu,"Palladam Road, 351, Nochipalayam - Allalapuram Rd, Pothiakattu Thottam, Nochipalayam, Veerapandi, Karaiputhur, Tamil Nadu 641605",11.0529275,77.3452671,Textile / Garment,https://maps.app.goo.gl/yufZkRJjuTusL6fX6
+TPR005,Jupiter Knitting Company,Tiruppur,Tamil Nadu,"1 J-33, Jupiter Thottam Road, Thaneerpanthal, Anupparpalayam Pudur, Tiruppur, Tamil Nadu 641652",11.1557017,77.3132088,Textile / Garment,https://maps.app.goo.gl/nf5ueFrXGaeDyU837
+TPR006,Kaiser Knitting Company,Tiruppur,Tamil Nadu,"KVR Nagar Main Rd, Karuvampalayam, Tiruppur, Tamil Nadu 641604",11.0936504,77.3368299,Textile / Garment,https://maps.app.goo.gl/3UwabdpcaRkph2rz6
+TPR007,Surpass Exports,Tiruppur,Tamil Nadu,"2/31, Arisikara Thottam, Mahaliamman Kovil back side, Post, Veerapandi, Tiruppur, Tamil Nadu 641605",11.061915,77.3465774,Textile / Garment,https://maps.app.goo.gl/Sq4az5eTppV2sL369
+TPR008,Lotus Knits,Tiruppur,Tamil Nadu,"SF No. 371/4, Nochipalayam Rd, Veerapandi, Tiruppur, Tamil Nadu 641605",11.0604649,77.3450945,Textile / Garment,https://maps.app.goo.gl/ukCqQ7wEbupmmf7V7
+CBE001,SREE SARO ENGINEERING - PRECISION COMPONENTS,Coimbatore,Tamil Nadu,"61, Athipalayam Road, Chinnavedampatti, Coimbatore, Tamil Nadu 641049, India",11.0546883,76.9839663,Precision Engineering / Components,https://maps.app.goo.gl/azF24UsWfwBWaZZs9
+CBE002,Accucut Lasers Private Limited,Coimbatore,Tamil Nadu,"34G3+82Q, 1/562-2, Mudalipalayam, PO, Arasur, Coimbatore, Tamil Nadu 641407",11.0758125,77.1025625,Laser Cutting / Fabrication,https://maps.app.goo.gl/UCfZBHEJGZRcX2ty9
+CBE003,M.R.FABRICATORS,Coimbatore,Tamil Nadu,"Mollai Thottam, Sathy Rd, Ganapathy Housing Unit, Coimbatore, Tamil Nadu 641006",11.042562,76.9843059,Fabrication,https://maps.app.goo.gl/K8vSYqeCkx86RLnJ6
+CBE004,Flowline Pumps and Engineering,Coimbatore,Tamil Nadu,"Thulukan Thottam, Urumandampalayam, Coimbatore, Tamil Nadu 641049",11.0569736,76.9636434,Pumps / Engineering,https://maps.app.goo.gl/iui2CVabZoca9Wux5
+CBE005,Sree Ayyappa Engineering Works,Coimbatore,Tamil Nadu,"25-A, MKP Road, Ganapathy, Post Box No-2081, MKP Road, Tamil Nadu 641006",11.0438003,76.976636,Engineering Works,https://maps.app.goo.gl/6giYp47rCWUzZTCU7
+CBE006,Marzoli Textile Machinery Manufacturers Pvt Ltd,Coimbatore,Tamil Nadu,"Door No. SF 143/1, 144/1, 146, SNMV College Road, Malumichampatti, Tamil Nadu 641050",10.9213306,77.005275,Textile Machinery,https://maps.app.goo.gl/uDxzfLUVvQhC4fGi8
+CBE007,Vishal Precision Products Pvt. Ltd.,Coimbatore,Tamil Nadu,"Glory Manor, 113-A, Kaveri Nagar, Villankurichi Rd, Peelamedu, Sri Lakshmi Nagar, Tamil Nadu 641004",11.0328139,77.015283,Precision Products,https://maps.app.goo.gl/AiwNLu5VmXs9EMRu5
+CBE008,V.Vidhya Industries,Coimbatore,Tamil Nadu,Coimbatore,11.0328139,77.015283,Pumps & Motors,https://maps.app.goo.gl/AiwNLu5VmXs9EMRu5
+CBE009,Elgi Electric Industries Ltd,Coimbatore,Tamil Nadu,"Puliakulam, Coimbatore",11.0052962,76.9916675,Electric Motors / Electrical,https://maps.app.goo.gl/j4Nfz1mW2pRWPxVP7
+CBE010,KVN Industries,Coimbatore,Tamil Nadu,"Avarampalayam, Coimbatore",11.0241078,76.9851652,Pumps / Motors,https://maps.app.goo.gl/ZDVEwnF1VxDEarsCA
+CBE011,Sri Chendur Pump Industries,Coimbatore,Tamil Nadu,"Peelamedu, Coimbatore",11.0416936,77.0104389,Pumps,https://maps.app.goo.gl/yNGyjUa9wEA2Wj8XA
+CBE012,Taro Pumps - Texmo Industries,Coimbatore,Tamil Nadu,"Mettupalayam Road, Coimbatore",11.06445,76.94368,Pumps / Motors,https://maps.app.goo.gl/9MAPf3pbhgCbc7vV9
+CBE013,Samudra Pumps India Private Limited,Coimbatore,Tamil Nadu,"Puliakulam, Coimbatore",11.009012,76.9900964,Pumps / Industrial Equipment,https://maps.app.goo.gl/k3MPSrw21sZ5n8Rc9
+CBE014,Aquasub Engineering Unit 4,Coimbatore,Tamil Nadu,"Kurudampalayam, Coimbatore",11.086359,76.936201,Foundry / Pumps,https://maps.app.goo.gl/ZAAt8tjTocLHYrST7
+CBE015,Aqua Sub Engineering Foundry 2,Coimbatore,Tamil Nadu,"Kurudampalayam, Coimbatore",11.1064871,76.9318707,Foundry,https://maps.app.goo.gl/ocQUD8S6ZEQsp7kA9
+CBE016,Roots Industries India Pvt Ltd,Coimbatore,Tamil Nadu,Coimbatore,11.0335,76.96672,Auto Components,https://maps.app.goo.gl/LCmonwCkd5dACdUy8
+CBE017,Craftsman Automation Pvt Ltd,Coimbatore,Tamil Nadu,Coimbatore,11.0989896,77.1368953,Auto Components / Precision Engineering,https://maps.app.goo.gl/NFimfofuFCJkx3vR9
+CBE018,PRICOL Limited,Coimbatore,Tamil Nadu,Coimbatore,11.1179433,76.9229219,Automotive Components / Electronics,https://maps.app.goo.gl/oZrP8e7mVDVit7xN7
+CBE019,Shanthi Gears Limited,Coimbatore,Tamil Nadu,Coimbatore,11.002778,77.027778,Gears / Transmission,https://maps.app.goo.gl/98sUw6j24KfWVjCq6
+CBE020,ELGI Equipments Limited,Coimbatore,Tamil Nadu,Coimbatore,11.005296,77.027596,Air Compressors / Industrial Equipment,https://maps.app.goo.gl/pontqNfoSB6Yqx7z7
+CBE021,Janatics India Pvt Ltd,Coimbatore,Tamil Nadu,Coimbatore,10.9062568,77.014312,Pneumatics / Industrial Automation,https://maps.app.goo.gl/b7K3rXLvxnBM4Hwi9
+CBE022,Lakshmi Machine Works Limited,Coimbatore,Tamil Nadu,Coimbatore,11.0105455,76.9846394,Textile Machinery,https://maps.app.goo.gl/FKzzSAfznUvZa4aD7
+CBE023,Premier Evolvics Pvt Ltd,Coimbatore,Tamil Nadu,Coimbatore,11.0367447,77.0789653,Testing / Measurement Equipment,https://maps.app.goo.gl/wSMYhT514jD61eF46
+CBE024,Revathi Equipment India Limited,Coimbatore,Tamil Nadu,Coimbatore,10.8982747,76.9988973,Drilling / Mining Equipment,https://maps.app.goo.gl/ZY9XFUiAvFz49T3B6
+CBE025,Deccan Industries,Coimbatore,Tamil Nadu,Coimbatore,11.0407,76.9827,Pumps / Engineering,https://maps.app.goo.gl/igWsyCa5ShdpLhsv7
+CBE026,KSB Limited – Coimbatore operations,Coimbatore,Tamil Nadu,Coimbatore,11.1232342,76.9350027,Pumps / Valves,https://maps.app.goo.gl/otz1b9UfkDp9tTJbA
+CBE027,Premier Precision Engineering,Coimbatore,Tamil Nadu,Coimbatore,11.0196,77.009,Instrumentation / Engineering,https://maps.app.goo.gl/id5wjknen5PyfpWCA
+TPR009,Victus Dyeing,Tiruppur,Tamil Nadu,"Chinnakarai, Tiruppur",10.9365,77.3225,Dyeing / Finishing,https://maps.app.goo.gl/nbwCgpeHXPvkJQmd7
+TPR010,Esplandea Incorporation,Tiruppur,Tamil Nadu,"Pooluvapatti, Tiruppur",11.0695,77.347,Garment Manufacturing,https://maps.app.goo.gl/z8SgtwLdyfAbmEkAA
+TPR011,C R Garments,Tiruppur,Tamil Nadu,"Palladam Road, Tiruppur",11.0477,77.3414,Garment Manufacturing,https://maps.app.goo.gl/dHpiLTUTPKDk1iUA9
+TPR012,Ashwath Inc,Tiruppur,Tamil Nadu,"Mummoorthi Nagar, Tiruppur",11.104,77.3237,Garment Manufacturing,https://maps.app.goo.gl/uorZwMurMuEMXszT8
+TPR013,DANAVARSHINI EXPORTS (P) LIMITED,Tiruppur,Tamil Nadu,"Uthukuli Road, Tiruppur",11.1159995,77.3706302,Garment Export / Manufacturing,https://maps.app.goo.gl/ni3AoQ6vjQAXscVx5
+TPR014,Mass Knit Garments,Tiruppur,Tamil Nadu,"Anupparpalayam, Tiruppur",11.119,77.347,Knitwear,https://maps.app.goo.gl/iBFkRWzgUvMUNza47
+TPR015,Cossmo Tex,Tiruppur,Tamil Nadu,"K. Chettipalayam, Tiruppur",11.0205,77.3148,Knitwear / Processing,https://maps.app.goo.gl/sjMpGeMUEAzjCZ7q6
+TPR016,Viga Knit Creation,Tiruppur,Tamil Nadu,"KNP Colony, Tiruppur",11.0205,77.3148,Knitwear,https://maps.app.goo.gl/9VZ2XrocLDCpusq76
+TPR017,Armstrong Knitting Mills,Tiruppur,Tamil Nadu,"Anupparpalayam, Tiruppur",11.1347512,77.3181151,Knitting,https://maps.app.goo.gl/VCWXESTZd9ySta836
+TPR018,WELL KNIT INDUSTRIES,Tiruppur,Tamil Nadu,"Anupparpalayam, Tiruppur",11.1407285,77.3154492,Knitwear / Garments,https://maps.app.goo.gl/XMKHadFUHSCq3UXx9
+TPR019,SCM Garments,Tiruppur,Tamil Nadu,Tiruppur,11.1209242,77.3279562,Garment Manufacturing,https://maps.app.goo.gl/BQoppcyP1fJKtDrQ9
+TPR020,Best Corporation Pvt Ltd,Tiruppur,Tamil Nadu,Tiruppur,11.1279,77.331,Textile / Garments,https://maps.app.goo.gl/8Lw1D5GQCo3bgP3s8
+TPR021,Poppys Knitwear Pvt Ltd,Tiruppur,Tamil Nadu,Tiruppur,11.1171148,77.345333,Knitwear,https://maps.app.goo.gl/wJ77h6yXrEuWFPe36
+TPR022,Eastman Exports Global Clothing Pvt Ltd,Tiruppur,Tamil Nadu,Tiruppur,11.1266174,77.3463165,Garment Export / Manufacturing,https://maps.app.goo.gl/xDbN98qdodRfKpdK6

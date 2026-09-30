@@ -29,6 +29,8 @@ class SeekerState extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
   String _selectedLocation = 'Coimbatore';
+  List<String> _industries = [];
+  String? _selectedIndustry;
 
   List<RequirementModel> get myRequirements => _myRequirements;
   RequirementModel? get activeRequirement => _activeRequirement;
@@ -39,10 +41,32 @@ class SeekerState extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   String get selectedLocation => _selectedLocation;
+  List<String> get industries => _industries;
+  String? get selectedIndustry => _selectedIndustry;
+
+  void clear() {
+    _myRequirements = [];
+    _activeRequirement = null;
+    _currentMatches = [];
+    _availableMachines = [];
+    _comparisonMatrix = null;
+    _myBookings = [];
+    _isLoading = false;
+    _errorMessage = null;
+    _selectedIndustry = null;
+    notifyListeners();
+  }
 
   void setSelectedLocation(String location) {
     if (_selectedLocation != location) {
       _selectedLocation = location;
+      notifyListeners();
+    }
+  }
+
+  void setSelectedIndustry(String? industry) {
+    if (_selectedIndustry != industry) {
+      _selectedIndustry = industry;
       notifyListeners();
     }
   }
@@ -59,8 +83,11 @@ class SeekerState extends ChangeNotifier {
       );
       if (res is Map<String, dynamic>) {
         final req = RequirementModel.fromJson(res);
-        _activeRequirement = req;
-        notifyListeners();
+        // Only set as active requirement if it is owned by the current user
+        if (_myRequirements.any((r) => r.id == req.id)) {
+          _activeRequirement = req;
+          notifyListeners();
+        }
         return req;
       }
     } catch (_) {
@@ -85,8 +112,11 @@ class SeekerState extends ChangeNotifier {
       final res = await apiClient.get(ApiEndpoints.myRequirements);
       if (res is List) {
         _myRequirements = res.map((e) => RequirementModel.fromJson(e)).toList();
-        if (_activeRequirement == null && _myRequirements.isNotEmpty) {
-          _activeRequirement = _myRequirements.first;
+        // Crucial: ensure _activeRequirement belongs to THIS authenticated user
+        if (_activeRequirement == null ||
+            !_myRequirements.any((r) => r.id == _activeRequirement!.id)) {
+          _activeRequirement =
+              _myRequirements.isNotEmpty ? _myRequirements.first : null;
         }
       }
       _isLoading = false;
@@ -152,18 +182,41 @@ class SeekerState extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchMatches(String requirementId, {String? location}) async {
+  Future<void> fetchIndustries() async {
+    try {
+      final res = await apiClient.get(ApiEndpoints.industries);
+      if (res is List) {
+        _industries = res.map((e) => e.toString()).toList();
+        notifyListeners();
+      }
+    } catch (_) {
+      // Graceful fallback
+    }
+  }
+
+  Future<void> fetchMatches(
+    String requirementId, {
+    String? location,
+    String? industry,
+  }) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
       final loc = location ?? _selectedLocation;
-      final queryParam = loc.isNotEmpty
-          ? '?location=${Uri.encodeComponent(loc)}'
-          : '';
+      final ind = industry ?? _selectedIndustry;
+      final queryParams = <String>[];
+      if (loc.isNotEmpty) {
+        queryParams.add('location=${Uri.encodeComponent(loc)}');
+      }
+      if (ind != null && ind.isNotEmpty) {
+        queryParams.add('industry=${Uri.encodeComponent(ind)}');
+      }
+      final queryString =
+          queryParams.isNotEmpty ? '?${queryParams.join('&')}' : '';
       final res = await apiClient.get(
-        '${ApiEndpoints.requirementMatches(requirementId)}$queryParam',
+        '${ApiEndpoints.requirementMatches(requirementId)}$queryString',
       );
       if (res is List) {
         _currentMatches = res.map((e) => MatchResultModel.fromJson(e)).toList();
@@ -179,17 +232,27 @@ class SeekerState extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchAvailableMachines({String? location}) async {
+  Future<void> fetchAvailableMachines({
+    String? location,
+    String? industry,
+  }) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
       final loc = location ?? _selectedLocation;
-      final queryParam = loc.isNotEmpty
-          ? '?location=${Uri.encodeComponent(loc)}'
-          : '';
-      final res = await apiClient.get('${ApiEndpoints.machines}$queryParam');
+      final ind = industry ?? _selectedIndustry;
+      final queryParams = <String>[];
+      if (loc.isNotEmpty) {
+        queryParams.add('location=${Uri.encodeComponent(loc)}');
+      }
+      if (ind != null && ind.isNotEmpty) {
+        queryParams.add('industry=${Uri.encodeComponent(ind)}');
+      }
+      final queryString =
+          queryParams.isNotEmpty ? '?${queryParams.join('&')}' : '';
+      final res = await apiClient.get('${ApiEndpoints.machines}$queryString');
       if (res is List) {
         _availableMachines = res.map((e) => MachineModel.fromJson(e)).toList();
       } else {

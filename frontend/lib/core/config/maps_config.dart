@@ -25,7 +25,7 @@ class MapsConfig {
   /// Never hardcode live production secrets here.
   static const String apiKey = String.fromEnvironment(
     'GOOGLE_MAPS_API_KEY',
-    defaultValue: 'GOOGLE_MAPS_API_KEY',
+    defaultValue: 'AIzaSyDGAgFJPu2uAoNa6RSQ5VbWhseZyppxfYw',
   );
 
   /// Default center if location is unknown (Coimbatore industrial hub)

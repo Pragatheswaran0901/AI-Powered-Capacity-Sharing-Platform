@@ -132,8 +132,33 @@ class _CompareMachinesScreenState extends State<CompareMachinesScreen> {
                 size: MachButtonSize.medium,
                 onPressed: () async {
                   Navigator.of(ctx).pop();
+                  String reqId = requirementId;
+                  if (reqId.isEmpty ||
+                      reqId == "req-1" ||
+                      !seekerState.myRequirements.any((r) => r.id == reqId)) {
+                    if (seekerState.myRequirements.isNotEmpty) {
+                      reqId = seekerState.myRequirements.first.id;
+                    } else if (seekerState.activeRequirement != null) {
+                      reqId = seekerState.activeRequirement!.id;
+                    }
+                  }
+
+                  if (reqId.isEmpty || reqId == "req-1") {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Please create or select an active requirement before booking.',
+                          ),
+                          backgroundColor: AppColors.errorRed,
+                        ),
+                      );
+                    }
+                    return;
+                  }
+
                   final success = await seekerState.requestBooking(
-                    requirementId: requirementId,
+                    requirementId: reqId,
                     machineId: item.machineId,
                     startDate: startDate.toIso8601String().split('T').first,
                     endDate: endDate.toIso8601String().split('T').first,
@@ -569,7 +594,10 @@ class _CompareMachinesScreenState extends State<CompareMachinesScreen> {
                                       seekerState
                                               .comparisonMatrix
                                               ?.requirementId ??
-                                          "req-1",
+                                          (seekerState.activeRequirement?.id ??
+                                              (seekerState.myRequirements.isNotEmpty
+                                                  ? seekerState.myRequirements.first.id
+                                                  : "")),
                                     ),
                                   ),
                                 ),

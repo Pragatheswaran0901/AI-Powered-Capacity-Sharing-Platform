@@ -151,7 +151,8 @@ def test_location_capacity_discovery():
     for m in cbe_machines:
         loc = (m.get("location_address") or "").lower()
         biz_name = (m.get("business_name") or "").lower()
-        assert "coimbatore" in loc or "kurichi" in loc or "ganapathy" in loc or "peelamedu" in loc or "kovai" in biz_name
+        city = (m.get("city") or "").lower()
+        assert "coimbatore" in loc or "kurichi" in loc or "ganapathy" in loc or "peelamedu" in loc or "kovai" in biz_name or "coimbatore" in city
 
     # 2. Search machines in Tiruppur
     tir_resp = client.get("/api/v1/machines?location=Tiruppur")
@@ -160,7 +161,8 @@ def test_location_capacity_discovery():
     assert len(tir_machines) >= 3
     for m in tir_machines:
         loc = (m.get("location_address") or "").lower()
-        assert "tirup" in loc
+        city = (m.get("city") or "").lower()
+        assert "tirup" in loc or "tirup" in city
 
     # 3. Matching with location query parameter
     login_resp = client.post(
@@ -182,7 +184,8 @@ def test_location_capacity_discovery():
     for match in cbe_matches:
         loc = (match.get("location_address") or "").lower()
         biz = (match.get("business_name") or "").lower()
-        assert "coimbatore" in loc or "kurichi" in loc or "ganapathy" in loc or "peelamedu" in loc or "kovai" in biz
+        city = (match.get("city") or "").lower()
+        assert "coimbatore" in loc or "kurichi" in loc or "ganapathy" in loc or "peelamedu" in loc or "kovai" in biz or "coimbatore" in city
 
     # Match in Tiruppur
     tir_match_resp = client.get(
@@ -194,7 +197,8 @@ def test_location_capacity_discovery():
     assert len(tir_matches) >= 3
     for match in tir_matches:
         loc = (match.get("location_address") or "").lower()
-        assert "tirup" in loc
+        city = (match.get("city") or "").lower()
+        assert "tirup" in loc or "tirup" in city
 
 
 
@@ -238,34 +242,54 @@ def test_booking_state_machine_flow():
         "/api/v1/auth/login", json={"email": "janika@machhunt.demo", "password": "password123"}
     ).json()["access_token"]
 
+    # Get Janika's machines and pick one with open slot
+    my_machs = client.get("/api/v1/machines/my", headers={"Authorization": f"Bearer {provider_token}"}).json()
+    target_m = my_machs[1] if len(my_machs) > 1 else my_machs[0]
+    slot_date = None
+    for m in my_machs:
+        avs = m.get("availabilities", [])
+        blocked = {a["date"] for a in avs if not a.get("is_available", True) or a.get("booking_id")}
+        valid_slots = [
+            date.fromisoformat(a["date"])
+            for a in avs
+            if a.get("is_available", True)
+            and not a.get("booking_id")
+            and a["date"] not in blocked
+            and date.fromisoformat(a["date"]) >= date.today()
+        ]
+        if valid_slots:
+            target_m = m
+            valid_slots.sort()
+            # pick second or later slot to avoid collision with test_booking_authorization
+            slot_date = valid_slots[-1] if len(valid_slots) > 1 else valid_slots[0]
+            break
+    if not slot_date:
+        slot_date = date.today() + timedelta(days=22)
+
+    mach_id = target_m["id"]
+
     # 1. Create a new requirement
-    import random
-    today = date.today() + timedelta(days=50 + random.randint(1, 250))
     req_payload = {
         "title": "200 Aluminium Fixture Plates",
         "description": "High tolerance fixture plates for automotive leak test jig.",
         "process": "CNC Milling",
         "material": "Aluminium 6061",
         "quantity": 200,
-        "required_date": str(today),
-        "delivery_deadline": str(today + timedelta(days=4)),
+        "required_date": str(slot_date),
+        "delivery_deadline": str(slot_date + timedelta(days=4)),
         "preferred_location": "Ganapathy, Coimbatore",
         "budget": 20000.0,
     }
     new_req = client.post("/api/v1/requirements/", json=req_payload, headers={"Authorization": f"Bearer {seeker_token}"}).json()
     req_id = new_req["id"]
 
-    # Get Janika's machine
-    my_machs = client.get("/api/v1/machines/my", headers={"Authorization": f"Bearer {provider_token}"}).json()
-    mach_id = my_machs[0]["id"]
-
     # 2. Seeker requests booking (PENDING)
     booking_payload = {
         "requirement_id": req_id,
         "machine_id": mach_id,
-        "start_date": str(today),
-        "end_date": str(today + timedelta(days=2)),
-        "total_hours": 10.0,
+        "start_date": str(slot_date),
+        "end_date": str(slot_date),
+        "total_hours": 6.0,
         "notes": "Urgent lot test"
     }
     bk_resp = client.post("/api/v1/bookings/", json=booking_payload, headers={"Authorization": f"Bearer {seeker_token}"})

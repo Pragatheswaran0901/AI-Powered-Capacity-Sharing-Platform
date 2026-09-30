@@ -43,5 +43,13 @@ def run_migrations(target_engine=None):
                 if "is_onboarded" not in columns:
                     conn.execute(text("ALTER TABLE users ADD COLUMN is_onboarded BOOLEAN DEFAULT 1 NOT NULL"))
                 conn.commit()
+
+            if "machines" in inspector.get_table_names():
+                m_columns = [c["name"] for c in inspector.get_columns("machines")]
+                if "company_id" not in m_columns:
+                    conn.execute(text("ALTER TABLE machines ADD COLUMN company_id VARCHAR(50)"))
+                if "google_maps_link" not in m_columns:
+                    conn.execute(text("ALTER TABLE machines ADD COLUMN google_maps_link VARCHAR(500)"))
+                conn.commit()
     except Exception as e:
         pass

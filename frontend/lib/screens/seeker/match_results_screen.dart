@@ -614,9 +614,64 @@ class _MatchResultsScreenState extends State<MatchResultsScreen> {
                 size: MachButtonSize.medium,
                 onPressed: () async {
                   Navigator.of(ctx).pop();
-                  final reqId = _activeRequirementId.isNotEmpty
+                  String reqId = _activeRequirementId.isNotEmpty
                       ? _activeRequirementId
                       : (seekerState.activeRequirement?.id ?? '');
+
+                  // Ensure requirement belongs to current seeker
+                  if (reqId.isEmpty ||
+                      !seekerState.myRequirements.any((r) => r.id == reqId)) {
+                    if (seekerState.myRequirements.isNotEmpty) {
+                      reqId = seekerState.myRequirements.first.id;
+                      _activeRequirementId = reqId;
+                    } else {
+                      final now = DateTime.now();
+                      final rawBudget = _budgetController.text
+                          .replaceAll(',', '')
+                          .replaceAll('₹', '')
+                          .trim();
+                      final budget = double.tryParse(rawBudget) ?? 25000.0;
+                      final qty =
+                          int.tryParse(_quantityController.text.trim()) ?? 100;
+                      final created = await seekerState.createRequirement({
+                        'title': _requirementController.text.trim().isNotEmpty
+                            ? _requirementController.text.trim()
+                            : '500 Aluminium Brackets',
+                        'description':
+                            'Booking requirement for ${match.machineName}',
+                        'process': _selectedProcess,
+                        'material': _selectedMaterial,
+                        'quantity': qty,
+                        'budget': budget,
+                        'preferred_location': _selectedLocation,
+                        'required_date': DateFormat('yyyy-MM-dd').format(now),
+                        'delivery_deadline': DateFormat(
+                          'yyyy-MM-dd',
+                        ).format(now.add(const Duration(days: 7))),
+                        'max_distance_km': 100.0,
+                        'operator_required': true,
+                      });
+                      if (created != null) {
+                        reqId = created.id;
+                        _activeRequirementId = created.id;
+                      }
+                    }
+                  }
+
+                  if (reqId.isEmpty) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Please select or specify your requirement before booking.',
+                          ),
+                          backgroundColor: AppColors.errorRed,
+                        ),
+                      );
+                    }
+                    return;
+                  }
+
                   final success = await seekerState.requestBooking(
                     requirementId: reqId,
                     machineId: match.machineId,

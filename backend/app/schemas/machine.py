@@ -66,6 +66,11 @@ class MachineBase(BaseModel):
     location_address: str
     latitude: float
     longitude: float
+    company_id: Optional[str] = None
+    company_name: Optional[str] = None
+    industry: Optional[str] = None
+    google_maps_link: Optional[str] = None
+    city: Optional[str] = None
     photos: Optional[List[str]] = []
 
     @field_validator("operating_parameters", mode="before")
@@ -109,6 +114,11 @@ class MachineUpdate(BaseModel):
     location_address: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
+    company_id: Optional[str] = None
+    company_name: Optional[str] = None
+    industry: Optional[str] = None
+    google_maps_link: Optional[str] = None
+    city: Optional[str] = None
     photos: Optional[List[str]] = None
     status: Optional[MachineStatus] = None
 

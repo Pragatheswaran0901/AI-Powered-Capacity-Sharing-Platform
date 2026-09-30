@@ -213,10 +213,13 @@ class _CreateRequirementScreenState extends State<CreateRequirementScreen>
         '/matches/${newReq.id}?title=${Uri.encodeComponent(newReq.title)}',
       );
     } else {
-      // Fallback demo match ID if server simulated
-      final fallbackId = "req-1";
-      context.go(
-        '/matches/$fallbackId?title=${Uri.encodeComponent(_titleController.text.trim())}',
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            seekerState.errorMessage ?? 'Failed to submit requirement. Please check fields.',
+          ),
+          backgroundColor: AppColors.errorRed,
+        ),
       );
     }
   }

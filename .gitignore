@@ -47,6 +47,8 @@ pnpm-debug.log*
 lerna-debug.log*
 dev_mailbox.json
 scratch_*.py
+scratch/
+backend/scratch/
 
 # Editor & OS files
 .vscode/*

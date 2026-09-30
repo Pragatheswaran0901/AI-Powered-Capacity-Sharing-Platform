@@ -58,6 +58,11 @@ class MatchResultModel {
   final String verificationStatus;
   final double? latitude;
   final double? longitude;
+  final String? companyId;
+  final String? companyName;
+  final String? industry;
+  final String? city;
+  final String? googleMapsLink;
 
   MatchResultModel({
     this.matchId,
@@ -84,6 +89,11 @@ class MatchResultModel {
     this.verificationStatus = 'VERIFIED',
     this.latitude,
     this.longitude,
+    this.companyId,
+    this.companyName,
+    this.industry,
+    this.city,
+    this.googleMapsLink,
   });
 
   bool get isVerified => verificationStatus.toUpperCase() == 'VERIFIED';
@@ -131,6 +141,11 @@ class MatchResultModel {
       verificationStatus: json['verification_status'] ?? 'VERIFIED',
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
+      companyId: json['company_id']?.toString(),
+      companyName: json['company_name']?.toString(),
+      industry: json['industry']?.toString(),
+      city: json['city']?.toString(),
+      googleMapsLink: json['google_maps_link']?.toString(),
     );
   }
 }

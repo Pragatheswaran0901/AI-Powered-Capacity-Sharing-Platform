@@ -28,6 +28,14 @@ class ProviderState extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
+  void clear() {
+    _myMachines = [];
+    _incomingRequests = [];
+    _isLoading = false;
+    _errorMessage = null;
+    notifyListeners();
+  }
+
   double get totalEarnings {
     double total = 0.0;
     for (var b in _incomingRequests) {

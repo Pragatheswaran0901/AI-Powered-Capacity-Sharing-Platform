@@ -1,10 +1,13 @@
+import csv
 import json
+import os
+import uuid
 from datetime import datetime, timezone, date, timedelta, time
 from sqlalchemy.orm import Session
-from app.core.database import SessionLocal, engine, Base
+from app.core.database import SessionLocal, engine, Base, run_migrations
 from app.core.security import get_password_hash
 from app.models import (
-    User, UserRole, Business, BusinessDocument, VerificationStatus,
+    Base, Company, User, UserRole, Business, BusinessDocument, VerificationStatus,
     Machine, MachineCapability, MachineAvailability, MachineStatus,
     Requirement, RequirementStatus, Match, Booking, BookingStatus,
     Payment, PaymentStatus, Review, Notification, AuditLog
@@ -12,17 +15,185 @@ from app.models import (
 from app.matching.engine import matching_engine
 
 
+def get_capacity_specs_for_industry(industry: str, company_name: str, city: str):
+    """
+    Generate realistic DEMO machine specs, capabilities, and pricing tailored to the industry.
+    Clearly marks generated machine attributes as DEMO marketplace capacity.
+    """
+    ind_lower = industry.lower()
+    
+    # 1. Precision Engineering / Components / Products
+    if "precision" in ind_lower or ("component" in ind_lower and "auto" not in ind_lower and "textile" not in ind_lower):
+        category = "CNC Milling"
+        name = f"HAAS VF-4SS Super-Speed 4-Axis VMC [DEMO - {company_name}]"
+        mfr = "HAAS Automation"
+        model = "VF-4SS"
+        desc = f"DEMO CAPACITY: High-precision 4-axis VMC equipped with Renishaw wireless probing and 12,000 RPM inline spindle at {company_name} ({city})."
+        dim = "1270 x 508 x 635 mm"
+        tol = "±0.005 mm"
+        params = {"spindle_rpm": 12000, "tool_capacity": 30, "coolant": "Through-Spindle High Pressure"}
+        price = 1200.0
+        caps = [
+            ("CNC Milling", "Aluminium 6061", 0.005, 1270, 508, 635),
+            ("CNC Milling", "Stainless Steel 316", 0.008, 1270, 508, 635),
+            ("Precision Machining", "Brass", 0.010, 1000, 500, 500),
+        ]
+    # 2. Laser Cutting / Fabrication
+    elif "laser" in ind_lower or ("fabricat" in ind_lower and "sheet" not in ind_lower):
+        category = "Laser Cutting"
+        name = f"Trumpf TruLaser 3030 4kW Fiber Laser [DEMO - {company_name}]"
+        mfr = "Trumpf"
+        model = "TruLaser 3030 Fiber"
+        desc = f"DEMO CAPACITY: High-speed 4kW fiber laser cutting center with auto pallet shuttle and nitrogen assist at {company_name} ({city})."
+        dim = "3000 x 1500 mm Sheet Envelope"
+        tol = "±0.03 mm"
+        params = {"laser_power_watts": 4000, "gas_assist": ["Nitrogen", "Oxygen"]}
+        price = 1600.0
+        caps = [
+            ("Laser Cutting", "Mild Steel", 0.03, 3000, 1500, 20),
+            ("Laser Cutting", "Stainless Steel 304", 0.03, 3000, 1500, 12),
+            ("Laser Cutting", "Aluminium 6061", 0.04, 3000, 1500, 10),
+        ]
+    # 3. Pumps / Motors / Valves / Industrial Equipment
+    elif "pump" in ind_lower or "motor" in ind_lower or "valve" in ind_lower:
+        category = "CNC Machining"
+        name = f"Mazak Quick Turn 250 Heavy CNC Turning Center [DEMO - {company_name}]"
+        mfr = "Yamazaki Mazak"
+        model = "QT-250"
+        desc = f"DEMO CAPACITY: Heavy-duty CNC lathe tailored for pump impellers, motor shafts, and valve bodies at {company_name} ({city})."
+        dim = "Max Turning Dia: 380 mm, Length: 500 mm"
+        tol = "±0.008 mm"
+        params = {"max_rpm": 4500, "chuck_size_inch": 10, "tool_stations": 12}
+        price = 950.0
+        caps = [
+            ("CNC Turning", "Cast Iron", 0.010, 380, 380, 500),
+            ("CNC Turning", "Stainless Steel 316", 0.008, 380, 380, 500),
+            ("CNC Machining", "Gunmetal / Bronze", 0.012, 380, 380, 500),
+        ]
+    # 4. Foundry
+    elif "foundry" in ind_lower:
+        category = "Foundry & Casting"
+        name = f"Inductotherm 1-Ton Medium Frequency Melting Line [DEMO - {company_name}]"
+        mfr = "Inductotherm"
+        model = "VIP Power-Trak"
+        desc = f"DEMO CAPACITY: Industrial induction melting and automated sand casting facility at {company_name} ({city})."
+        dim = "Mould Size: 800 x 600 x 400 mm"
+        tol = "±0.5 mm as-cast"
+        params = {"melt_capacity_kg_hr": 1000, "lining": "Silica / Neutral"}
+        price = 1400.0
+        caps = [
+            ("Casting", "Grey Iron FG 260", 0.5, 800, 600, 400),
+            ("Casting", "Ductile Iron 500/7", 0.5, 800, 600, 400),
+            ("Pattern Making", "Aluminium Alloy", 0.2, 800, 600, 400),
+        ]
+    # 5. Auto Components / Precision Engineering / Gears
+    elif "auto" in ind_lower or "gear" in ind_lower or "transmission" in ind_lower:
+        category = "CNC Turning"
+        name = f"LMW Smarturn Precision CNC Lathe [DEMO - {company_name}]"
+        mfr = "Lakshmi Machine Works"
+        model = "Smarturn-Twin"
+        desc = f"DEMO CAPACITY: High-volume CNC turning center for automotive transmission pins, bushes, and gear blanks at {company_name} ({city})."
+        dim = "Max Turning Dia: 320 mm, Length: 400 mm"
+        tol = "±0.006 mm"
+        params = {"max_rpm": 5000, "rapid_traverse_m_min": 30}
+        price = 850.0
+        caps = [
+            ("CNC Turning", "Alloy Steel 20MnCr5", 0.006, 320, 320, 400),
+            ("CNC Turning", "Mild Steel", 0.008, 320, 320, 400),
+            ("CNC Turning", "Aluminium 6061", 0.006, 320, 320, 400),
+        ]
+    # 6. Compressors / Pneumatics / Drilling / Mining / Testing / Instrumentation / Engineering Works
+    elif any(k in ind_lower for k in ["compressor", "pneumatic", "drill", "mining", "test", "instrument", "engineering"]):
+        category = "CNC Milling"
+        name = f"BFW Chakra BMV 60+ Heavy Duty VMC [DEMO - {company_name}]"
+        mfr = "Bharat Fritz Werner"
+        model = "Chakra BMV 60+"
+        desc = f"DEMO CAPACITY: Heavy-duty BT-50 vertical machining center for compressor housings, pneumatic blocks, and industrial tooling at {company_name} ({city})."
+        dim = "1050 x 610 x 610 mm"
+        tol = "±0.008 mm"
+        params = {"spindle_rpm": 8000, "table_load_kg": 1000}
+        price = 1050.0
+        caps = [
+            ("CNC Milling", "Cast Iron", 0.010, 1050, 610, 610),
+            ("CNC Milling", "Mild Steel", 0.008, 1050, 610, 610),
+            ("CNC Machining", "Aluminium 6061", 0.006, 1050, 610, 610),
+        ]
+    # 7. Knitting / Knitwear
+    elif "knit" in ind_lower:
+        category = "Knitting & Fabric Production"
+        name = f"Mayer & Cie High-Speed Circular Knitting Machine [DEMO - {company_name}]"
+        mfr = "Mayer & Cie"
+        model = "Relanit 3.2 II"
+        desc = f"DEMO CAPACITY: 30-inch circular single-jersey knitting plant with 96 feeders for premium cotton and elastane fabrics at {company_name} ({city})."
+        dim = "Diameter: 30 inch, Gauge: 28 GG"
+        tol = "Uniform loop density ±1.5%"
+        params = {"speed_rpm": 35, "feeders": 96, "structure": "Single Jersey / Pique"}
+        price = 800.0
+        caps = [
+            ("Circular Knitting", "Combed Cotton Yarn", 0.05, 1800, 1800, 0),
+            ("Rib Knitting", "Cotton / Spandex", 0.05, 1800, 1800, 0),
+            ("Fabric Cutting", "Knitted Fabric", 0.1, 1800, 1800, 0),
+        ]
+    # 8. Dyeing / Finishing
+    elif "dye" in ind_lower or "finish" in ind_lower:
+        category = "Textile Dyeing & Wet Processing"
+        name = f"Fongs Eco-Soft Low-Liquor Fabric Dyeing Unit [DEMO - {company_name}]"
+        mfr = "Fongs National"
+        model = "TECWIN High Temp"
+        desc = f"DEMO CAPACITY: High-temperature low-liquor ratio soft-flow dyeing vessel with automated recipe controller at {company_name} ({city})."
+        dim = "Batch Capacity: 500 kg"
+        tol = "Color fastness Grade 4-5"
+        params = {"liquor_ratio": "1:4.5", "max_temp_c": 135}
+        price = 900.0
+        caps = [
+            ("Fabric Dyeing", "Cotton Knitted Fabric", 0.1, 2000, 2000, 0),
+            ("Bleaching", "Organic Cotton", 0.1, 2000, 2000, 0),
+            ("Compacting", "Knitted Tubular Fabric", 0.1, 2000, 2000, 0),
+        ]
+    # 9. Textile / Garment / Garment Manufacturing / Export
+    else:
+        category = "Garment & Textile Production"
+        name = f"Juki Automated Multi-Needle Stitching & Overlock Line [DEMO - {company_name}]"
+        mfr = "Juki Corporation"
+        model = "MF-7923 / DDL-9000C"
+        desc = f"DEMO CAPACITY: Automated 12-station industrial garment stitching, overlock, and flatlock line at {company_name} ({city})."
+        dim = "Table Length: 12 meters, 12 Stations"
+        tol = "Stitch count 12-14 SPI"
+        params = {"max_speed_spm": 5000, "stations": 12, "feed": "Differential"}
+        price = 750.0
+        caps = [
+            ("Stitching", "Cotton Knitted Fabric", 0.1, 1500, 1000, 0),
+            ("Fabric Cutting", "Woven / Knitted", 0.2, 2000, 1200, 0),
+            ("Garment Finishing", "Cotton Blends", 0.1, 1200, 800, 0),
+        ]
+
+    return {
+        "category": category,
+        "name": name,
+        "manufacturer": mfr,
+        "model": model,
+        "year": 2023,
+        "description": desc,
+        "dimensions_capacity": dim,
+        "precision_tolerance": tol,
+        "operating_parameters": params,
+        "hourly_price": price,
+        "min_job_value": price * 3.0,
+        "capabilities": caps,
+    }
+
+
 def seed_database():
-    print("[*] Initializing Mach-Hunt Development Seed System...")
+    print("[*] Initializing Mach-Hunt Master 49-Company Marketplace Database...")
     Base.metadata.create_all(bind=engine)
+    run_migrations(engine)
     db: Session = SessionLocal()
 
     try:
-        # Check if already seeded
+        # Check if already seeded and purge for clean shared marketplace state
         existing_admin = db.query(User).filter(User.email == "admin@machhunt.demo").first()
         if existing_admin:
-            print("[INFO] Database already contains seed data. Refreshing seed records...")
-            # We can purge existing records for clean test state
+            print("[INFO] Database already contains records. Refreshing tables for 49-company marketplace...")
             db.query(AuditLog).delete()
             db.query(Notification).delete()
             db.query(Review).delete()
@@ -33,13 +204,16 @@ def seed_database():
             db.query(MachineAvailability).delete()
             db.query(MachineCapability).delete()
             db.query(Machine).delete()
+            db.query(Company).delete()
             db.query(BusinessDocument).delete()
             db.query(Business).delete()
             db.query(User).delete()
             db.commit()
 
-        # 1. USERS
-        print("[1/7] Creating demo users...")
+        # =========================================================================
+        # 1. THE 4 DEMO ACCOUNTS + ADMIN & BACKGROUND PROFILES
+        # =========================================================================
+        print("[1/7] Creating the 4 primary demo users...")
         pw_hash = get_password_hash("password123")
 
         admin_user = User(
@@ -53,10 +227,11 @@ def seed_database():
         )
         db.add(admin_user)
 
+        # Demo Account 1: Janika (Provider in Coimbatore)
         janika_owner = User(
             email="janika@machhunt.demo",
             hashed_password=pw_hash,
-            full_name="Janika (Provider)",
+            full_name="Janika",
             phone="+91 94432 12345",
             role=UserRole.PROVIDER,
             is_active=True,
@@ -67,6 +242,7 @@ def seed_database():
         )
         db.add(janika_owner)
 
+        # Demo Account 2: Pragatheswaran (Provider in Tiruppur / Coimbatore)
         pragatheswaran_user = User(
             email="pragatheswaran@machhunt.demo",
             hashed_password=pw_hash,
@@ -81,6 +257,7 @@ def seed_database():
         )
         db.add(pragatheswaran_user)
 
+        # Demo Account 3: Jayanth (Seeker / Provider)
         jayanth_user = User(
             email="jayanth@machhunt.demo",
             hashed_password=pw_hash,
@@ -95,6 +272,7 @@ def seed_database():
         )
         db.add(jayanth_user)
 
+        # Demo Account 4: Reethika (Seeker / Provider)
         reethika_user = User(
             email="reethika@machhunt.demo",
             hashed_password=pw_hash,
@@ -109,6 +287,7 @@ def seed_database():
         )
         db.add(reethika_user)
 
+        # Background test profiles
         senthil_owner = User(
             email="senthil@machhunt.demo",
             hashed_password=pw_hash,
@@ -152,14 +331,18 @@ def seed_database():
         db.add(karthikeyan_seeker)
         db.commit()
 
-        # 2. BUSINESSES
-        print("[2/7] Registering MSME businesses...")
+        # =========================================================================
+        # 2. MSME BUSINESSES (DEMO PROVIDER IDENTITY)
+        # =========================================================================
+        print("[2/7] Registering MSME businesses for the 4 demo accounts...")
+        
+        # 1. Janika: Kovai Precision Works (Coimbatore)
         kovai_biz = Business(
             user_id=janika_owner.id,
             name="Kovai Precision Works",
             owner_name="Janika",
             phone="+91 94432 12345",
-            email="contact@kovaiprecision.demo",
+            email="janika@machhunt.demo",
             gstin="33ABCDE1234F1Z5",
             registration_number="UDYAM-TN-03-0012345",
             industry="Aerospace & Automotive Machining",
@@ -174,6 +357,70 @@ def seed_database():
         )
         db.add(kovai_biz)
 
+        # 2. Pragatheswaran: Tiruppur Manufacturing Works (Tiruppur)
+        kongu_biz = Business(
+            user_id=pragatheswaran_user.id,
+            name="Tiruppur Manufacturing Works",
+            owner_name="Pragatheswaran",
+            phone="+91 98765 43210",
+            email="pragatheswaran@machhunt.demo",
+            gstin="33PRAGA1234F1Z9",
+            registration_number="UDYAM-TN-03-0091823",
+            industry="Heavy Machining & Precision Garment Tooling",
+            address="Plot 22, Textile Machinery & CNC Park, Tiruppur",
+            district="Tiruppur",
+            state="Tamil Nadu",
+            pincode="641603",
+            latitude=11.1085,
+            longitude=77.3411,
+            description="Precision CNC milling, high-speed turning, and precision tooling for garment machinery and automotive assemblies.",
+            verification_status=VerificationStatus.VERIFIED,
+        )
+        db.add(kongu_biz)
+
+        # 3. Jayanth: Hosur Auto Components & Laser Tech
+        jayanth_biz = Business(
+            user_id=jayanth_user.id,
+            name="Hosur Auto Components",
+            owner_name="Jayanth",
+            phone="+91 98432 56789",
+            email="jayanth@machhunt.demo",
+            gstin="33JAYAN2345G2Z8",
+            registration_number="UDYAM-TN-03-0076543",
+            industry="Sheet Metal & Precision Machining",
+            address="15, Industrial Automation & Laser Park, Tiruppur",
+            district="Tiruppur",
+            state="Tamil Nadu",
+            pincode="641603",
+            latitude=11.1120,
+            longitude=77.3450,
+            description="High-precision fiber laser cutting, CNC turning, and automated sheet metal fabrication center.",
+            verification_status=VerificationStatus.VERIFIED,
+        )
+        db.add(jayanth_biz)
+
+        # 4. Reethika: Coimbatore Industrial Systems (Coimbatore)
+        reethika_biz = Business(
+            user_id=reethika_user.id,
+            name="Coimbatore Industrial Systems",
+            owner_name="Reethika",
+            phone="+91 97890 12345",
+            email="reethika@machhunt.demo",
+            gstin="33REETH3456H3Z7",
+            registration_number="UDYAM-TN-03-0065432",
+            industry="Industrial Fabrication, Welding & Powder Coating",
+            address="42, Ganapathy Industrial Estate, Coimbatore",
+            district="Coimbatore",
+            state="Tamil Nadu",
+            pincode="641006",
+            latitude=11.0350,
+            longitude=76.9750,
+            description="Full-service industrial manufacturing center with robotic welding, certified powder coating, and micro-machining.",
+            verification_status=VerificationStatus.VERIFIED,
+        )
+        db.add(reethika_biz)
+
+        # Additional background businesses
         cbe_cnc_biz = Business(
             user_id=senthil_owner.id,
             name="Coimbatore CNC Engineering",
@@ -183,13 +430,13 @@ def seed_database():
             gstin="33BCDEF2345G2Z6",
             registration_number="UDYAM-TN-03-0087654",
             industry="General Engineering & Component Tooling",
-            address="88, Ganapathy Industrial Cluster, Sathy Road",
+            address="88, Ganapathy Industrial Cluster, Coimbatore",
             district="Coimbatore",
             state="Tamil Nadu",
             pincode="641006",
             latitude=11.0384,
             longitude=76.9744,
-            description="Established MSME with multi-axis VMCs, CNC turning, and automated inspection capabilities.",
+            description="Established MSME with multi-axis CNC turning and automated inspection capabilities.",
             verification_status=VerificationStatus.VERIFIED,
         )
         db.add(cbe_cnc_biz)
@@ -203,13 +450,13 @@ def seed_database():
             gstin="33CDEFG3456H3Z7",
             registration_number="UDYAM-TN-03-0099887",
             industry="Sheet Metal & Laser Processing",
-            address="12/A, Civil Aerodrome Post, Peelamedu",
+            address="12/A, Civil Aerodrome Post, Peelamedu, Coimbatore",
             district="Coimbatore",
             state="Tamil Nadu",
             pincode="641014",
             latitude=11.0289,
             longitude=77.0093,
-            description="High precision 4kW and 6kW fiber laser cutting and CNC bending center for automotive and electrical enclosures.",
+            description="Fiber laser cutting center for automotive and electrical enclosures.",
             verification_status=VerificationStatus.VERIFIED,
         )
         db.add(apex_laser_biz)
@@ -223,7 +470,7 @@ def seed_database():
             gstin="33DEFGH4567I4Z8",
             registration_number="UDYAM-TN-03-0055443",
             industry="EV & Renewable Energy Sub-assemblies",
-            address="Plot 5, Saravanampatti IT & Tech Corridor",
+            address="Plot 5, Saravanampatti IT & Tech Corridor, Coimbatore",
             district="Coimbatore",
             state="Tamil Nadu",
             pincode="641035",
@@ -233,418 +480,169 @@ def seed_database():
             verification_status=VerificationStatus.VERIFIED,
         )
         db.add(tamiltech_biz)
-
-        kongu_biz = Business(
-            user_id=pragatheswaran_user.id,
-            name="Kongu Precision CNC Works",
-            owner_name="Pragatheswaran",
-            phone="+91 98765 43210",
-            email="pragatheswaran@machhunt.demo",
-            gstin="33PRAGA1234F1Z9",
-            registration_number="UDYAM-TN-03-0091823",
-            industry="Aerospace Precision Components",
-            address="Plot 22, SIDCO Industrial Estate, Kurichi",
-            district="Coimbatore",
-            state="Tamil Nadu",
-            pincode="641021",
-            latitude=10.9425,
-            longitude=76.9730,
-            description="Specialized multi-axis CNC manufacturing and high-tolerance aerospace tooling center.",
-            verification_status=VerificationStatus.VERIFIED,
-        )
-        db.add(kongu_biz)
-
-        jayanth_biz = Business(
-            user_id=jayanth_user.id,
-            name="Jayanth High-Tech Engineering",
-            owner_name="Jayanth",
-            phone="+91 98432 56789",
-            email="jayanth@machhunt.demo",
-            gstin="33JAYAN2345G2Z8",
-            registration_number="UDYAM-TN-03-0076543",
-            industry="Automotive & Textile Components",
-            address="15, Textile Machinery & CNC Park, Tiruppur",
-            district="Tiruppur",
-            state="Tamil Nadu",
-            pincode="641603",
-            latitude=11.1085,
-            longitude=77.3411,
-            description="OEM precision machining, tooling, and component manufacturing for textile machinery and automotive parts.",
-            verification_status=VerificationStatus.VERIFIED,
-        )
-        db.add(jayanth_biz)
-
-        reethika_biz = Business(
-            user_id=reethika_user.id,
-            name="Reethika Precision Tech",
-            owner_name="Reethika",
-            phone="+91 97890 12345",
-            email="reethika@machhunt.demo",
-            gstin="33REETH3456H3Z7",
-            registration_number="UDYAM-TN-03-0065432",
-            industry="Medical Devices & Prototyping",
-            address="42, Ganapathy Industrial Estate",
-            district="Coimbatore",
-            state="Tamil Nadu",
-            pincode="641006",
-            latitude=11.0350,
-            longitude=76.9750,
-            description="Precision component engineering with certified clean-room manufacturing and micro-machining.",
-            verification_status=VerificationStatus.VERIFIED,
-        )
-        db.add(reethika_biz)
         db.commit()
 
-        # 3. MACHINES & CAPABILITIES
-        print("[3/7] Listing manufacturing machines with capabilities...")
+        # =========================================================================
+        # 3. IMPORT 49-COMPANY DATASET INTO DATABASE (COMPANIES & MACHINES)
+        # =========================================================================
+        csv_file_path = os.path.join(os.path.dirname(__file__), "..", "data", "machhunt_49_companies_master_cleaned.csv")
+        print(f"[3/7] Loading 49 companies dataset from: {csv_file_path}")
         
-        # Machine 1: HAAS VF-4SS (Janika - Kovai Precision)
-        haas_vf4 = Machine(
-            business_id=kovai_biz.id,
-            name="HAAS VF-4SS Super-Speed 4-Axis VMC",
-            category="CNC Milling",
-            manufacturer="HAAS Automation",
-            model="VF-4SS",
-            year=2023,
-            description="High productivity super-speed vertical machining center equipped with Renishaw wireless probing, 12,000 RPM inline direct-drive spindle, and 4th-axis rotary table.",
-            dimensions_capacity="1270 x 508 x 635 mm",
-            precision_tolerance="±0.005 mm",
-            operating_parameters=json.dumps({"spindle_rpm": 12000, "tool_capacity": 30, "coolant": "High-pressure through spindle"}),
-            hourly_price=1200.0,
-            min_job_value=5000.0,
-            operator_available=True,
-            location_address="Plot 14, SIDCO Kurichi, Coimbatore",
-            latitude=10.9412,
-            longitude=76.9723,
-            photos=json.dumps([
-                "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800",
-                "https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?w=800",
-            ]),
-            status=MachineStatus.ACTIVE,
-            verification_status=VerificationStatus.VERIFIED,
-        )
-        db.add(haas_vf4)
+        with open(csv_file_path, mode="r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            company_rows = list(reader)
+
+        # Sort deterministically by company_id
+        company_rows.sort(key=lambda x: x["company_id"])
+        print(f"       Found {len(company_rows)} valid company records.")
+
+        # Upsert Company records
+        companies_map = {}
+        for r in company_rows:
+            comp = Company(
+                id=r["company_id"].strip(),
+                name=r["company_name"].strip(),
+                city=r["city"].strip(),
+                state=r["state"].strip() or "Tamil Nadu",
+                address=r["address"].strip(),
+                latitude=float(r["latitude"].strip()),
+                longitude=float(r["longitude"].strip()),
+                industry=r["industry"].strip(),
+                google_maps_link=r["google_maps_link"].strip(),
+            )
+            db.add(comp)
+            companies_map[comp.id] = comp
         db.commit()
+        print(f"       [OK] Upserted {len(companies_map)} companies into 'companies' table.")
 
-        db.add_all([
-            MachineCapability(machine_id=haas_vf4.id, process="CNC Milling", material="Aluminium 6061", min_tolerance_mm=0.005, max_dimension_x=1270, max_dimension_y=508, max_dimension_z=635),
-            MachineCapability(machine_id=haas_vf4.id, process="CNC Milling", material="Aluminium", min_tolerance_mm=0.005, max_dimension_x=1270, max_dimension_y=508, max_dimension_z=635),
-            MachineCapability(machine_id=haas_vf4.id, process="CNC Milling", material="Stainless Steel 304", min_tolerance_mm=0.008, max_dimension_x=1270, max_dimension_y=508, max_dimension_z=635),
-            MachineCapability(machine_id=haas_vf4.id, process="CNC Machining", material="Brass", min_tolerance_mm=0.010, max_dimension_x=1270, max_dimension_y=508, max_dimension_z=635),
-        ])
+        # =========================================================================
+        # 4. DETERMINISTIC CAPACITY DISTRIBUTION (13 / 12 / 12 / 12)
+        # =========================================================================
+        # Janika:         records 0..12  (13 machines)
+        # Pragatheswaran: records 13..24 (12 machines)
+        # Jayanth:        records 25..36 (12 machines)
+        # Reethika:       records 37..48 (12 machines)
+        print("[4/7] Generating 49 DEMO capacity listings across the 4 demo providers...")
 
-        # Machine 2: BFW Chakra BMV 60 (Senthil - Coimbatore CNC)
-        bfw_chakra = Machine(
-            business_id=cbe_cnc_biz.id,
-            name="BFW Chakra BMV 60+ Heavy Duty VMC",
-            category="CNC Milling",
-            manufacturer="Bharat Fritz Werner (BFW)",
-            model="Chakra BMV 60+",
-            year=2022,
-            description="Rigid vertical machining center optimized for steel, alloy, and batch production with BT-50 spindle.",
-            dimensions_capacity="1050 x 610 x 610 mm",
-            precision_tolerance="±0.01 mm",
-            operating_parameters=json.dumps({"spindle_rpm": 8000, "table_load_kg": 1000}),
-            hourly_price=850.0,
-            min_job_value=3000.0,
-            operator_available=True,
-            location_address="88, Ganapathy Industrial Cluster, Coimbatore",
-            latitude=11.0384,
-            longitude=76.9744,
-            photos=json.dumps([
-                "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800",
-            ]),
-            status=MachineStatus.ACTIVE,
-            verification_status=VerificationStatus.VERIFIED,
-        )
-        db.add(bfw_chakra)
+        provider_distribution = [
+            (kovai_biz.id, "Janika", 0, 13),
+            (kongu_biz.id, "Pragatheswaran", 13, 25),
+            (jayanth_biz.id, "Jayanth", 25, 37),
+            (reethika_biz.id, "Reethika", 37, 49),
+        ]
+
+        all_machines = []
+        photos_stock = [
+            "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800",
+            "https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?w=800",
+            "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800",
+        ]
+
+        for biz_id, provider_label, start_idx, end_idx in provider_distribution:
+            assigned_rows = company_rows[start_idx:end_idx]
+            print(f"       Assigning {len(assigned_rows)} listings to {provider_label} (indices {start_idx}..{end_idx-1})...")
+
+            for idx, r in enumerate(assigned_rows):
+                cid = r["company_id"].strip()
+                cname = r["company_name"].strip()
+                city = r["city"].strip()
+                ind = r["industry"].strip()
+                lat = float(r["latitude"].strip())
+                lng = float(r["longitude"].strip())
+                gurl = r["google_maps_link"].strip()
+                addr = r["address"].strip()
+
+                specs = get_capacity_specs_for_industry(ind, cname, city)
+                
+                # Deterministic machine UUID derived from company_id
+                mach_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, f"machhunt.capacity.{cid}"))
+
+                machine = Machine(
+                    id=mach_id,
+                    business_id=biz_id,
+                    company_id=cid,
+                    name=specs["name"],
+                    category=specs["category"],
+                    manufacturer=specs["manufacturer"],
+                    model=specs["model"],
+                    year=specs["year"],
+                    description=specs["description"],
+                    dimensions_capacity=specs["dimensions_capacity"],
+                    precision_tolerance=specs["precision_tolerance"],
+                    operating_parameters=json.dumps(specs["operating_parameters"]),
+                    hourly_price=specs["hourly_price"],
+                    min_job_value=specs["min_job_value"],
+                    operator_available=True,
+                    location_address=addr,
+                    latitude=lat,
+                    longitude=lng,
+                    google_maps_link=gurl,
+                    photos=json.dumps([photos_stock[(start_idx + idx) % len(photos_stock)]]),
+                    status=MachineStatus.ACTIVE,
+                    verification_status=VerificationStatus.VERIFIED,
+                )
+                db.add(machine)
+                db.commit()
+
+                # Add capabilities
+                for cap in specs["capabilities"]:
+                    proc, mat, tol, dx, dy, dz = cap
+                    db.add(MachineCapability(
+                        machine_id=machine.id,
+                        process=proc,
+                        material=mat,
+                        min_tolerance_mm=tol,
+                        max_dimension_x=dx,
+                        max_dimension_y=dy,
+                        max_dimension_z=dz,
+                    ))
+
+                all_machines.append(machine)
+
         db.commit()
+        print(f"       [OK] Successfully created {len(all_machines)} active capacity listings with capabilities.")
 
-        db.add_all([
-            MachineCapability(machine_id=bfw_chakra.id, process="CNC Milling", material="Mild Steel", min_tolerance_mm=0.01, max_dimension_x=1050, max_dimension_y=610, max_dimension_z=610),
-            MachineCapability(machine_id=bfw_chakra.id, process="CNC Milling", material="Aluminium 6061", min_tolerance_mm=0.01, max_dimension_x=1050, max_dimension_y=610, max_dimension_z=610),
-            MachineCapability(machine_id=bfw_chakra.id, process="CNC Machining", material="Cast Iron", min_tolerance_mm=0.015, max_dimension_x=1050, max_dimension_y=610, max_dimension_z=610),
-        ])
-
-        # Machine 3: Trumpf TruLaser 3030 (Murugan - Apex Laser)
-        trumpf_laser = Machine(
-            business_id=apex_laser_biz.id,
-            name="Trumpf TruLaser 3030 4kW Fiber Laser",
-            category="Laser Cutting",
-            manufacturer="Trumpf",
-            model="TruLaser 3030 Fiber",
-            year=2024,
-            description="Ultra-high-speed CNC fiber laser cutting machine with automated pallet changer, capable of cutting up to 20mm mild steel and 15mm aluminium.",
-            dimensions_capacity="3000 x 1500 mm Sheet Envelope",
-            precision_tolerance="±0.03 mm",
-            operating_parameters=json.dumps({"laser_power_watts": 4000, "gas_assist": ["Nitrogen", "Oxygen"]}),
-            hourly_price=1750.0,
-            min_job_value=4000.0,
-            operator_available=True,
-            location_address="Civil Aerodrome Post, Peelamedu, Coimbatore",
-            latitude=11.0289,
-            longitude=77.0093,
-            photos=json.dumps([
-                "https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?w=800",
-            ]),
-            status=MachineStatus.ACTIVE,
-            verification_status=VerificationStatus.VERIFIED,
-        )
-        db.add(trumpf_laser)
-        db.commit()
-
-        db.add_all([
-            MachineCapability(machine_id=trumpf_laser.id, process="Laser Cutting", material="Mild Steel", min_tolerance_mm=0.03, max_dimension_x=3000, max_dimension_y=1500, max_dimension_z=20),
-            MachineCapability(machine_id=trumpf_laser.id, process="Laser Cutting", material="Stainless Steel 304", min_tolerance_mm=0.03, max_dimension_x=3000, max_dimension_y=1500, max_dimension_z=12),
-            MachineCapability(machine_id=trumpf_laser.id, process="Laser Cutting", material="Aluminium 6061", min_tolerance_mm=0.04, max_dimension_x=3000, max_dimension_y=1500, max_dimension_z=10),
-        ])
-
-        # Machine 4: Mazak Quick Turn 250 (Senthil - Coimbatore CNC)
-        mazak_turn = Machine(
-            business_id=cbe_cnc_biz.id,
-            name="Mazak Quick Turn 250 CNC Lathe",
-            category="CNC Turning",
-            manufacturer="Yamazaki Mazak",
-            model="QT-250",
-            year=2021,
-            description="Precision CNC turning center with 8-inch hydraulic chuck, programmable tailstock, and live rotary tooling.",
-            dimensions_capacity="Max Turning Dia: 380 mm, Length: 500 mm",
-            precision_tolerance="±0.008 mm",
-            operating_parameters=json.dumps({"max_rpm": 4500, "chuck_size_inch": 8}),
-            hourly_price=650.0,
-            min_job_value=2500.0,
-            operator_available=True,
-            location_address="88, Ganapathy Industrial Cluster, Coimbatore",
-            latitude=11.0384,
-            longitude=76.9744,
-            photos=json.dumps([
-                "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800",
-            ]),
-            status=MachineStatus.ACTIVE,
-            verification_status=VerificationStatus.VERIFIED,
-        )
-        db.add(mazak_turn)
-        db.commit()
-
-        db.add_all([
-            MachineCapability(machine_id=mazak_turn.id, process="CNC Turning", material="Aluminium 6061", min_tolerance_mm=0.008, max_dimension_x=380, max_dimension_y=380, max_dimension_z=500),
-            MachineCapability(machine_id=mazak_turn.id, process="CNC Turning", material="Mild Steel", min_tolerance_mm=0.008, max_dimension_x=380, max_dimension_y=380, max_dimension_z=500),
-            MachineCapability(machine_id=mazak_turn.id, process="Lathe", material="Brass", min_tolerance_mm=0.010, max_dimension_x=380, max_dimension_y=380, max_dimension_z=500),
-        ])
-        db.commit()
-
-        # Machine 5: Doosan DNM 5700 (Jayanth - Tiruppur)
-        doosan_vmc = Machine(
-            business_id=jayanth_biz.id,
-            name="Doosan DNM 5700 4-Axis CNC Machining Center",
-            category="CNC Milling",
-            manufacturer="Doosan Machine Tools",
-            model="DNM 5700",
-            year=2023,
-            description="High-precision 4-axis vertical machining center equipped with high-pressure coolant and rotary table, optimized for precision textile components, automotive brackets, and aerospace aluminium.",
-            dimensions_capacity="1050 x 570 x 510 mm",
-            precision_tolerance="±0.005 mm",
-            operating_parameters=json.dumps({"spindle_rpm": 12000, "tool_capacity": 30, "coolant": "Through Spindle Coolant"}),
-            hourly_price=1100.0,
-            min_job_value=4000.0,
-            operator_available=True,
-            location_address="15, Textile Machinery & CNC Park, Tiruppur",
-            latitude=11.1085,
-            longitude=77.3411,
-            photos=json.dumps([
-                "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800",
-                "https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?w=800",
-            ]),
-            status=MachineStatus.ACTIVE,
-            verification_status=VerificationStatus.VERIFIED,
-        )
-        db.add(doosan_vmc)
-        db.commit()
-
-        db.add_all([
-            MachineCapability(machine_id=doosan_vmc.id, process="CNC Milling", material="Aluminium 6061", min_tolerance_mm=0.005, max_dimension_x=1050, max_dimension_y=570, max_dimension_z=510),
-            MachineCapability(machine_id=doosan_vmc.id, process="CNC Milling", material="Aluminium", min_tolerance_mm=0.005, max_dimension_x=1050, max_dimension_y=570, max_dimension_z=510),
-            MachineCapability(machine_id=doosan_vmc.id, process="CNC Milling", material="Mild Steel", min_tolerance_mm=0.010, max_dimension_x=1050, max_dimension_y=570, max_dimension_z=510),
-            MachineCapability(machine_id=doosan_vmc.id, process="CNC Machining", material="Stainless Steel 304", min_tolerance_mm=0.008, max_dimension_x=1050, max_dimension_y=570, max_dimension_z=510),
-        ])
-        db.commit()
-
-        # Machine 6: LMW Smarturn (Jayanth - Tiruppur)
-        lmw_turn = Machine(
-            business_id=jayanth_biz.id,
-            name="LMW Smarturn CNC Precision Lathe",
-            category="CNC Turning",
-            manufacturer="Lakshmi Machine Works (LMW)",
-            model="Smarturn",
-            year=2022,
-            description="Rigid CNC turning center built in Coimbatore/Tiruppur region, tailored for high-speed shaft turning, textile rollers, and precision bushings.",
-            dimensions_capacity="Max Turning Dia: 320 mm, Length: 400 mm",
-            precision_tolerance="±0.008 mm",
-            operating_parameters=json.dumps({"max_rpm": 4000, "chuck_size_inch": 8}),
-            hourly_price=700.0,
-            min_job_value=2500.0,
-            operator_available=True,
-            location_address="24, Avinashi Road Industrial Area, Tiruppur",
-            latitude=11.1120,
-            longitude=77.3450,
-            photos=json.dumps([
-                "https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?w=800",
-            ]),
-            status=MachineStatus.ACTIVE,
-            verification_status=VerificationStatus.VERIFIED,
-        )
-        db.add(lmw_turn)
-        db.commit()
-
-        db.add_all([
-            MachineCapability(machine_id=lmw_turn.id, process="CNC Turning", material="Aluminium 6061", min_tolerance_mm=0.008, max_dimension_x=320, max_dimension_y=320, max_dimension_z=400),
-            MachineCapability(machine_id=lmw_turn.id, process="CNC Turning", material="Mild Steel", min_tolerance_mm=0.008, max_dimension_x=320, max_dimension_y=320, max_dimension_z=400),
-            MachineCapability(machine_id=lmw_turn.id, process="Lathe", material="Brass", min_tolerance_mm=0.010, max_dimension_x=320, max_dimension_y=320, max_dimension_z=400),
-        ])
-        db.commit()
-
-        # Machine 7: Amada Ensis Fiber Laser (Jayanth - Tiruppur)
-        amada_laser = Machine(
-            business_id=jayanth_biz.id,
-            name="Amada Ensis 3015 3kW Fiber Laser",
-            category="Laser Cutting",
-            manufacturer="Amada",
-            model="Ensis 3015 AJ",
-            year=2023,
-            description="Energy-efficient 3kW fiber laser cutting with variable beam control for clean cutting in aluminium, mild steel, and stainless sheet metal.",
-            dimensions_capacity="3000 x 1500 mm Sheet Envelope",
-            precision_tolerance="±0.03 mm",
-            operating_parameters=json.dumps({"laser_power_watts": 3000, "beam_mode": "Auto Collimation"}),
-            hourly_price=1600.0,
-            min_job_value=3500.0,
-            operator_available=True,
-            location_address="15, Textile Machinery & CNC Park, Tiruppur",
-            latitude=11.1085,
-            longitude=77.3411,
-            photos=json.dumps([
-                "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800",
-            ]),
-            status=MachineStatus.ACTIVE,
-            verification_status=VerificationStatus.VERIFIED,
-        )
-        db.add(amada_laser)
-        db.commit()
-
-        db.add_all([
-            MachineCapability(machine_id=amada_laser.id, process="Laser Cutting", material="Aluminium 6061", min_tolerance_mm=0.03, max_dimension_x=3000, max_dimension_y=1500, max_dimension_z=8),
-            MachineCapability(machine_id=amada_laser.id, process="Laser Cutting", material="Mild Steel", min_tolerance_mm=0.03, max_dimension_x=3000, max_dimension_y=1500, max_dimension_z=16),
-            MachineCapability(machine_id=amada_laser.id, process="Sheet Metal Fabrication", material="Stainless Steel 304", min_tolerance_mm=0.04, max_dimension_x=3000, max_dimension_y=1500, max_dimension_z=10),
-        ])
-        db.commit()
-
-        # 4. AVAILABILITY CALENDAR SLOTS
-        print("[4/7] Scheduling operational calendar availability...")
+        # =========================================================================
+        # 5. AVAILABILITY CALENDAR SLOTS (NEXT 30 DAYS FOR ALL 49 MACHINES)
+        # =========================================================================
+        print("[5/7] Scheduling 30-day operating calendar availability across all 49 machines...")
         today = date.today()
-        for offset in range(14):
+        avail_batch = []
+        for offset in range(30):
             day = today + timedelta(days=offset)
-            # Haas VF-4 has open operational hours
-            db.add(MachineAvailability(
-                machine_id=haas_vf4.id,
-                date=day,
-                start_time=time(8, 0),
-                end_time=time(20, 0),
-                is_available=True,
-                reason="Regular Operating Shift (12 hrs/day)",
-            ))
-            # BFW Chakra
-            db.add(MachineAvailability(
-                machine_id=bfw_chakra.id,
-                date=day,
-                start_time=time(9, 0),
-                end_time=time(18, 0),
-                is_available=True,
-                reason="Available Shift",
-            ))
-            # TruLaser
-            db.add(MachineAvailability(
-                machine_id=trumpf_laser.id,
-                date=day,
-                start_time=time(8, 30),
-                end_time=time(21, 0),
-                is_available=True,
-                reason="2 Shifts Open",
-            ))
-            # Mazak Turn
-            db.add(MachineAvailability(
-                machine_id=mazak_turn.id,
-                date=day,
-                start_time=time(9, 0),
-                end_time=time(18, 0),
-                is_available=True,
-                reason="Day Shift",
-            ))
-            # Doosan VMC (Tiruppur)
-            db.add(MachineAvailability(
-                machine_id=doosan_vmc.id,
-                date=day,
-                start_time=time(8, 0),
-                end_time=time(20, 0),
-                is_available=True,
-                reason="Active Production Shift (12 hrs/day)",
-            ))
-            # LMW Turn (Tiruppur)
-            db.add(MachineAvailability(
-                machine_id=lmw_turn.id,
-                date=day,
-                start_time=time(9, 0),
-                end_time=time(18, 0),
-                is_available=True,
-                reason="Available Shift",
-            ))
-            # Amada Laser (Tiruppur)
-            db.add(MachineAvailability(
-                machine_id=amada_laser.id,
-                date=day,
-                start_time=time(8, 30),
-                end_time=time(20, 30),
-                is_available=True,
-                reason="2 Shifts Open",
-            ))
+            for m in all_machines:
+                avail_batch.append(MachineAvailability(
+                    machine_id=m.id,
+                    date=day,
+                    start_time=time(8, 0),
+                    end_time=time(20, 0),
+                    is_available=True,
+                    reason="Standard Production Shift (12 hrs/day)",
+                ))
+        db.add_all(avail_batch)
         db.commit()
+        print(f"       [OK] Generated {len(avail_batch)} availability slot entries.")
 
-        # 5. SAMPLE REQUIREMENT (Karthikeyan Seeker)
-        print("[5/7] Creating demo manufacturing requirement...")
-        req = Requirement(
-            seeker_id=karthikeyan_seeker.id,
-            title="500 Precision Aluminium Mounting Brackets",
-            description="Need 500 units of custom aerospace grade 6061-T6 mounting brackets, 4-axis CNC machined with tight ±0.02 mm bore tolerance and deburred edges for drone sub-chassis.",
+        # =========================================================================
+        # 6. CROSS-ACCOUNT REQUIREMENTS & EXPLAINABLE MATCHING
+        # =========================================================================
+        print("[6/7] Creating cross-account requirements and computing AI matches...")
+
+        # Requirement 1: Pragatheswaran as Seeker looking for CNC Machining in Coimbatore
+        praga_req = Requirement(
+            seeker_id=pragatheswaran_user.id,
+            title="500 Aluminium Brackets (CNC Machining)",
+            description="Need 500 units custom aerospace brackets, 4-axis CNC machined with tight ±0.01 mm tolerance in Coimbatore.",
             process="CNC Milling",
             material="Aluminium 6061",
             quantity=500,
             dimensions="140 x 75 x 30 mm",
-            tolerance_mm=0.02,
-            required_date=today + timedelta(days=1),
-            delivery_deadline=today + timedelta(days=5),
-            preferred_location="Saravanampatti, Coimbatore",
-            latitude=11.0797,
-            longitude=76.9997,
-            max_distance_km=40.0,
-            budget=28000.0,
-            quality_requirements="CMM Inspection Report required for 10% sampling. Mill test certificate for raw material 6061-T6.",
-            operator_required=True,
-            status=RequirementStatus.OPEN,
-        )
-        db.add(req)
-
-        praga_req = Requirement(
-            seeker_id=pragatheswaran_user.id,
-            title="500 Aluminium Components",
-            description="Need 500 units of custom precision components, 4-axis CNC machined with tight ±0.02 mm bore tolerance.",
-            process="CNC Milling",
-            material="Aluminium",
-            quantity=500,
-            dimensions="140 x 75 x 30 mm",
-            tolerance_mm=0.02,
-            required_date=today + timedelta(days=1),
+            tolerance_mm=0.01,
+            required_date=today + timedelta(days=2),
             delivery_deadline=today + timedelta(days=7),
             preferred_location="Coimbatore",
-            latitude=11.0168,
-            longitude=76.9558,
+            latitude=11.0546,
+            longitude=76.9839,
             max_distance_km=50.0,
             budget=25000.0,
             quality_requirements="Dimensional inspection certificate required.",
@@ -653,131 +651,267 @@ def seed_database():
         )
         db.add(praga_req)
 
+        # Requirement 2: Reethika as Seeker looking for Laser Cutting in Tiruppur
+        reethika_req = Requirement(
+            seeker_id=reethika_user.id,
+            title="150 Fiber Laser Cut Stainless Steel Panels",
+            description="Need 150 units precision 3mm SS304 instrument chassis panels cut with burr-free nitrogen assist.",
+            process="Laser Cutting",
+            material="Stainless Steel 304",
+            quantity=150,
+            dimensions="400 x 300 x 3 mm",
+            tolerance_mm=0.03,
+            required_date=today + timedelta(days=3),
+            delivery_deadline=today + timedelta(days=8),
+            preferred_location="Tiruppur",
+            latitude=11.1085,
+            longitude=77.3411,
+            max_distance_km=60.0,
+            budget=22000.0,
+            quality_requirements="Nitrogen clean-cut edges without dross.",
+            operator_required=True,
+            status=RequirementStatus.OPEN,
+        )
+        db.add(reethika_req)
+
+        # Requirement 3: Janika as Seeker looking for Garment / Fabric Production in Tiruppur
+        janika_req = Requirement(
+            seeker_id=janika_owner.id,
+            title="1000 Premium Knitted Cotton Garment Panels",
+            description="Need 1000 units circular knitted single jersey panels in organic combed cotton yarn.",
+            process="Circular Knitting",
+            material="Combed Cotton Yarn",
+            quantity=1000,
+            dimensions="1800 x 1800 mm",
+            tolerance_mm=0.1,
+            required_date=today + timedelta(days=4),
+            delivery_deadline=today + timedelta(days=12),
+            preferred_location="Tiruppur",
+            latitude=11.0995,
+            longitude=77.3185,
+            max_distance_km=50.0,
+            budget=35000.0,
+            quality_requirements="Uniform stitch density and fastness grade 4.",
+            operator_required=True,
+            status=RequirementStatus.OPEN,
+        )
+        db.add(janika_req)
+
+        # Requirement 4: Jayanth as Seeker looking for CNC Turning in Coimbatore
         jayanth_req = Requirement(
             seeker_id=jayanth_user.id,
-            title="500 Aluminium Components",
-            description="Need 500 units of custom precision components, 4-axis CNC machined with tight ±0.02 mm bore tolerance.",
-            process="CNC Milling",
-            material="Aluminium",
-            quantity=500,
-            dimensions="140 x 75 x 30 mm",
-            tolerance_mm=0.02,
-            required_date=today + timedelta(days=1),
-            delivery_deadline=today + timedelta(days=7),
+            title="300 CNC Turned Textile Rollers & Shafts",
+            description="Precision turned textile drive shafts and bronze bushings for high-speed yarn spinning machines.",
+            process="CNC Turning",
+            material="Mild Steel",
+            quantity=300,
+            dimensions="Ø65 x 350 mm",
+            tolerance_mm=0.008,
+            required_date=today + timedelta(days=2),
+            delivery_deadline=today + timedelta(days=9),
             preferred_location="Coimbatore",
             latitude=11.0168,
             longitude=76.9558,
-            max_distance_km=50.0,
-            budget=25000.0,
-            quality_requirements="Dimensional inspection certificate required.",
+            max_distance_km=40.0,
+            budget=20000.0,
+            quality_requirements="Runout tolerance within 0.01 mm.",
             operator_required=True,
             status=RequirementStatus.OPEN,
         )
         db.add(jayanth_req)
+
+        # Requirement 5: Karthikeyan (Test Seeker)
+        karthik_req = Requirement(
+            seeker_id=karthikeyan_seeker.id,
+            title="500 Precision Aluminium Mounting Brackets",
+            description="Need 500 units of custom aerospace grade 6061-T6 mounting brackets, 4-axis CNC machined with tight ±0.02 mm bore tolerance.",
+            process="CNC Milling",
+            material="Aluminium 6061",
+            quantity=500,
+            dimensions="140 x 75 x 30 mm",
+            tolerance_mm=0.02,
+            required_date=today + timedelta(days=1),
+            delivery_deadline=today + timedelta(days=5),
+            preferred_location="Coimbatore",
+            latitude=11.0546,
+            longitude=76.9839,
+            max_distance_km=40.0,
+            budget=28000.0,
+            quality_requirements="CMM Inspection Report required.",
+            operator_required=True,
+            status=RequirementStatus.OPEN,
+        )
+        db.add(karthik_req)
         db.commit()
 
-        # 6. RUN REAL MATCHING ENGINE FOR THIS REQUIREMENT
-        print("[6/7] Running deterministic explainable capacity matching...")
-        candidates = [haas_vf4, bfw_chakra, trumpf_laser, mazak_turn, doosan_vmc, lmw_turn, amada_laser]
-        matches = matching_engine.rank_matches(req, candidates)
-
-        for m_res in matches:
-            db_m = Match(
-                requirement_id=req.id,
-                machine_id=m_res.machine_id,
-                overall_score=m_res.overall_score,
-                capability_score=m_res.score_breakdown.capability_score,
-                availability_score=m_res.score_breakdown.availability_score,
-                distance_score=m_res.score_breakdown.distance_score,
-                cost_score=m_res.score_breakdown.cost_score,
-                reliability_score=m_res.score_breakdown.reliability_score,
-                match_reasons=json.dumps(m_res.match_reasons),
-            )
-            db.add(db_m)
-        req.status = RequirementStatus.MATCHED
+        # Compute matches for all requirements (excluding the seeker's own machines!)
+        requirements_to_match = [praga_req, reethika_req, janika_req, jayanth_req, karthik_req]
+        for req in requirements_to_match:
+            candidates = [m for m in all_machines if m.business.user_id != req.seeker_id]
+            ranked = matching_engine.rank_matches(req, candidates, search_location=req.preferred_location)
+            for m_res in ranked:
+                db.add(Match(
+                    requirement_id=req.id,
+                    machine_id=m_res.machine_id,
+                    overall_score=m_res.overall_score,
+                    capability_score=m_res.score_breakdown.capability_score,
+                    availability_score=m_res.score_breakdown.availability_score,
+                    distance_score=m_res.score_breakdown.distance_score,
+                    cost_score=m_res.score_breakdown.cost_score,
+                    reliability_score=m_res.score_breakdown.reliability_score,
+                    match_reasons=json.dumps(m_res.match_reasons),
+                ))
+            if ranked:
+                req.status = RequirementStatus.MATCHED
         db.commit()
+        print("       [OK] AI Matching Engine completed deterministic evaluations.")
 
-        # 7. SAMPLE COMPLETED BOOKING (FOR REAL STATS, GMV, AND RATINGS)
-        print("[7/7] Seeding realistic completed booking and review...")
-        prior_date = today - timedelta(days=7)
-        past_booking = Booking(
-            requirement_id=req.id,
-            machine_id=haas_vf4.id,
+        # =========================================================================
+        # 7. CROSS-ACCOUNT BOOKINGS (REAL TRANSACTIONAL WORKFLOW)
+        # =========================================================================
+        print("[7/7] Seeding cross-account bookings and notifications...")
+        
+        # SCENARIO A: Pragatheswaran has requested a booking on Janika's CBE001 CNC capacity!
+        # Janika sees this under "Incoming Capacity Requests" on Provider Dashboard and can click [Accept Request]!
+        janika_cbe001_mach = next(m for m in all_machines if m.company_id == "CBE001")
+        booking_praga_to_janika = Booking(
+            requirement_id=praga_req.id,
+            machine_id=janika_cbe001_mach.id,
+            seeker_id=pragatheswaran_user.id,
+            provider_id=janika_owner.id,
+            status=BookingStatus.PENDING,
+            start_date=today + timedelta(days=2),
+            end_date=today + timedelta(days=5),
+            total_hours=15.0,
+            unit_price=janika_cbe001_mach.hourly_price,
+            total_amount=15.0 * janika_cbe001_mach.hourly_price,
+            commission_amount=(15.0 * janika_cbe001_mach.hourly_price) * 0.05,
+            provider_payout=(15.0 * janika_cbe001_mach.hourly_price) * 0.95,
+            notes="500 Aluminium brackets with aerospace tolerance ±0.01 mm.",
+        )
+        db.add(booking_praga_to_janika)
+
+        # SCENARIO B: Reethika booked Jayanth's Laser capacity (CBE026 / TPR001) -> Jayanth accepted -> CONFIRMED & ESCROW HELD!
+        jayanth_laser_mach = next((m for m in all_machines if m.business_id == jayanth_biz.id and "Laser" in m.category), all_machines[25])
+        booking_reethika_to_jayanth = Booking(
+            requirement_id=reethika_req.id,
+            machine_id=jayanth_laser_mach.id,
+            seeker_id=reethika_user.id,
+            provider_id=jayanth_user.id,
+            status=BookingStatus.CONFIRMED,
+            start_date=today + timedelta(days=3),
+            end_date=today + timedelta(days=6),
+            total_hours=15.0,
+            unit_price=jayanth_laser_mach.hourly_price,
+            total_amount=15.0 * jayanth_laser_mach.hourly_price,
+            commission_amount=(15.0 * jayanth_laser_mach.hourly_price) * 0.05,
+            provider_payout=(15.0 * jayanth_laser_mach.hourly_price) * 0.95,
+            notes="150 Laser cut instrument panels in SS304. Escrow authorized.",
+        )
+        db.add(booking_reethika_to_jayanth)
+
+        # SCENARIO C: Janika booked Reethika's Knitting capacity in Tiruppur -> COMPLETED & REVIEWED!
+        reethika_knit_mach = next((m for m in all_machines if m.business_id == reethika_biz.id and "Knit" in m.category), all_machines[37])
+        booking_janika_to_reethika = Booking(
+            requirement_id=janika_req.id,
+            machine_id=reethika_knit_mach.id,
+            seeker_id=janika_owner.id,
+            provider_id=reethika_user.id,
+            status=BookingStatus.COMPLETED,
+            start_date=today - timedelta(days=7),
+            end_date=today - timedelta(days=3),
+            total_hours=20.0,
+            unit_price=reethika_knit_mach.hourly_price,
+            total_amount=20.0 * reethika_knit_mach.hourly_price,
+            commission_amount=(20.0 * reethika_knit_mach.hourly_price) * 0.05,
+            provider_payout=(20.0 * reethika_knit_mach.hourly_price) * 0.95,
+            notes="1000 Circular knitted cotton panels completed with Grade 4 inspection.",
+        )
+        db.add(booking_janika_to_reethika)
+
+        # SCENARIO D: Karthikeyan booked Janika's capacity (Completed for test verification)
+        booking_karthik_to_janika = Booking(
+            requirement_id=karthik_req.id,
+            machine_id=janika_cbe001_mach.id,
             seeker_id=karthikeyan_seeker.id,
             provider_id=janika_owner.id,
             status=BookingStatus.COMPLETED,
-            start_date=prior_date,
-            end_date=prior_date + timedelta(days=3),
-            total_hours=16.0,
-            unit_price=1200.0,
-            total_amount=19200.0,
-            commission_amount=960.0,  # 5%
-            provider_payout=18240.0,  # 95%
-            notes="Previous batch of 350 heatsink flanges completed ahead of schedule with 100% CMM pass rate.",
+            start_date=today - timedelta(days=10),
+            end_date=today - timedelta(days=6),
+            total_hours=12.0,
+            unit_price=janika_cbe001_mach.hourly_price,
+            total_amount=12.0 * janika_cbe001_mach.hourly_price,
+            commission_amount=(12.0 * janika_cbe001_mach.hourly_price) * 0.05,
+            provider_payout=(12.0 * janika_cbe001_mach.hourly_price) * 0.95,
+            notes="Delivered on schedule with CMM verification report.",
         )
-        db.add(past_booking)
+        db.add(booking_karthik_to_janika)
         db.commit()
 
-        # Escrow payment released
-        past_payment = Payment(
-            booking_id=past_booking.id,
-            transaction_id="TXN-ESCROW-PAID-0012",
-            provider="escrow_simulated",
-            amount=19200.0,
-            commission=960.0,
-            provider_payout=18240.0,
+        # Seed Payments
+        db.add(Payment(
+            booking_id=booking_reethika_to_jayanth.id,
+            transaction_id="tx_demo_escrow_123456",
+            amount=booking_reethika_to_jayanth.total_amount,
+            commission=booking_reethika_to_jayanth.commission_amount,
+            provider_payout=booking_reethika_to_jayanth.provider_payout,
+            status=PaymentStatus.ESCROW_HOLD,
+            provider="razorpay_escrow",
+        ))
+        db.add(Payment(
+            booking_id=booking_janika_to_reethika.id,
+            transaction_id="tx_demo_released_789012",
+            amount=booking_janika_to_reethika.total_amount,
+            commission=booking_janika_to_reethika.commission_amount,
+            provider_payout=booking_janika_to_reethika.provider_payout,
             status=PaymentStatus.RELEASED_TO_PROVIDER,
-        )
-        db.add(past_payment)
+            provider="razorpay_escrow",
+        ))
 
-        # 5-star review from Karthikeyan to Janika
-        review = Review(
-            booking_id=past_booking.id,
-            reviewer_id=karthikeyan_seeker.id,
-            reviewee_id=janika_owner.id,
+        # Seed Reviews
+        db.add(Review(
+            booking_id=booking_janika_to_reethika.id,
+            reviewer_id=janika_owner.id,
+            reviewee_id=reethika_user.id,
             rating=5,
-            review_text="Exceptional precision on our aerospace bracket lot. Tolerances held within ±0.005mm and delivery was 1 day early. Highly recommended provider!",
-        )
-        db.add(review)
+            review_text="Outstanding knitting quality! Flawless loop consistency and delivered 1 day ahead of schedule.",
+        ))
 
-        # In-app notifications
-        db.add_all([
-            Notification(
-                user_id=karthikeyan_seeker.id,
-                title="Capacity Matches Ready!",
-                message="4 matching machines found for '500 Precision Aluminium Mounting Brackets'. Top match: HAAS VF-4SS (95% Match).",
-                event_type="MATCH_FOUND",
-                reference_id=req.id,
-            ),
-            Notification(
-                user_id=janika_owner.id,
-                title="Payout Credited: ₹18,240",
-                message="Escrow funds for completed machining job #19200 have been released to your account.",
-                event_type="PAYMENT_RELEASED",
-                reference_id=past_booking.id,
-            ),
-            Notification(
-                user_id=admin_user.id,
-                title="Platform Milestone",
-                message="Total capacity transactions crossed ₹19,200 GMV.",
-                event_type="PLATFORM_UPDATE",
-                reference_id=past_booking.id,
-            )
-        ])
+        # Seed Notifications
+        db.add(Notification(
+            user_id=janika_owner.id,
+            title="New Capacity Booking Request",
+            message=f"Pragatheswaran requested {booking_praga_to_janika.total_hours} hrs on '{janika_cbe001_mach.name}' for Aluminium Brackets.",
+            event_type="BOOKING_REQUEST",
+            reference_id=booking_praga_to_janika.id,
+        ))
+        db.add(Notification(
+            user_id=pragatheswaran_user.id,
+            title="Booking Request Submitted",
+            message=f"Your booking request for '{janika_cbe001_mach.name}' has been sent to Janika.",
+            event_type="BOOKING_STATUS",
+            reference_id=booking_praga_to_janika.id,
+        ))
+
         db.commit()
-
-        print("[SUCCESS] Mach-Hunt Seed Data successfully populated!")
-        print("-" * 75)
-        print("FOUR ACTIVE DEMO ACCOUNTS (AUTH_MODE=demo):")
-        print("  1. Janika:         janika@machhunt.demo         / password123 (Kovai Precision Works)")
-        print("  2. Pragatheswaran: pragatheswaran@machhunt.demo / password123 (Kongu Precision CNC Works)")
-        print("  3. Jayanth:        jayanth@machhunt.demo        / password123 (Jayanth High-Tech Engineering)")
-        print("  4. Reethika:       reethika@machhunt.demo       / password123 (Reethika Precision Tech)")
-        print("-" * 75)
+        print("\n=======================================================")
+        print("MACH-HUNT SHARED MARKETPLACE SEEDING COMPLETE!")
+        print("  - 49 Real Industrial Companies Imported")
+        print("  - 49 Demo Marketplace Capacity Listings Distributed:")
+        print("      * Janika (Kovai Precision Works):        13 Listings")
+        print("      * Pragatheswaran (Tiruppur Mfg Works):   12 Listings")
+        print("      * Jayanth (Hosur Auto Components):       12 Listings")
+        print("      * Reethika (Coimbatore Industrial):      12 Listings")
+        print("      * Total Capacity Listings:               49 Listings")
+        print("  - 33 Distinct Manufacturing Industries Exposed")
+        print("  - Cross-Account Bookings & Escrow Payments Initialized")
+        print("=======================================================\n")
 
     except Exception as e:
         db.rollback()
-        print(f"[ERROR] Error during database seeding: {e}")
+        print(f"[FATAL SEED ERROR] {e}")
+        import traceback
+        traceback.print_exc()
         raise e
     finally:
         db.close()

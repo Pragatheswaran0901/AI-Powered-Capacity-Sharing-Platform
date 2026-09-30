@@ -1,7 +1,8 @@
 from datetime import date, time
 from typing import Optional, List
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 from sqlalchemy.orm import Session, joinedload
+from app.models.company import Company
 from app.models.machine import (
     Machine, MachineCapability, MachineAvailability, MachineStatus
 )
@@ -20,6 +21,7 @@ class MachineRepository(BaseRepository[Machine]):
                 joinedload(Machine.capabilities),
                 joinedload(Machine.availabilities),
                 joinedload(Machine.business),
+                joinedload(Machine.company),
             )
             .filter(Machine.id == machine_id)
             .first()
@@ -32,6 +34,7 @@ class MachineRepository(BaseRepository[Machine]):
                 joinedload(Machine.capabilities),
                 joinedload(Machine.availabilities),
                 joinedload(Machine.business),
+                joinedload(Machine.company),
             )
             .filter(Machine.business_id == business_id)
             .all()
@@ -42,9 +45,11 @@ class MachineRepository(BaseRepository[Machine]):
         category: Optional[str] = None,
         process: Optional[str] = None,
         material: Optional[str] = None,
+        industry: Optional[str] = None,
         max_rate: Optional[float] = None,
         verified_only: bool = False,
         location: Optional[str] = None,
+        exclude_user_id: Optional[str] = None,
     ) -> List[Machine]:
         query = (
             self.db.query(Machine)
@@ -52,9 +57,13 @@ class MachineRepository(BaseRepository[Machine]):
                 joinedload(Machine.capabilities),
                 joinedload(Machine.availabilities),
                 joinedload(Machine.business),
+                joinedload(Machine.company),
             )
             .filter(Machine.status.in_([MachineStatus.ACTIVE, MachineStatus.AVAILABLE]))
         )
+
+        if exclude_user_id:
+            query = query.filter(Machine.business.has(Business.user_id != exclude_user_id))
 
         if category:
             query = query.filter(Machine.category.ilike(f"%{category}%"))
@@ -62,6 +71,14 @@ class MachineRepository(BaseRepository[Machine]):
             query = query.filter(Machine.hourly_price <= max_rate)
         if verified_only:
             query = query.filter(Machine.verification_status == VerificationStatus.VERIFIED)
+
+        if industry:
+            query = query.filter(
+                or_(
+                    Machine.category.ilike(f"%{industry}%"),
+                    Machine.company.has(Company.industry.ilike(f"%{industry}%")),
+                )
+            )
 
         if location:
             loc_clean = location.strip().lower()
@@ -72,11 +89,17 @@ class MachineRepository(BaseRepository[Machine]):
             else:
                 term = f"%{loc_clean}%"
 
-            query = query.join(Machine.business).filter(
+            query = query.filter(
                 or_(
-                    Machine.location_address.ilike(term),
-                    Business.district.ilike(term),
-                    Business.address.ilike(term),
+                    and_(Machine.company_id.isnot(None), Machine.company.has(Company.city.ilike(term))),
+                    and_(
+                        Machine.company_id.is_(None),
+                        or_(
+                            Machine.location_address.ilike(term),
+                            Machine.business.has(Business.district.ilike(term)),
+                            Machine.business.has(Business.address.ilike(term)),
+                        ),
+                    ),
                 )
             )
 

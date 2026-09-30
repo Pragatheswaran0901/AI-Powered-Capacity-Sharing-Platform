@@ -34,6 +34,7 @@ class _SeekerDashboardScreenState extends State<SeekerDashboardScreen> {
   String _selectedProcess = 'CNC Milling';
   String _selectedMaterial = 'Aluminium';
   String _selectedLocation = 'Coimbatore';
+  String? _selectedIndustry;
 
   // AI Natural Language Assistant
   final _aiPromptController = TextEditingController(
@@ -111,9 +112,13 @@ class _SeekerDashboardScreenState extends State<SeekerDashboardScreen> {
   }
 
   Future<void> _loadInitialData() async {
+    await seekerState.fetchIndustries();
     await seekerState.fetchMyRequirements();
     await seekerState.fetchMyBookings();
-    await seekerState.fetchAvailableMachines(location: _selectedLocation);
+    await seekerState.fetchAvailableMachines(
+      location: _selectedLocation,
+      industry: _selectedIndustry,
+    );
 
     // If seeker has an active requirement, populate form and pre-load matches
     if (seekerState.activeRequirement != null) {
@@ -245,7 +250,11 @@ class _SeekerDashboardScreenState extends State<SeekerDashboardScreen> {
     if (!mounted) return;
 
     if (newReq != null) {
-      await seekerState.fetchMatches(newReq.id, location: _selectedLocation);
+      await seekerState.fetchMatches(
+        newReq.id,
+        location: _selectedLocation,
+        industry: _selectedIndustry,
+      );
       final coords = MapsConfig.getCoordinatesForLocation(_selectedLocation);
       _mapKey.currentState?.animateToLocation(
         coords,
@@ -270,17 +279,55 @@ class _SeekerDashboardScreenState extends State<SeekerDashboardScreen> {
     );
 
     // Fetch capacity for the new location from shared backend
-    await seekerState.fetchAvailableMachines(location: newLoc);
+    await seekerState.fetchAvailableMachines(
+      location: newLoc,
+      industry: _selectedIndustry,
+    );
 
     if (seekerState.activeRequirement != null) {
       await seekerState.fetchMatches(
         seekerState.activeRequirement!.id,
         location: newLoc,
+        industry: _selectedIndustry,
       );
     } else if (seekerState.myRequirements.isNotEmpty) {
       final req = seekerState.myRequirements.first;
       seekerState.setActiveRequirement(req);
-      await seekerState.fetchMatches(req.id, location: newLoc);
+      await seekerState.fetchMatches(
+        req.id,
+        location: newLoc,
+        industry: _selectedIndustry,
+      );
+    }
+  }
+
+  Future<void> _handleIndustryChange(String? newInd) async {
+    setState(() {
+      _selectedIndustry = newInd;
+      _selectedCompareIds.clear();
+      _highlightedMachineId = null;
+    });
+    seekerState.setSelectedIndustry(newInd);
+
+    await seekerState.fetchAvailableMachines(
+      location: _selectedLocation,
+      industry: newInd,
+    );
+
+    if (seekerState.activeRequirement != null) {
+      await seekerState.fetchMatches(
+        seekerState.activeRequirement!.id,
+        location: _selectedLocation,
+        industry: newInd,
+      );
+    } else if (seekerState.myRequirements.isNotEmpty) {
+      final req = seekerState.myRequirements.first;
+      seekerState.setActiveRequirement(req);
+      await seekerState.fetchMatches(
+        req.id,
+        location: _selectedLocation,
+        industry: newInd,
+      );
     }
   }
 
@@ -303,8 +350,63 @@ class _SeekerDashboardScreenState extends State<SeekerDashboardScreen> {
     });
   }
 
+  Future<String?> _resolveValidRequirementId({String? fallbackTitle}) async {
+    // 1. If activeRequirement is set and belongs to this user's requirements, return its id
+    if (seekerState.activeRequirement != null &&
+        seekerState.myRequirements.any((r) => r.id == seekerState.activeRequirement!.id)) {
+      return seekerState.activeRequirement!.id;
+    }
+
+    // 2. If user already has requirements, use the first one and set it as active
+    if (seekerState.myRequirements.isNotEmpty) {
+      final req = seekerState.myRequirements.first;
+      seekerState.setActiveRequirement(req);
+      return req.id;
+    }
+
+    // 3. Otherwise create a requirement for this authenticated seeker from current form values
+    final qty = int.tryParse(_quantityController.text.trim()) ?? 100;
+    final budget = double.tryParse(_budgetController.text.trim()) ?? 25000.0;
+    final title = _reqController.text.trim().isNotEmpty
+        ? _reqController.text.trim()
+        : (fallbackTitle ?? '500 Aluminium Brackets (CNC Machining)');
+
+    final newReq = await seekerState.createRequirement({
+      'title': title,
+      'description':
+          'Manufacturing requirement for $qty units of $_selectedMaterial via $_selectedProcess in $_selectedLocation.',
+      'process': _selectedProcess,
+      'material': _selectedMaterial,
+      'quantity': qty,
+      'budget': budget,
+      'preferred_location': _selectedLocation,
+      'required_date': DateTime.now().toIso8601String().split('T').first,
+      'delivery_deadline': DateTime.now()
+          .add(const Duration(days: 7))
+          .toIso8601String()
+          .split('T')
+          .first,
+      'max_distance_km': 100.0,
+      'operator_required': true,
+    });
+
+    return newReq?.id;
+  }
+
   Future<void> _handleBookCapacity(MatchResultModel match) async {
-    final reqId = seekerState.activeRequirement?.id ?? '';
+    final reqId = await _resolveValidRequirementId(
+      fallbackTitle: 'Manufacturing Requirement for ${match.machineName}',
+    );
+    if (reqId == null || reqId.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please specify requirement details before booking.'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
     final qty = int.tryParse(_quantityController.text.trim()) ?? 100;
     final estimatedHours = (qty * 0.1).clamp(4.0, 80.0);
     final startDate = DateTime.now().add(const Duration(days: 1));
@@ -1008,40 +1110,24 @@ class _SeekerDashboardScreenState extends State<SeekerDashboardScreen> {
 
             const SizedBox(height: 16),
 
-            // 6-Field Responsive Grid
+            // 7-Field Responsive Grid (with Industry from Master 33 Sectors)
             LayoutBuilder(
               builder: (context, constraints) {
                 final width = constraints.maxWidth;
                 if (width >= 1040) {
-                  // Desktop: 6 columns
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(flex: 3, child: _buildRequirementField()),
-                      const SizedBox(width: 10),
-                      Expanded(flex: 2, child: _buildProcessDropdown()),
-                      const SizedBox(width: 10),
-                      Expanded(flex: 2, child: _buildMaterialDropdown()),
-                      const SizedBox(width: 10),
-                      Expanded(flex: 1, child: _buildQuantityField()),
-                      const SizedBox(width: 10),
-                      Expanded(flex: 2, child: _buildBudgetField()),
-                      const SizedBox(width: 10),
-                      Expanded(flex: 2, child: _buildLocationDropdown()),
-                    ],
-                  );
-                } else if (width >= 620) {
-                  // Tablet: 3 columns x 2 rows
+                  // Desktop: 2 balanced rows
                   return Column(
                     children: [
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(flex: 4, child: _buildRequirementField()),
+                          Expanded(flex: 3, child: _buildRequirementField()),
                           const SizedBox(width: 10),
-                          Expanded(flex: 3, child: _buildProcessDropdown()),
+                          Expanded(flex: 3, child: _buildIndustryDropdown()),
                           const SizedBox(width: 10),
-                          Expanded(flex: 3, child: _buildMaterialDropdown()),
+                          Expanded(flex: 2, child: _buildProcessDropdown()),
+                          const SizedBox(width: 10),
+                          Expanded(flex: 2, child: _buildMaterialDropdown()),
                         ],
                       ),
                       const SizedBox(height: 12),
@@ -1050,9 +1136,38 @@ class _SeekerDashboardScreenState extends State<SeekerDashboardScreen> {
                         children: [
                           Expanded(flex: 2, child: _buildQuantityField()),
                           const SizedBox(width: 10),
-                          Expanded(flex: 4, child: _buildBudgetField()),
+                          Expanded(flex: 3, child: _buildBudgetField()),
                           const SizedBox(width: 10),
                           Expanded(flex: 4, child: _buildLocationDropdown()),
+                        ],
+                      ),
+                    ],
+                  );
+                } else if (width >= 620) {
+                  // Tablet: 2 rows
+                  return Column(
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(flex: 4, child: _buildRequirementField()),
+                          const SizedBox(width: 10),
+                          Expanded(flex: 3, child: _buildIndustryDropdown()),
+                          const SizedBox(width: 10),
+                          Expanded(flex: 3, child: _buildProcessDropdown()),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(flex: 3, child: _buildMaterialDropdown()),
+                          const SizedBox(width: 10),
+                          Expanded(flex: 2, child: _buildQuantityField()),
+                          const SizedBox(width: 10),
+                          Expanded(flex: 2, child: _buildBudgetField()),
+                          const SizedBox(width: 10),
+                          Expanded(flex: 3, child: _buildLocationDropdown()),
                         ],
                       ),
                     ],
@@ -1062,6 +1177,8 @@ class _SeekerDashboardScreenState extends State<SeekerDashboardScreen> {
                   return Column(
                     children: [
                       _buildRequirementField(),
+                      const SizedBox(height: 10),
+                      _buildIndustryDropdown(),
                       const SizedBox(height: 10),
                       _buildProcessDropdown(),
                       const SizedBox(height: 10),
@@ -1243,6 +1360,38 @@ class _SeekerDashboardScreenState extends State<SeekerDashboardScreen> {
           final n = double.tryParse(v.trim());
           if (n == null || n <= 0) return 'Valid budget';
           return null;
+        },
+      ),
+    );
+  }
+
+  Widget _buildIndustryDropdown() {
+    final industries = seekerState.industries;
+    return _wrapField(
+      label: 'Industry (33 Master Sectors)',
+      child: DropdownButtonFormField<String?>(
+        value: _selectedIndustry,
+        isExpanded: true,
+        style: GoogleFonts.inter(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: AppColors.primaryNavy,
+        ),
+        decoration: _inputDecoration(null),
+        items: [
+          const DropdownMenuItem<String?>(
+            value: null,
+            child: Text('All Industries', overflow: TextOverflow.ellipsis),
+          ),
+          ...industries.map(
+            (ind) => DropdownMenuItem<String?>(
+              value: ind,
+              child: Text(ind, overflow: TextOverflow.ellipsis),
+            ),
+          ),
+        ],
+        onChanged: (val) {
+          _handleIndustryChange(val);
         },
       ),
     );
@@ -1561,6 +1710,10 @@ class _SeekerDashboardScreenState extends State<SeekerDashboardScreen> {
             distanceKm: m.scoreBreakdown.distanceKm,
             matchPercentage: m.matchPercentage,
             isAvailable: true,
+            mapsUrl: m.googleMapsLink,
+            companyName: m.companyName,
+            industry: m.industry,
+            city: m.city,
             originalData: m,
           ),
         );
@@ -1595,6 +1748,10 @@ class _SeekerDashboardScreenState extends State<SeekerDashboardScreen> {
             matchPercentage: null,
             isAvailable: mach.status.toUpperCase() == 'ACTIVE' ||
                 mach.status.toUpperCase() == 'AVAILABLE',
+            mapsUrl: mach.googleMapsLink,
+            companyName: mach.companyName,
+            industry: mach.industry,
+            city: mach.city,
             originalData: mach,
           ),
         );
@@ -1609,7 +1766,19 @@ class _SeekerDashboardScreenState extends State<SeekerDashboardScreen> {
       await _handleBookCapacity(marker.originalData as MatchResultModel);
     } else if (marker.originalData is MachineModel) {
       final mach = marker.originalData as MachineModel;
-      final reqId = seekerState.activeRequirement?.id ?? '';
+      final reqId = await _resolveValidRequirementId(
+        fallbackTitle: 'Manufacturing Requirement for ${mach.name}',
+      );
+      if (reqId == null || reqId.isEmpty) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please specify requirement details before booking.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
       final startDate = DateTime.now().add(const Duration(days: 1));
       final endDate = startDate.add(const Duration(days: 3));
 

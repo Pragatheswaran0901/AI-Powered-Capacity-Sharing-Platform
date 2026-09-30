@@ -32,6 +32,11 @@ class ApiEndpoints {
   static const String businesses = '/businesses';
   static const String myBusiness = '/businesses/me';
 
+  // Companies & Industries (49 Master Industrial Locations)
+  static const String companies = '/companies';
+  static String companyDetail(String id) => '/companies/$id';
+  static const String industries = '/industries';
+
   // Machines
   static const String machines = '/machines';
   static const String myMachines = '/machines/my';
