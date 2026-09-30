@@ -81,6 +81,7 @@ class MachineModel {
   final String status;
   final String verificationStatus;
   final List<MachineCapabilityModel> capabilities;
+  final List<MachineAvailabilityModel> availabilities;
   final double averageRating;
   final int completedJobs;
 
@@ -106,17 +107,26 @@ class MachineModel {
     this.status = 'ACTIVE',
     this.verificationStatus = 'PENDING',
     this.capabilities = const [],
+    this.availabilities = const [],
     this.averageRating = 4.5,
     this.completedJobs = 0,
   });
 
   factory MachineModel.fromJson(Map<String, dynamic> json) {
-    final capsList = (json['capabilities'] as List?)
+    final capsList =
+        (json['capabilities'] as List?)
             ?.map((e) => MachineCapabilityModel.fromJson(e))
             .toList() ??
         [];
 
-    final photosList = (json['photos'] as List?)?.map((e) => e.toString()).toList() ?? [];
+    final availList =
+        (json['availabilities'] as List?)
+            ?.map((e) => MachineAvailabilityModel.fromJson(e))
+            .toList() ??
+        [];
+
+    final photosList =
+        (json['photos'] as List?)?.map((e) => e.toString()).toList() ?? [];
 
     return MachineModel(
       id: json['id'] ?? '',
@@ -140,10 +150,50 @@ class MachineModel {
       status: json['status'] ?? 'ACTIVE',
       verificationStatus: json['verification_status'] ?? 'PENDING',
       capabilities: capsList,
+      availabilities: availList,
       averageRating: (json['average_rating'] as num?)?.toDouble() ?? 4.5,
       completedJobs: json['completed_jobs'] ?? 0,
     );
   }
 
-  bool get isVerified => verificationStatus == 'VERIFIED';
+  bool get isVerified => verificationStatus.toUpperCase() == 'VERIFIED';
+
+  String get normalizedStatus {
+    final upper = status.toUpperCase();
+    if (upper == 'ACTIVE' || upper == 'AVAILABLE') return 'AVAILABLE';
+    if (upper == 'INACTIVE' || upper == 'OFFLINE') return 'OFFLINE';
+    if (upper == 'BUSY') return 'BUSY';
+    if (upper == 'MAINTENANCE') return 'MAINTENANCE';
+    return upper;
+  }
+
+  int? get utilizationPercentage {
+    if (availabilities.isEmpty) return null;
+    double totalLoad = 0.0;
+    for (final slot in availabilities) {
+      if (!slot.isAvailable) {
+        totalLoad += 1.0;
+      } else {
+        final hours = _parseShiftHours(slot.startTime, slot.endTime);
+        totalLoad += (hours / 18.0).clamp(0.2, 0.95);
+      }
+    }
+    final pct = ((totalLoad / availabilities.length) * 100).round();
+    return pct.clamp(0, 100);
+  }
+
+  static double _parseShiftHours(String start, String end) {
+    try {
+      final sParts = start.split(':');
+      final eParts = end.split(':');
+      if (sParts.length >= 2 && eParts.length >= 2) {
+        final sHours = int.parse(sParts[0]) + (int.parse(sParts[1]) / 60.0);
+        final eHours = int.parse(eParts[0]) + (int.parse(eParts[1]) / 60.0);
+        if (eHours > sHours) {
+          return eHours - sHours;
+        }
+      }
+    } catch (_) {}
+    return 9.0;
+  }
 }

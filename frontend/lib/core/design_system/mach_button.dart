@@ -3,20 +3,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:machhunt/core/constants/app_colors.dart';
 
 enum MachButtonVariant {
-  primary,     // Deep Industrial Navy
-  secondary,   // Cobalt Blue
-  accent,      // Manufacturing Orange
-  dark,        // Dark Slate / Navy
-  outline,     // Bordered Subtle
-  danger,      // Red
-  ghost,       // Subtle text
+  primary, // Deep Industrial Navy
+  secondary, // Cobalt Blue
+  accent, // Manufacturing Orange
+  dark, // Dark Slate / Navy
+  outline, // Bordered Subtle
+  danger, // Red
+  ghost, // Subtle text
 }
 
-enum MachButtonSize {
-  small,
-  medium,
-  large,
-}
+enum MachButtonSize { small, medium, large }
 
 class MachButton extends StatelessWidget {
   final String label;
@@ -56,17 +52,17 @@ class MachButton extends StatelessWidget {
         fg = Colors.white;
         break;
       case MachButtonVariant.accent:
-        bg = AppColors.orangeAccent;
+        bg = AppColors.machOrange;
         fg = Colors.white;
         break;
       case MachButtonVariant.dark:
-        bg = AppColors.navyIndustrial;
+        bg = AppColors.darkNavy;
         fg = Colors.white;
         break;
       case MachButtonVariant.outline:
-        bg = Colors.transparent;
-        fg = AppColors.primary;
-        borderSide = const BorderSide(color: AppColors.slate300, width: 1.5);
+        bg = Colors.white;
+        fg = AppColors.primaryNavy;
+        borderSide = const BorderSide(color: AppColors.lightBorder, width: 1.2);
         break;
       case MachButtonVariant.danger:
         bg = AppColors.errorRed;
@@ -144,9 +140,7 @@ class MachButton extends StatelessWidget {
           elevation: variant == MachButtonVariant.primary ? 0.5 : 0,
           shadowColor: AppColors.navyDark.withValues(alpha: 0.2),
           side: borderSide,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: padding,
         ),
         child: content,

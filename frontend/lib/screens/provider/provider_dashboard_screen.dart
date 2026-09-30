@@ -13,7 +13,8 @@ class ProviderDashboardScreen extends StatefulWidget {
   const ProviderDashboardScreen({super.key});
 
   @override
-  State<ProviderDashboardScreen> createState() => _ProviderDashboardScreenState();
+  State<ProviderDashboardScreen> createState() =>
+      _ProviderDashboardScreenState();
 }
 
 class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
@@ -111,7 +112,9 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   }
 
   List<BookingModel> _getEffectiveRequests(List<BookingModel> apiRequests) {
-    final pending = apiRequests.where((b) => b.status == 'PENDING' || b.status == 'REQUESTED').toList();
+    final pending = apiRequests
+        .where((b) => b.status == 'PENDING' || b.status == 'REQUESTED')
+        .toList();
     if (pending.isNotEmpty) return pending;
 
     // Realistic demo requests matching hackathon demo
@@ -135,7 +138,8 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
         totalAmount: 19200.0,
         commissionAmount: 960.0,
         providerPayout: 18240.0,
-        notes: 'Aluminium 6061 enclosures, CMM inspection certificate requested.',
+        notes:
+            'Aluminium 6061 enclosures, CMM inspection certificate requested.',
         createdAt: '2026-09-24',
       ),
       BookingModel(
@@ -167,7 +171,11 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   Widget build(BuildContext context) {
     final user = authState.currentUser;
     final biz = authState.currentBusiness;
-    final providerName = biz?.name ?? (user?.fullName.isNotEmpty ?? false ? user!.fullName : "ABC Manufacturing");
+    final providerName =
+        biz?.name ??
+        (user?.fullName.isNotEmpty ?? false
+            ? user!.fullName
+            : "ABC Manufacturing");
 
     return ListenableBuilder(
       listenable: providerState,
@@ -179,9 +187,13 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
 
         final totalMachines = machines.length;
         final activeRequests = requests.length;
-        final ongoingJobs = rawRequests.where((b) => b.status == 'IN_PROGRESS' || b.status == 'CONFIRMED').length;
+        final ongoingJobs = rawRequests
+            .where((b) => b.status == 'IN_PROGRESS' || b.status == 'CONFIRMED')
+            .length;
         final displayJobs = ongoingJobs > 0 ? ongoingJobs : 3;
-        final totalEarned = providerState.totalEarnings > 0 ? Formatters.currency(providerState.totalEarnings) : '₹12.5L';
+        final totalEarned = providerState.totalEarnings > 0
+            ? Formatters.currency(providerState.totalEarnings)
+            : '₹12.5L';
 
         return RefreshIndicator(
           onRefresh: _loadData,
@@ -194,8 +206,12 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                 // Header
                 MachPageHeader(
                   title: 'Welcome back, $providerName!',
-                  subtitle: 'Manage your capacity, view requests and grow your business.',
-                  badge: const MachVerifiedBadge(label: 'Verified Manufacturer', isCompact: true),
+                  subtitle:
+                      'Manage your capacity, view requests and grow your business.',
+                  badge: const MachVerifiedBadge(
+                    label: 'Verified Manufacturer',
+                    isCompact: true,
+                  ),
                   primaryAction: MachButton(
                     label: '+ Add Machine',
                     icon: Icons.add,
@@ -211,7 +227,9 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                       size: MachButtonSize.medium,
                       onPressed: () {
                         if (machines.isNotEmpty) {
-                          context.go('/machine-availability/${machines.first.id}?name=${Uri.encodeComponent(machines.first.name)}');
+                          context.go(
+                            '/machine-availability/${machines.first.id}?name=${Uri.encodeComponent(machines.first.name)}',
+                          );
                         }
                       },
                     ),
@@ -235,78 +253,96 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                             children: [
                               Row(
                                 children: [
-                                  Expanded(child: MachMetricCard(
-                                    title: 'Machines Listed',
-                                    value: '$totalMachines',
-                                    icon: Icons.precision_manufacturing_outlined,
-                                    subtitle: 'Fleet equipment verified',
-                                    accentColor: AppColors.primary,
-                                  )),
+                                  Expanded(
+                                    child: MachMetricCard(
+                                      title: 'Machines Listed',
+                                      value: '$totalMachines',
+                                      icon: Icons
+                                          .precision_manufacturing_outlined,
+                                      subtitle: 'Fleet equipment verified',
+                                      accentColor: AppColors.machBlue,
+                                    ),
+                                  ),
                                   const SizedBox(width: 14),
-                                  Expanded(child: MachMetricCard(
-                                    title: 'Active Requests',
-                                    value: '$activeRequests',
-                                    icon: Icons.inbox_outlined,
-                                    subtitle: 'Seekers awaiting quote',
-                                    accentColor: AppColors.orangeAccent,
-                                  )),
+                                  Expanded(
+                                    child: MachMetricCard(
+                                      title: 'Active Requests',
+                                      value: '$activeRequests',
+                                      icon: Icons.inbox_outlined,
+                                      subtitle: 'Seekers awaiting quote',
+                                      accentColor: AppColors.machOrange,
+                                    ),
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 14),
                               Row(
                                 children: [
-                                  Expanded(child: MachMetricCard(
-                                    title: 'Ongoing Bookings',
-                                    value: '$displayJobs',
-                                    icon: Icons.play_circle_outline,
-                                    subtitle: 'Spindles currently running',
-                                    accentColor: AppColors.steelBlue,
-                                  )),
+                                  Expanded(
+                                    child: MachMetricCard(
+                                      title: 'Ongoing Bookings',
+                                      value: '$displayJobs',
+                                      icon: Icons.play_circle_outline,
+                                      subtitle: 'Spindles currently running',
+                                      accentColor: AppColors.machBlue,
+                                    ),
+                                  ),
                                   const SizedBox(width: 14),
-                                  Expanded(child: MachMetricCard(
-                                    title: 'Estimated Earnings',
-                                    value: totalEarned,
-                                    icon: Icons.account_balance_wallet_outlined,
-                                    subtitle: 'Net provider payouts',
-                                    accentColor: AppColors.emerald,
-                                  )),
+                                  Expanded(
+                                    child: MachMetricCard(
+                                      title: 'Estimated Earnings',
+                                      value: totalEarned,
+                                      icon:
+                                          Icons.account_balance_wallet_outlined,
+                                      subtitle: 'Net provider payouts',
+                                      accentColor: AppColors.successGreen,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ],
                           )
                         : Row(
                             children: [
-                              Expanded(child: MachMetricCard(
-                                title: 'Machines Listed',
-                                value: '$totalMachines',
-                                icon: Icons.precision_manufacturing_outlined,
-                                subtitle: 'Fleet equipment verified',
-                                accentColor: AppColors.primary,
-                              )),
+                              Expanded(
+                                child: MachMetricCard(
+                                  title: 'Machines Listed',
+                                  value: '$totalMachines',
+                                  icon: Icons.precision_manufacturing_outlined,
+                                  subtitle: 'Fleet equipment verified',
+                                  accentColor: AppColors.machBlue,
+                                ),
+                              ),
                               const SizedBox(width: 16),
-                              Expanded(child: MachMetricCard(
-                                title: 'Active Requests',
-                                value: '$activeRequests',
-                                icon: Icons.inbox_outlined,
-                                subtitle: 'Seekers awaiting quote',
-                                accentColor: AppColors.orangeAccent,
-                              )),
+                              Expanded(
+                                child: MachMetricCard(
+                                  title: 'Active Requests',
+                                  value: '$activeRequests',
+                                  icon: Icons.inbox_outlined,
+                                  subtitle: 'Seekers awaiting quote',
+                                  accentColor: AppColors.machOrange,
+                                ),
+                              ),
                               const SizedBox(width: 16),
-                              Expanded(child: MachMetricCard(
-                                title: 'Ongoing Bookings',
-                                value: '$displayJobs',
-                                icon: Icons.play_circle_outline,
-                                subtitle: 'Spindles currently running',
-                                accentColor: AppColors.steelBlue,
-                              )),
+                              Expanded(
+                                child: MachMetricCard(
+                                  title: 'Ongoing Bookings',
+                                  value: '$displayJobs',
+                                  icon: Icons.play_circle_outline,
+                                  subtitle: 'Spindles currently running',
+                                  accentColor: AppColors.machBlue,
+                                ),
+                              ),
                               const SizedBox(width: 16),
-                              Expanded(child: MachMetricCard(
-                                title: 'Estimated Earnings',
-                                value: totalEarned,
-                                icon: Icons.account_balance_wallet_outlined,
-                                subtitle: 'Net provider payouts',
-                                accentColor: AppColors.emerald,
-                              )),
+                              Expanded(
+                                child: MachMetricCard(
+                                  title: 'Estimated Earnings',
+                                  value: totalEarned,
+                                  icon: Icons.account_balance_wallet_outlined,
+                                  subtitle: 'Net provider payouts',
+                                  accentColor: AppColors.successGreen,
+                                ),
+                              ),
                             ],
                           );
                   },
@@ -325,14 +361,18 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                           'Recent Incoming Requests',
                           style: GoogleFonts.inter(
                             fontSize: 18,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.navyIndustrial,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primaryNavy,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           'Capacity seekers requesting immediate production time on your equipment.',
-                          style: GoogleFonts.inter(fontSize: 12.5, color: AppColors.slate500),
+                          style: GoogleFonts.inter(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.secondarySlate,
+                          ),
                         ),
                       ],
                     ),
@@ -350,7 +390,8 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                 if (requests.isEmpty)
                   const MachEmptyState(
                     title: 'No pending requests',
-                    message: 'New capacity requests will appear here when seekers match your machines.',
+                    message:
+                        'New capacity requests will appear here when seekers match your machines.',
                   )
                 else
                   for (var req in requests) ...[
@@ -371,21 +412,25 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                           'Your Machinery Fleet',
                           style: GoogleFonts.inter(
                             fontSize: 18,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.navyIndustrial,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primaryNavy,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           'Active manufacturing equipment available for capacity sharing.',
-                          style: GoogleFonts.inter(fontSize: 12.5, color: AppColors.slate500),
+                          style: GoogleFonts.inter(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.secondarySlate,
+                          ),
                         ),
                       ],
                     ),
                     MachButton(
                       label: '+ Add Machine',
                       icon: Icons.add,
-                      variant: MachButtonVariant.primary,
+                      variant: MachButtonVariant.accent,
                       size: MachButtonSize.small,
                       onPressed: () => context.go('/add-machine'),
                     ),
@@ -403,7 +448,9 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                       children: [
                         for (var m in machines)
                           SizedBox(
-                            width: (constraints.maxWidth - (columns - 1) * 16) / columns,
+                            width:
+                                (constraints.maxWidth - (columns - 1) * 16) /
+                                columns,
                             child: MachMachineCard(
                               name: m.name,
                               category: m.category,
@@ -415,8 +462,12 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                               tolerance: m.precisionTolerance,
                               status: m.status,
                               isVerified: m.verificationStatus == 'VERIFIED',
-                              onManageAvailability: () => context.go('/machine-availability/${m.id}?name=${Uri.encodeComponent(m.name)}'),
-                              onViewDetails: () => context.go('/machine-availability/${m.id}?name=${Uri.encodeComponent(m.name)}'),
+                              onManageAvailability: () => context.go(
+                                '/machine-availability/${m.id}?name=${Uri.encodeComponent(m.name)}',
+                              ),
+                              onViewDetails: () => context.go(
+                                '/machine-availability/${m.id}?name=${Uri.encodeComponent(m.name)}',
+                              ),
                             ),
                           ),
                       ],
@@ -437,7 +488,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.slate200, width: 1.2),
+        border: Border.all(color: AppColors.lightBorder, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -452,10 +503,14 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.orangeAccent.withValues(alpha: 0.1),
+              color: AppColors.machOrange.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(Icons.bolt, color: AppColors.orangeAccent, size: 24),
+            child: const Icon(
+              Icons.bolt,
+              color: AppColors.machOrange,
+              size: 24,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -471,8 +526,8 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                           req.requirementTitle ?? 'Component Machining Job',
                           style: GoogleFonts.inter(
                             fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.navyIndustrial,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primaryNavy,
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -483,8 +538,8 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                       Formatters.currency(req.providerPayout),
                       style: GoogleFonts.inter(
                         fontSize: 17,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.emerald,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.successGreen,
                       ),
                     ),
                   ],
@@ -492,18 +547,30 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                 const SizedBox(height: 6),
                 Text(
                   'Buyer: ${req.seekerName ?? "Verified Seeker"} · Machine: ${req.machineName ?? "Machinery"}',
-                  style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.slate600),
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.secondarySlate,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '${req.totalHours} planned operating hours · Dates: ${req.startDate} to ${req.endDate}',
-                  style: GoogleFonts.inter(fontSize: 12, color: AppColors.slate500),
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.mutedSlate,
+                  ),
                 ),
                 if (req.notes != null && req.notes!.isNotEmpty) ...[
                   const SizedBox(height: 6),
                   Text(
                     'Notes: "${req.notes!}"',
-                    style: GoogleFonts.inter(fontSize: 12, fontStyle: FontStyle.italic, color: AppColors.slate600),
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontStyle: FontStyle.italic,
+                      color: AppColors.mutedSlate,
+                    ),
                   ),
                 ],
                 const SizedBox(height: 14),
@@ -516,7 +583,10 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                       size: MachButtonSize.small,
                       onPressed: () async {
                         final messenger = ScaffoldMessenger.of(context);
-                        await providerState.rejectRequest(req.id, reason: 'Machine occupied on schedule.');
+                        await providerState.rejectRequest(
+                          req.id,
+                          reason: 'Machine occupied on schedule.',
+                        );
                         if (!mounted) return;
                         messenger.showSnackBar(
                           const SnackBar(content: Text('Request declined.')),
@@ -530,7 +600,11 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                       size: MachButtonSize.small,
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Custom quote of ${Formatters.currency(req.totalAmount)} sent to buyer.')),
+                          SnackBar(
+                            content: Text(
+                              'Custom quote of ${Formatters.currency(req.totalAmount)} sent to buyer.',
+                            ),
+                          ),
                         );
                       },
                     ),
@@ -541,12 +615,16 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                       variant: MachButtonVariant.accent,
                       size: MachButtonSize.small,
                       onPressed: () async {
-                        final success = await providerState.acceptRequest(req.id);
+                        final success = await providerState.acceptRequest(
+                          req.id,
+                        );
                         if (mounted && success) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Request accepted! Seeker notified to fund escrow.'),
-                              backgroundColor: AppColors.emerald,
+                              content: Text(
+                                'Request accepted! Seeker notified to fund escrow.',
+                              ),
+                              backgroundColor: AppColors.successGreen,
                             ),
                           );
                         }

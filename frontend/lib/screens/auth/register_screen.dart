@@ -79,46 +79,77 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           onPressed: () => context.go('/login'),
                         ),
                         const SizedBox(width: 8),
-                        const Text('Register MSME Account', style: AppTypography.displayMedium),
+                        const Text(
+                          'Register MSME Account',
+                          style: AppTypography.displayMedium,
+                        ),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    const Text('Join Tamil Nadu\'s trusted manufacturing capacity-sharing network.', style: AppTypography.bodyMedium),
+                    const Text(
+                      'Join Tamil Nadu\'s trusted manufacturing capacity-sharing network.',
+                      style: AppTypography.bodyMedium,
+                    ),
                     const SizedBox(height: 24),
 
                     // Role selection toggle
-                    const Text('I am registering as:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+                    const Text(
+                      'I am registering as:',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     Row(
                       children: [
                         Expanded(
                           child: InkWell(
-                            onTap: () => setState(() => _selectedRole = 'SEEKER'),
+                            onTap: () =>
+                                setState(() => _selectedRole = 'SEEKER'),
                             borderRadius: BorderRadius.circular(8),
                             child: Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: _selectedRole == 'SEEKER' ? AppColors.primary.withOpacity(0.08) : Colors.white,
+                                color: _selectedRole == 'SEEKER'
+                                    ? AppColors.primary.withOpacity(0.08)
+                                    : Colors.white,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: _selectedRole == 'SEEKER' ? AppColors.primary : AppColors.border,
+                                  color: _selectedRole == 'SEEKER'
+                                      ? AppColors.primary
+                                      : AppColors.border,
                                   width: _selectedRole == 'SEEKER' ? 2 : 1,
                                 ),
                               ),
                               child: Column(
                                 children: [
-                                  Icon(Icons.search, color: _selectedRole == 'SEEKER' ? AppColors.primary : AppColors.textMuted),
+                                  Icon(
+                                    Icons.search,
+                                    color: _selectedRole == 'SEEKER'
+                                        ? AppColors.primary
+                                        : AppColors.textMuted,
+                                  ),
                                   const SizedBox(height: 4),
                                   Text(
                                     'Capacity Seeker',
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w700,
-                                      color: _selectedRole == 'SEEKER' ? AppColors.primary : AppColors.textPrimary,
+                                      color: _selectedRole == 'SEEKER'
+                                          ? AppColors.primary
+                                          : AppColors.textPrimary,
                                     ),
                                   ),
                                   const SizedBox(height: 2),
-                                  const Text('I need parts made', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                                  const Text(
+                                    'I need parts made',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -127,32 +158,50 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: InkWell(
-                            onTap: () => setState(() => _selectedRole = 'PROVIDER'),
+                            onTap: () =>
+                                setState(() => _selectedRole = 'PROVIDER'),
                             borderRadius: BorderRadius.circular(8),
                             child: Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: _selectedRole == 'PROVIDER' ? AppColors.primary.withOpacity(0.08) : Colors.white,
+                                color: _selectedRole == 'PROVIDER'
+                                    ? AppColors.primary.withOpacity(0.08)
+                                    : Colors.white,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: _selectedRole == 'PROVIDER' ? AppColors.primary : AppColors.border,
+                                  color: _selectedRole == 'PROVIDER'
+                                      ? AppColors.primary
+                                      : AppColors.border,
                                   width: _selectedRole == 'PROVIDER' ? 2 : 1,
                                 ),
                               ),
                               child: Column(
                                 children: [
-                                  Icon(Icons.precision_manufacturing, color: _selectedRole == 'PROVIDER' ? AppColors.primary : AppColors.textMuted),
+                                  Icon(
+                                    Icons.precision_manufacturing,
+                                    color: _selectedRole == 'PROVIDER'
+                                        ? AppColors.primary
+                                        : AppColors.textMuted,
+                                  ),
                                   const SizedBox(height: 4),
                                   Text(
                                     'Capacity Provider',
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w700,
-                                      color: _selectedRole == 'PROVIDER' ? AppColors.primary : AppColors.textPrimary,
+                                      color: _selectedRole == 'PROVIDER'
+                                          ? AppColors.primary
+                                          : AppColors.textPrimary,
                                     ),
                                   ),
                                   const SizedBox(height: 2),
-                                  const Text('I own machines', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                                  const Text(
+                                    'I own machines',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -167,7 +216,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       hint: 'e.g. Senthil Kumar',
                       controller: _nameController,
                       prefixIcon: const Icon(Icons.person_outline, size: 18),
-                      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+                      validator: (val) =>
+                          val == null || val.isEmpty ? 'Required' : null,
                     ),
                     const SizedBox(height: 16),
 
@@ -177,7 +227,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       prefixIcon: const Icon(Icons.email_outlined, size: 18),
-                      validator: (val) => val == null || !val.contains('@') ? 'Enter a valid email' : null,
+                      validator: (val) => val == null || !val.contains('@')
+                          ? 'Enter a valid email'
+                          : null,
                     ),
                     const SizedBox(height: 16),
 
@@ -187,7 +239,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       controller: _phoneController,
                       keyboardType: TextInputType.phone,
                       prefixIcon: const Icon(Icons.phone_outlined, size: 18),
-                      validator: (val) => val == null || val.length < 10 ? 'Enter 10-digit mobile number' : null,
+                      validator: (val) => val == null || val.length < 10
+                          ? 'Enter 10-digit mobile number'
+                          : null,
                     ),
                     const SizedBox(height: 16),
 
@@ -197,7 +251,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       controller: _passwordController,
                       obscureText: true,
                       prefixIcon: const Icon(Icons.lock_outline, size: 18),
-                      validator: (val) => val == null || val.length < 6 ? 'Minimum 6 characters' : null,
+                      validator: (val) => val == null || val.length < 6
+                          ? 'Minimum 6 characters'
+                          : null,
                     ),
                     const SizedBox(height: 24),
 
@@ -216,10 +272,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text("Already registered? ", style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                        const Text(
+                          "Already registered? ",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
                         TextButton(
                           onPressed: () => context.go('/login'),
-                          child: const Text('Sign In', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                          child: const Text(
+                            'Sign In',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
                       ],
                     ),

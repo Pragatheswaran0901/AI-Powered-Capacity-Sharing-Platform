@@ -5,11 +5,7 @@ class ApiException implements Exception {
   final int? statusCode;
   final dynamic details;
 
-  ApiException({
-    required this.message,
-    this.statusCode,
-    this.details,
-  });
+  ApiException({required this.message, this.statusCode, this.details});
 
   factory ApiException.fromDioError(DioException error) {
     String message = 'An unexpected network error occurred.';
@@ -37,10 +33,12 @@ class ApiException implements Exception {
         case DioExceptionType.connectionTimeout:
         case DioExceptionType.sendTimeout:
         case DioExceptionType.receiveTimeout:
-          message = 'Network connection timed out. Please check your internet connection.';
+          message =
+              'Network connection timed out. Please check your internet connection.';
           break;
         case DioExceptionType.connectionError:
-          message = 'Unable to connect to Mach-Hunt servers. Ensure backend is running.';
+          message =
+              'Unable to connect to Mach-Hunt servers. Ensure backend is running.';
           break;
         case DioExceptionType.badCertificate:
           message = 'Security certificate validation failed.';

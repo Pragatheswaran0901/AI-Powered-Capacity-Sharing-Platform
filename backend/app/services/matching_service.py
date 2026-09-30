@@ -19,13 +19,17 @@ class MatchingService:
         self.machine_repo = MachineRepository(db)
         self.review_repo = ReviewRepository(db)
 
-    def find_matches_for_requirement(self, requirement_id: str) -> List[MatchResultOut]:
+    def find_matches_for_requirement(
+        self,
+        requirement_id: str,
+        location: Optional[str] = None,
+    ) -> List[MatchResultOut]:
         requirement = self.req_repo.get(requirement_id)
         if not requirement:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Requirement not found")
 
-        # Gather active candidate machines
-        candidates = self.machine_repo.search_active_machines()
+        # Gather active candidate machines (filtered by location if specified)
+        candidates = self.machine_repo.search_active_machines(location=location)
         if not candidates:
             return []
 
@@ -36,7 +40,13 @@ class MatchingService:
                 ratings_map[str(c.business.id)] = self.review_repo.get_average_rating(str(c.business.user_id))
 
         # Rank matches via matching engine
-        ranked = matching_engine.rank_matches(requirement, candidates, ratings_map=ratings_map)
+        search_loc = location or requirement.preferred_location
+        ranked = matching_engine.rank_matches(
+            requirement,
+            candidates,
+            ratings_map=ratings_map,
+            search_location=search_loc,
+        )
 
         # Persist matches into the database for auditability and caching
         db_matches = []

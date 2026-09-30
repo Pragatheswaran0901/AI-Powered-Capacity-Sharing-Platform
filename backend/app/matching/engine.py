@@ -28,6 +28,7 @@ class MatchingEngine:
         machine: Machine,
         average_rating: float = 4.7,
         completed_jobs: int = 15,
+        search_location: Optional[str] = None,
     ) -> MatchResultOut:
         # 1. Capability Score (40%)
         cap_score, cap_reasons = calculate_capability_score(requirement, machine)
@@ -36,7 +37,9 @@ class MatchingEngine:
         avail_score, avail_reasons = calculate_availability_score(requirement, machine)
 
         # 3. Distance Score (15%)
-        dist_score, dist_km, dist_reasons = calculate_distance_score(requirement, machine)
+        dist_score, dist_km, dist_reasons = calculate_distance_score(
+            requirement, machine, search_location=search_location
+        )
 
         # 4. Cost Score (15%)
         cost_score, est_cost, cost_reasons = calculate_cost_score(requirement, machine)
@@ -67,6 +70,18 @@ class MatchingEngine:
         )
 
         biz_name = machine.business.name if machine.business else "MSME Partner"
+        caps_out = [
+            {
+                "id": str(c.id),
+                "process": c.process,
+                "material": c.material,
+                "min_tolerance_mm": c.min_tolerance_mm,
+                "max_dimension_x": c.max_dimension_x,
+                "max_dimension_y": c.max_dimension_y,
+                "max_dimension_z": c.max_dimension_z,
+            }
+            for c in (machine.capabilities or [])
+        ]
 
         return MatchResultOut(
             machine_id=str(machine.id),
@@ -74,6 +89,9 @@ class MatchingEngine:
             business_name=biz_name,
             machine_name=machine.name,
             machine_category=machine.category,
+            manufacturer=machine.manufacturer,
+            model=machine.model,
+            year=machine.year,
             location_address=machine.location_address,
             hourly_price=machine.hourly_price,
             overall_score=round(overall, 4),
@@ -81,9 +99,14 @@ class MatchingEngine:
             score_breakdown=breakdown,
             match_reasons=all_reasons,
             photos=machine.photo_list,
+            capabilities=caps_out,
+            operator_available=bool(machine.operator_available),
+            status=machine.status.value if hasattr(machine.status, 'value') else str(machine.status),
             average_rating=average_rating,
             completed_jobs=completed_jobs,
             verification_status=machine.verification_status.value if hasattr(machine.verification_status, 'value') else str(machine.verification_status),
+            latitude=machine.latitude,
+            longitude=machine.longitude,
         )
 
     def rank_matches(
@@ -92,6 +115,7 @@ class MatchingEngine:
         machines: List[Machine],
         ratings_map: Optional[Dict[str, float]] = None,
         jobs_map: Optional[Dict[str, int]] = None,
+        search_location: Optional[str] = None,
     ) -> List[MatchResultOut]:
         results: List[MatchResultOut] = []
         ratings_map = ratings_map or {}
@@ -100,7 +124,13 @@ class MatchingEngine:
         for m in machines:
             rating = ratings_map.get(str(m.business_id), 4.7)
             jobs = jobs_map.get(str(m.business_id), 18)
-            result = self.evaluate_machine(requirement, m, average_rating=rating, completed_jobs=jobs)
+            result = self.evaluate_machine(
+                requirement,
+                m,
+                average_rating=rating,
+                completed_jobs=jobs,
+                search_location=search_location,
+            )
             results.append(result)
 
         # Sort descending by overall match score

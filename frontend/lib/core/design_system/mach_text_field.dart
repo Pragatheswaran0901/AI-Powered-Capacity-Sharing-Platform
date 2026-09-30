@@ -96,22 +96,37 @@ class MachTextField extends StatelessWidget {
             suffixIcon: suffixIcon,
             filled: true,
             fillColor: readOnly ? AppColors.slate50 : Colors.white,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 12,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.slate200, width: 1.2),
+              borderSide: const BorderSide(
+                color: AppColors.slate200,
+                width: 1.2,
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.slate200, width: 1.2),
+              borderSide: const BorderSide(
+                color: AppColors.slate200,
+                width: 1.2,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.steelBlue, width: 1.8),
+              borderSide: const BorderSide(
+                color: AppColors.steelBlue,
+                width: 1.8,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.errorRed, width: 1.2),
+              borderSide: const BorderSide(
+                color: AppColors.errorRed,
+                width: 1.2,
+              ),
             ),
           ),
         ),

@@ -17,7 +17,10 @@ class OtpVerificationScreen extends StatefulWidget {
 }
 
 class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
-  final List<TextEditingController> _controllers = List.generate(6, (_) => TextEditingController());
+  final List<TextEditingController> _controllers = List.generate(
+    6,
+    (_) => TextEditingController(),
+  );
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
 
   Timer? _timer;
@@ -106,7 +109,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   }
 
   void _onKeyDown(int index, KeyEvent event) {
-    if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.backspace) {
+    if (event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.backspace) {
       if (_controllers[index].text.isEmpty && index > 0) {
         _controllers[index - 1].clear();
         _focusNodes[index - 1].requestFocus();
@@ -149,7 +153,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       }
     } else {
       setState(() {
-        _errorMessage = authState.errorMessage ?? "Incorrect code. Please try again.";
+        _errorMessage =
+            authState.errorMessage ?? "Incorrect code. Please try again.";
       });
     }
   }
@@ -178,13 +183,17 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       _focusNodes[0].requestFocus();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("A fresh verification code has been dispatched to your email."),
+          content: Text(
+            "A fresh verification code has been dispatched to your email.",
+          ),
           backgroundColor: AppColors.steelBlue,
         ),
       );
     } else {
       setState(() {
-        _errorMessage = authState.errorMessage ?? "Failed to resend code. Please try again.";
+        _errorMessage =
+            authState.errorMessage ??
+            "Failed to resend code. Please try again.";
       });
     }
   }
@@ -224,7 +233,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       decoration: BoxDecoration(
                         color: const Color(0xFFEFF6FF),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.steelBlue.withValues(alpha: 0.3)),
+                        border: Border.all(
+                          color: AppColors.steelBlue.withValues(alpha: 0.3),
+                        ),
                       ),
                       child: const Icon(
                         Icons.mark_email_read_outlined,
@@ -277,7 +288,11 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.error_outline, size: 18, color: AppColors.errorRed),
+                          const Icon(
+                            Icons.error_outline,
+                            size: 18,
+                            color: AppColors.errorRed,
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -326,15 +341,24 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                               contentPadding: EdgeInsets.zero,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: AppColors.slate300, width: 1.5),
+                                borderSide: const BorderSide(
+                                  color: AppColors.slate300,
+                                  width: 1.5,
+                                ),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: AppColors.slate300, width: 1.5),
+                                borderSide: const BorderSide(
+                                  color: AppColors.slate300,
+                                  width: 1.5,
+                                ),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: AppColors.steelBlue, width: 2),
+                                borderSide: const BorderSide(
+                                  color: AppColors.steelBlue,
+                                  width: 2,
+                                ),
                               ),
                             ),
                             onChanged: (val) => _onDigitChanged(index, val),
@@ -403,7 +427,11 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   Center(
                     child: TextButton.icon(
                       onPressed: () => context.go('/login'),
-                      icon: const Icon(Icons.arrow_back, size: 14, color: AppColors.slate500),
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        size: 14,
+                        color: AppColors.slate500,
+                      ),
                       label: Text(
                         "Change email",
                         style: GoogleFonts.inter(

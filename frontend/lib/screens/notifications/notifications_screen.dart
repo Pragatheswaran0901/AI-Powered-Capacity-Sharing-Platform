@@ -30,7 +30,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       final res = await apiClient.get(ApiEndpoints.notifications);
       if (res is List) {
         setState(() {
-          _notifications = res.map((e) => NotificationModel.fromJson(e)).toList();
+          _notifications = res
+              .map((e) => NotificationModel.fromJson(e))
+              .toList();
         });
       }
     } catch (_) {
@@ -93,7 +95,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Notifications & Alerts', style: AppTypography.displayMedium),
+                  const Text(
+                    'Notifications & Alerts',
+                    style: AppTypography.displayMedium,
+                  ),
                   const SizedBox(height: 4),
                   Text(
                     'Real-time events: booking requests, escrow updates, and production milestones',
@@ -125,9 +130,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               child: Center(
                 child: Column(
                   children: [
-                    const Icon(Icons.notifications_off_outlined, size: 48, color: AppColors.textMuted),
+                    const Icon(
+                      Icons.notifications_off_outlined,
+                      size: 48,
+                      color: AppColors.textMuted,
+                    ),
                     const SizedBox(height: 12),
-                    const Text('No Notifications Yet', style: AppTypography.titleMedium),
+                    const Text(
+                      'No Notifications Yet',
+                      style: AppTypography.titleMedium,
+                    ),
                     const SizedBox(height: 4),
                     const Text(
                       'You will receive notifications when providers accept requests or milestone payments update.',
@@ -159,12 +171,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: item.isRead ? Colors.grey.shade100 : AppColors.primary.withOpacity(0.1),
+                            color: item.isRead
+                                ? Colors.grey.shade100
+                                : AppColors.primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Icon(
                             icon,
-                            color: item.isRead ? AppColors.textMuted : AppColors.primary,
+                            color: item.isRead
+                                ? AppColors.textMuted
+                                : AppColors.primary,
                             size: 22,
                           ),
                         ),
@@ -179,7 +195,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                     item.title,
                                     style: TextStyle(
                                       fontSize: 14,
-                                      fontWeight: item.isRead ? FontWeight.w500 : FontWeight.w700,
+                                      fontWeight: item.isRead
+                                          ? FontWeight.w500
+                                          : FontWeight.w700,
                                       color: AppColors.textPrimary,
                                     ),
                                   ),
@@ -197,10 +215,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                 ],
                               ),
                               const SizedBox(height: 4),
-                              Text(item.message, style: AppTypography.bodySmall),
+                              Text(
+                                item.message,
+                                style: AppTypography.bodySmall,
+                              ),
                               const SizedBox(height: 6),
                               Text(
-                                item.createdAt.contains('T') ? item.createdAt.split('T').first : item.createdAt,
+                                item.createdAt.contains('T')
+                                    ? item.createdAt.split('T').first
+                                    : item.createdAt,
                                 style: AppTypography.caption,
                               ),
                             ],

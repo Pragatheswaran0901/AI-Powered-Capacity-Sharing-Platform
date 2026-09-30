@@ -129,7 +129,8 @@ class MachErrorState extends StatelessWidget {
   const MachErrorState({
     super.key,
     this.title = 'Unable to complete request',
-    this.message = 'Something went wrong while connecting to the platform. Please try again.',
+    this.message =
+        'Something went wrong while connecting to the platform. Please try again.',
     this.onRetry,
   });
 
@@ -149,9 +150,16 @@ class MachErrorState extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: const Color(0xFFFEF2F2),
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFFFECACA), width: 1.2),
+                  border: Border.all(
+                    color: const Color(0xFFFECACA),
+                    width: 1.2,
+                  ),
                 ),
-                child: const Icon(Icons.error_outline_rounded, size: 28, color: AppColors.errorRed),
+                child: const Icon(
+                  Icons.error_outline_rounded,
+                  size: 28,
+                  color: AppColors.errorRed,
+                ),
               ),
               const SizedBox(height: 16),
               Text(

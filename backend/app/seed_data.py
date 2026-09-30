@@ -262,14 +262,14 @@ def seed_database():
             email="jayanth@machhunt.demo",
             gstin="33JAYAN2345G2Z8",
             registration_number="UDYAM-TN-03-0076543",
-            industry="Automotive & Robotics Enclosures",
-            address="15, Peelamedu Industrial Area",
-            district="Coimbatore",
+            industry="Automotive & Textile Components",
+            address="15, Textile Machinery & CNC Park, Tiruppur",
+            district="Tiruppur",
             state="Tamil Nadu",
-            pincode="641004",
-            latitude=11.0250,
-            longitude=77.0120,
-            description="OEM supplier of precision automotive housings and robotics structural assemblies.",
+            pincode="641603",
+            latitude=11.1085,
+            longitude=77.3411,
+            description="OEM precision machining, tooling, and component manufacturing for textile machinery and automotive parts.",
             verification_status=VerificationStatus.VERIFIED,
         )
         db.add(jayanth_biz)
@@ -433,6 +433,110 @@ def seed_database():
         ])
         db.commit()
 
+        # Machine 5: Doosan DNM 5700 (Jayanth - Tiruppur)
+        doosan_vmc = Machine(
+            business_id=jayanth_biz.id,
+            name="Doosan DNM 5700 4-Axis CNC Machining Center",
+            category="CNC Milling",
+            manufacturer="Doosan Machine Tools",
+            model="DNM 5700",
+            year=2023,
+            description="High-precision 4-axis vertical machining center equipped with high-pressure coolant and rotary table, optimized for precision textile components, automotive brackets, and aerospace aluminium.",
+            dimensions_capacity="1050 x 570 x 510 mm",
+            precision_tolerance="±0.005 mm",
+            operating_parameters=json.dumps({"spindle_rpm": 12000, "tool_capacity": 30, "coolant": "Through Spindle Coolant"}),
+            hourly_price=1100.0,
+            min_job_value=4000.0,
+            operator_available=True,
+            location_address="15, Textile Machinery & CNC Park, Tiruppur",
+            latitude=11.1085,
+            longitude=77.3411,
+            photos=json.dumps([
+                "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800",
+                "https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?w=800",
+            ]),
+            status=MachineStatus.ACTIVE,
+            verification_status=VerificationStatus.VERIFIED,
+        )
+        db.add(doosan_vmc)
+        db.commit()
+
+        db.add_all([
+            MachineCapability(machine_id=doosan_vmc.id, process="CNC Milling", material="Aluminium 6061", min_tolerance_mm=0.005, max_dimension_x=1050, max_dimension_y=570, max_dimension_z=510),
+            MachineCapability(machine_id=doosan_vmc.id, process="CNC Milling", material="Aluminium", min_tolerance_mm=0.005, max_dimension_x=1050, max_dimension_y=570, max_dimension_z=510),
+            MachineCapability(machine_id=doosan_vmc.id, process="CNC Milling", material="Mild Steel", min_tolerance_mm=0.010, max_dimension_x=1050, max_dimension_y=570, max_dimension_z=510),
+            MachineCapability(machine_id=doosan_vmc.id, process="CNC Machining", material="Stainless Steel 304", min_tolerance_mm=0.008, max_dimension_x=1050, max_dimension_y=570, max_dimension_z=510),
+        ])
+        db.commit()
+
+        # Machine 6: LMW Smarturn (Jayanth - Tiruppur)
+        lmw_turn = Machine(
+            business_id=jayanth_biz.id,
+            name="LMW Smarturn CNC Precision Lathe",
+            category="CNC Turning",
+            manufacturer="Lakshmi Machine Works (LMW)",
+            model="Smarturn",
+            year=2022,
+            description="Rigid CNC turning center built in Coimbatore/Tiruppur region, tailored for high-speed shaft turning, textile rollers, and precision bushings.",
+            dimensions_capacity="Max Turning Dia: 320 mm, Length: 400 mm",
+            precision_tolerance="±0.008 mm",
+            operating_parameters=json.dumps({"max_rpm": 4000, "chuck_size_inch": 8}),
+            hourly_price=700.0,
+            min_job_value=2500.0,
+            operator_available=True,
+            location_address="24, Avinashi Road Industrial Area, Tiruppur",
+            latitude=11.1120,
+            longitude=77.3450,
+            photos=json.dumps([
+                "https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?w=800",
+            ]),
+            status=MachineStatus.ACTIVE,
+            verification_status=VerificationStatus.VERIFIED,
+        )
+        db.add(lmw_turn)
+        db.commit()
+
+        db.add_all([
+            MachineCapability(machine_id=lmw_turn.id, process="CNC Turning", material="Aluminium 6061", min_tolerance_mm=0.008, max_dimension_x=320, max_dimension_y=320, max_dimension_z=400),
+            MachineCapability(machine_id=lmw_turn.id, process="CNC Turning", material="Mild Steel", min_tolerance_mm=0.008, max_dimension_x=320, max_dimension_y=320, max_dimension_z=400),
+            MachineCapability(machine_id=lmw_turn.id, process="Lathe", material="Brass", min_tolerance_mm=0.010, max_dimension_x=320, max_dimension_y=320, max_dimension_z=400),
+        ])
+        db.commit()
+
+        # Machine 7: Amada Ensis Fiber Laser (Jayanth - Tiruppur)
+        amada_laser = Machine(
+            business_id=jayanth_biz.id,
+            name="Amada Ensis 3015 3kW Fiber Laser",
+            category="Laser Cutting",
+            manufacturer="Amada",
+            model="Ensis 3015 AJ",
+            year=2023,
+            description="Energy-efficient 3kW fiber laser cutting with variable beam control for clean cutting in aluminium, mild steel, and stainless sheet metal.",
+            dimensions_capacity="3000 x 1500 mm Sheet Envelope",
+            precision_tolerance="±0.03 mm",
+            operating_parameters=json.dumps({"laser_power_watts": 3000, "beam_mode": "Auto Collimation"}),
+            hourly_price=1600.0,
+            min_job_value=3500.0,
+            operator_available=True,
+            location_address="15, Textile Machinery & CNC Park, Tiruppur",
+            latitude=11.1085,
+            longitude=77.3411,
+            photos=json.dumps([
+                "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800",
+            ]),
+            status=MachineStatus.ACTIVE,
+            verification_status=VerificationStatus.VERIFIED,
+        )
+        db.add(amada_laser)
+        db.commit()
+
+        db.add_all([
+            MachineCapability(machine_id=amada_laser.id, process="Laser Cutting", material="Aluminium 6061", min_tolerance_mm=0.03, max_dimension_x=3000, max_dimension_y=1500, max_dimension_z=8),
+            MachineCapability(machine_id=amada_laser.id, process="Laser Cutting", material="Mild Steel", min_tolerance_mm=0.03, max_dimension_x=3000, max_dimension_y=1500, max_dimension_z=16),
+            MachineCapability(machine_id=amada_laser.id, process="Sheet Metal Fabrication", material="Stainless Steel 304", min_tolerance_mm=0.04, max_dimension_x=3000, max_dimension_y=1500, max_dimension_z=10),
+        ])
+        db.commit()
+
         # 4. AVAILABILITY CALENDAR SLOTS
         print("[4/7] Scheduling operational calendar availability...")
         today = date.today()
@@ -474,6 +578,33 @@ def seed_database():
                 is_available=True,
                 reason="Day Shift",
             ))
+            # Doosan VMC (Tiruppur)
+            db.add(MachineAvailability(
+                machine_id=doosan_vmc.id,
+                date=day,
+                start_time=time(8, 0),
+                end_time=time(20, 0),
+                is_available=True,
+                reason="Active Production Shift (12 hrs/day)",
+            ))
+            # LMW Turn (Tiruppur)
+            db.add(MachineAvailability(
+                machine_id=lmw_turn.id,
+                date=day,
+                start_time=time(9, 0),
+                end_time=time(18, 0),
+                is_available=True,
+                reason="Available Shift",
+            ))
+            # Amada Laser (Tiruppur)
+            db.add(MachineAvailability(
+                machine_id=amada_laser.id,
+                date=day,
+                start_time=time(8, 30),
+                end_time=time(20, 30),
+                is_available=True,
+                reason="2 Shifts Open",
+            ))
         db.commit()
 
         # 5. SAMPLE REQUIREMENT (Karthikeyan Seeker)
@@ -499,11 +630,55 @@ def seed_database():
             status=RequirementStatus.OPEN,
         )
         db.add(req)
+
+        praga_req = Requirement(
+            seeker_id=pragatheswaran_user.id,
+            title="500 Aluminium Components",
+            description="Need 500 units of custom precision components, 4-axis CNC machined with tight ±0.02 mm bore tolerance.",
+            process="CNC Milling",
+            material="Aluminium",
+            quantity=500,
+            dimensions="140 x 75 x 30 mm",
+            tolerance_mm=0.02,
+            required_date=today + timedelta(days=1),
+            delivery_deadline=today + timedelta(days=7),
+            preferred_location="Coimbatore",
+            latitude=11.0168,
+            longitude=76.9558,
+            max_distance_km=50.0,
+            budget=25000.0,
+            quality_requirements="Dimensional inspection certificate required.",
+            operator_required=True,
+            status=RequirementStatus.OPEN,
+        )
+        db.add(praga_req)
+
+        jayanth_req = Requirement(
+            seeker_id=jayanth_user.id,
+            title="500 Aluminium Components",
+            description="Need 500 units of custom precision components, 4-axis CNC machined with tight ±0.02 mm bore tolerance.",
+            process="CNC Milling",
+            material="Aluminium",
+            quantity=500,
+            dimensions="140 x 75 x 30 mm",
+            tolerance_mm=0.02,
+            required_date=today + timedelta(days=1),
+            delivery_deadline=today + timedelta(days=7),
+            preferred_location="Coimbatore",
+            latitude=11.0168,
+            longitude=76.9558,
+            max_distance_km=50.0,
+            budget=25000.0,
+            quality_requirements="Dimensional inspection certificate required.",
+            operator_required=True,
+            status=RequirementStatus.OPEN,
+        )
+        db.add(jayanth_req)
         db.commit()
 
         # 6. RUN REAL MATCHING ENGINE FOR THIS REQUIREMENT
         print("[6/7] Running deterministic explainable capacity matching...")
-        candidates = [haas_vf4, bfw_chakra, trumpf_laser, mazak_turn]
+        candidates = [haas_vf4, bfw_chakra, trumpf_laser, mazak_turn, doosan_vmc, lmw_turn, amada_laser]
         matches = matching_engine.rank_matches(req, candidates)
 
         for m_res in matches:

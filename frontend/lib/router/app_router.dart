@@ -14,6 +14,7 @@ import 'package:machhunt/screens/provider/my_machines_screen.dart';
 import 'package:machhunt/screens/provider/add_machine_screen.dart';
 import 'package:machhunt/screens/provider/availability_calendar_screen.dart';
 import 'package:machhunt/screens/seeker/seeker_dashboard_screen.dart';
+import 'package:machhunt/screens/seeker/my_requirements_screen.dart';
 import 'package:machhunt/screens/seeker/create_requirement_screen.dart';
 import 'package:machhunt/screens/seeker/match_results_screen.dart';
 import 'package:machhunt/screens/seeker/compare_machines_screen.dart';
@@ -23,24 +24,19 @@ import 'package:machhunt/screens/notifications/notifications_screen.dart';
 import 'package:machhunt/screens/profile/profile_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
-final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> _shellNavigatorKey =
+    GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/',
   routes: [
-    GoRoute(
-      path: '/',
-      builder: (context, state) => const SplashScreen(),
-    ),
+    GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
     GoRoute(
       path: '/landing',
       builder: (context, state) => const LandingScreen(),
     ),
-    GoRoute(
-      path: '/login',
-      builder: (context, state) => const LoginScreen(),
-    ),
+    GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
     GoRoute(
       path: '/register',
       builder: (context, state) => const RegisterScreen(),
@@ -58,7 +54,9 @@ final GoRouter appRouter = GoRouter(
         return null;
       },
       builder: (context, state) {
-        final email = state.uri.queryParameters['email'] ?? (state.extra as String? ?? '');
+        final email =
+            state.uri.queryParameters['email'] ??
+            (state.extra as String? ?? '');
         return OtpVerificationScreen(email: email);
       },
     ),
@@ -71,7 +69,9 @@ final GoRouter appRouter = GoRouter(
         return null;
       },
       builder: (context, state) {
-        final email = state.uri.queryParameters['email'] ?? (state.extra as String? ?? '');
+        final email =
+            state.uri.queryParameters['email'] ??
+            (state.extra as String? ?? '');
         return OtpVerificationScreen(email: email);
       },
     ),
@@ -84,7 +84,9 @@ final GoRouter appRouter = GoRouter(
         return null;
       },
       builder: (context, state) {
-        final email = state.uri.queryParameters['email'] ?? (state.extra as String? ?? '');
+        final email =
+            state.uri.queryParameters['email'] ??
+            (state.extra as String? ?? '');
         return OtpVerificationScreen(email: email);
       },
     ),
@@ -97,7 +99,9 @@ final GoRouter appRouter = GoRouter(
         return null;
       },
       builder: (context, state) {
-        final email = state.uri.queryParameters['email'] ?? (state.extra as String? ?? '');
+        final email =
+            state.uri.queryParameters['email'] ??
+            (state.extra as String? ?? '');
         return OtpVerificationScreen(email: email);
       },
     ),
@@ -154,14 +158,18 @@ final GoRouter appRouter = GoRouter(
         ),
         GoRoute(
           path: '/my-requirements',
-          builder: (context, state) => const SeekerDashboardScreen(),
+          builder: (context, state) => const MyRequirementsScreen(),
         ),
         GoRoute(
           path: '/matches/:reqId',
           builder: (context, state) {
             final reqId = state.pathParameters['reqId'] ?? '';
-            final title = state.uri.queryParameters['title'] ?? 'Capacity Matches';
-            return MatchResultsScreen(requirementId: reqId, requirementTitle: title);
+            final title =
+                state.uri.queryParameters['title'] ?? 'Capacity Matches';
+            return MatchResultsScreen(
+              requirementId: reqId,
+              requirementTitle: title,
+            );
           },
         ),
         GoRoute(

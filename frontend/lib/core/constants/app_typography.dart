@@ -103,5 +103,3 @@ class AppTypography {
     color: AppColors.textPrimary,
   );
 }
-
-

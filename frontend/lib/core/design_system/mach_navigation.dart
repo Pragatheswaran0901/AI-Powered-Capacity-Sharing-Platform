@@ -26,7 +26,9 @@ class MachSidebar extends StatelessWidget {
     required String route,
     String? badgeText,
   }) {
-    final isSelected = currentRoute.startsWith(route) || (route == '/provider-dashboard' && currentRoute == '/my-machines');
+    final isSelected =
+        currentRoute.startsWith(route) ||
+        (route == '/provider-dashboard' && currentRoute == '/my-machines');
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
@@ -42,10 +44,13 @@ class MachSidebar extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: isSelected ? AppColors.steelBlue.withValues(alpha: 0.12) : Colors.transparent,
+              color: isSelected ? const Color(0xFF142B4A) : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
               border: isSelected
-                  ? Border.all(color: AppColors.steelBlue.withValues(alpha: 0.25), width: 1)
+                  ? Border.all(
+                      color: AppColors.machBlue.withValues(alpha: 0.35),
+                      width: 1,
+                    )
                   : null,
             ),
             child: Row(
@@ -53,7 +58,9 @@ class MachSidebar extends StatelessWidget {
                 Icon(
                   icon,
                   size: 19,
-                  color: isSelected ? AppColors.steelBlue : AppColors.slate400,
+                  color: isSelected
+                      ? const Color(0xFF60A5FA)
+                      : const Color(0xFF71839A),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -61,21 +68,34 @@ class MachSidebar extends StatelessWidget {
                     label,
                     style: GoogleFonts.inter(
                       fontSize: 13.5,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                      color: isSelected ? Colors.white : AppColors.slate300,
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                      color: isSelected
+                          ? Colors.white
+                          : const Color(0xFFC5D1DF),
                     ),
                   ),
                 ),
                 if (badgeText != null)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 7,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
-                      color: isSelected ? AppColors.steelBlue : AppColors.slate800,
+                      color: isSelected
+                          ? AppColors.machBlue
+                          : AppColors.slate800,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       badgeText,
-                      style: GoogleFonts.inter(fontSize: 10.5, fontWeight: FontWeight.w700, color: Colors.white),
+                      style: GoogleFonts.inter(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
               ],
@@ -93,7 +113,7 @@ class MachSidebar extends StatelessWidget {
 
     return Container(
       width: 250,
-      color: AppColors.navyIndustrial,
+      color: AppColors.darkNavy,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -105,17 +125,21 @@ class MachSidebar extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.steelBlue,
+                    color: AppColors.machBlue,
                     borderRadius: BorderRadius.circular(8),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.steelBlue.withValues(alpha: 0.4),
+                        color: AppColors.machBlue.withValues(alpha: 0.4),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.precision_manufacturing, color: Colors.white, size: 22),
+                  child: const Icon(
+                    Icons.precision_manufacturing,
+                    color: Colors.white,
+                    size: 22,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Column(
@@ -135,7 +159,7 @@ class MachSidebar extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
-                        color: AppColors.slate400,
+                        color: const Color(0xFFAFC0D4),
                       ),
                     ),
                   ],
@@ -155,16 +179,27 @@ class MachSidebar extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.navySurface,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.slate700.withValues(alpha: 0.5), width: 1),
+                border: Border.all(
+                  color: AppColors.slate700.withValues(alpha: 0.5),
+                  width: 1,
+                ),
               ),
               child: Row(
                 children: [
                   CircleAvatar(
                     radius: 16,
-                    backgroundColor: isProvider ? AppColors.orangeAccent : AppColors.steelBlue,
+                    backgroundColor: isProvider
+                        ? AppColors.orangeAccent
+                        : AppColors.steelBlue,
                     child: Text(
-                      (user?.fullName.isNotEmpty ?? false) ? user!.fullName[0].toUpperCase() : 'M',
-                      style: GoogleFonts.inter(fontWeight: FontWeight.w800, color: Colors.white, fontSize: 13),
+                      (user?.fullName.isNotEmpty ?? false)
+                          ? user!.fullName[0].toUpperCase()
+                          : 'M',
+                      style: GoogleFonts.inter(
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        fontSize: 13,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -176,12 +211,20 @@ class MachSidebar extends StatelessWidget {
                           biz?.name ?? user?.fullName ?? "MSME Account",
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.inter(fontSize: 12.5, fontWeight: FontWeight.w700, color: Colors.white),
+                          style: GoogleFonts.inter(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           isProvider ? 'Capacity Provider' : 'Capacity Seeker',
-                          style: GoogleFonts.inter(fontSize: 10.5, fontWeight: FontWeight.w500, color: AppColors.slate400),
+                          style: GoogleFonts.inter(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.slate400,
+                          ),
                         ),
                       ],
                     ),
@@ -200,26 +243,110 @@ class MachSidebar extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (isAdmin) ...[
-                    _buildNavItem(context: context, icon: Icons.admin_panel_settings_outlined, label: 'Admin Oversight', route: '/admin'),
-                    _buildNavItem(context: context, icon: Icons.receipt_long_outlined, label: 'All Bookings', route: '/bookings'),
-                    _buildNavItem(context: context, icon: Icons.notifications_outlined, label: 'Notifications', route: '/notifications'),
-                    _buildNavItem(context: context, icon: Icons.person_outline, label: 'Profile', route: '/profile'),
+                    _buildNavItem(
+                      context: context,
+                      icon: Icons.admin_panel_settings_outlined,
+                      label: 'Admin Oversight',
+                      route: '/admin',
+                    ),
+                    _buildNavItem(
+                      context: context,
+                      icon: Icons.receipt_long_outlined,
+                      label: 'All Bookings',
+                      route: '/bookings',
+                    ),
+                    _buildNavItem(
+                      context: context,
+                      icon: Icons.notifications_outlined,
+                      label: 'Notifications',
+                      route: '/notifications',
+                    ),
+                    _buildNavItem(
+                      context: context,
+                      icon: Icons.person_outline,
+                      label: 'Profile',
+                      route: '/profile',
+                    ),
                   ] else if (isProvider) ...[
-                    _buildNavItem(context: context, icon: Icons.dashboard_outlined, label: 'Dashboard', route: '/provider-dashboard'),
-                    _buildNavItem(context: context, icon: Icons.precision_manufacturing_outlined, label: 'My Machines', route: '/my-machines'),
-                    _buildNavItem(context: context, icon: Icons.calendar_month_outlined, label: 'Availability', route: '/availability'),
-                    _buildNavItem(context: context, icon: Icons.inbox_outlined, label: 'Incoming Requests', route: '/incoming-requests'),
-                    _buildNavItem(context: context, icon: Icons.receipt_long_outlined, label: 'Bookings', route: '/bookings'),
-                    _buildNavItem(context: context, icon: Icons.verified_user_outlined, label: 'Verification', route: '/profile'),
-                    _buildNavItem(context: context, icon: Icons.settings_outlined, label: 'Settings', route: '/profile'),
+                    _buildNavItem(
+                      context: context,
+                      icon: Icons.dashboard_outlined,
+                      label: 'Dashboard',
+                      route: '/provider-dashboard',
+                    ),
+                    _buildNavItem(
+                      context: context,
+                      icon: Icons.precision_manufacturing_outlined,
+                      label: 'My Machines',
+                      route: '/my-machines',
+                    ),
+                    _buildNavItem(
+                      context: context,
+                      icon: Icons.calendar_month_outlined,
+                      label: 'Availability',
+                      route: '/availability',
+                    ),
+                    _buildNavItem(
+                      context: context,
+                      icon: Icons.inbox_outlined,
+                      label: 'Incoming Requests',
+                      route: '/incoming-requests',
+                    ),
+                    _buildNavItem(
+                      context: context,
+                      icon: Icons.receipt_long_outlined,
+                      label: 'Bookings',
+                      route: '/bookings',
+                    ),
+                    _buildNavItem(
+                      context: context,
+                      icon: Icons.verified_user_outlined,
+                      label: 'Verification',
+                      route: '/profile',
+                    ),
+                    _buildNavItem(
+                      context: context,
+                      icon: Icons.settings_outlined,
+                      label: 'Settings',
+                      route: '/profile',
+                    ),
                   ] else ...[
-                    _buildNavItem(context: context, icon: Icons.dashboard_outlined, label: 'Dashboard', route: '/seeker-dashboard'),
-                    _buildNavItem(context: context, icon: Icons.add_circle_outline, label: 'Create Requirement', route: '/create-requirement'),
-                    _buildNavItem(context: context, icon: Icons.assignment_outlined, label: 'My Requirements', route: '/my-requirements'),
-                    _buildNavItem(context: context, icon: Icons.compare_arrows_outlined, label: 'Compare Options', route: '/compare'),
-                    _buildNavItem(context: context, icon: Icons.receipt_long_outlined, label: 'Bookings', route: '/bookings'),
-                    _buildNavItem(context: context, icon: Icons.verified_user_outlined, label: 'Verification', route: '/profile'),
-                    _buildNavItem(context: context, icon: Icons.settings_outlined, label: 'Settings', route: '/profile'),
+                    _buildNavItem(
+                      context: context,
+                      icon: Icons.dashboard_outlined,
+                      label: 'Dashboard',
+                      route: '/seeker-dashboard',
+                    ),
+                    _buildNavItem(
+                      context: context,
+                      icon: Icons.assignment_outlined,
+                      label: 'My Requirements',
+                      route: '/my-requirements',
+                    ),
+                    _buildNavItem(
+                      context: context,
+                      icon: Icons.receipt_long_outlined,
+                      label: 'My Bookings',
+                      route: '/bookings',
+                    ),
+                    _buildNavItem(
+                      context: context,
+                      icon: Icons.compare_arrows_outlined,
+                      label: 'Compare Options',
+                      route: '/compare',
+                    ),
+                    _buildNavItem(
+                      context: context,
+                      icon: Icons.notifications_outlined,
+                      label: 'Notifications',
+                      route: '/notifications',
+                    ),
+                    _buildNavItem(
+                      context: context,
+                      icon: Icons.settings_outlined,
+                      label: 'Settings',
+                      route: '/profile',
+                    ),
                   ],
                 ],
               ),
@@ -233,16 +360,21 @@ class MachSidebar extends StatelessWidget {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: onSwitchRole ?? () {
-                  if (isProvider) {
-                    context.go('/seeker-dashboard');
-                  } else {
-                    context.go('/provider-dashboard');
-                  }
-                },
+                onTap:
+                    onSwitchRole ??
+                    () {
+                      if (isProvider) {
+                        context.go('/seeker-dashboard');
+                      } else {
+                        context.go('/provider-dashboard');
+                      }
+                    },
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 11,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.navySurface,
                     borderRadius: BorderRadius.circular(8),
@@ -254,7 +386,9 @@ class MachSidebar extends StatelessWidget {
                       Icon(
                         Icons.swap_horiz_rounded,
                         size: 18,
-                        color: isProvider ? AppColors.steelBlue : AppColors.orangeAccent,
+                        color: isProvider
+                            ? AppColors.machBlue
+                            : AppColors.machOrange,
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -280,7 +414,10 @@ class MachSidebar extends StatelessWidget {
               children: [
                 Text(
                   'Mach-Hunt v2.0',
-                  style: GoogleFonts.inter(fontSize: 11, color: AppColors.slate500),
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    color: AppColors.slate500,
+                  ),
                 ),
                 InkWell(
                   onTap: () async {
@@ -292,11 +429,18 @@ class MachSidebar extends StatelessWidget {
                     padding: const EdgeInsets.all(4),
                     child: Row(
                       children: [
-                        const Icon(Icons.logout, size: 14, color: AppColors.slate400),
+                        const Icon(
+                          Icons.logout,
+                          size: 14,
+                          color: AppColors.slate400,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           'Sign Out',
-                          style: GoogleFonts.inter(fontSize: 11, color: AppColors.slate400),
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            color: AppColors.slate400,
+                          ),
                         ),
                       ],
                     ),
@@ -367,8 +511,14 @@ class MachTopBar extends StatelessWidget implements PreferredSizeWidget {
                   radius: 16,
                   backgroundColor: AppColors.steelBlue,
                   child: Text(
-                    user.fullName.isNotEmpty ? user.fullName[0].toUpperCase() : 'U',
-                    style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13),
+                    user.fullName.isNotEmpty
+                        ? user.fullName[0].toUpperCase()
+                        : 'U',
+                    style: GoogleFonts.inter(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                    ),
                   ),
                 ),
               ],

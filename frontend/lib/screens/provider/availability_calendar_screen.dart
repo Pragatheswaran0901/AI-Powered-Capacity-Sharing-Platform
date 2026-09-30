@@ -11,18 +11,22 @@ import 'package:machhunt/state/provider_state.dart';
 class AvailabilityCalendarScreen extends StatefulWidget {
   final String machineId;
   final String machineName;
+  final String returnPath;
 
   const AvailabilityCalendarScreen({
     super.key,
     required this.machineId,
     required this.machineName,
+    this.returnPath = '/my-machines',
   });
 
   @override
-  State<AvailabilityCalendarScreen> createState() => _AvailabilityCalendarScreenState();
+  State<AvailabilityCalendarScreen> createState() =>
+      _AvailabilityCalendarScreenState();
 }
 
-class _AvailabilityCalendarScreenState extends State<AvailabilityCalendarScreen> {
+class _AvailabilityCalendarScreenState
+    extends State<AvailabilityCalendarScreen> {
   bool _isLoading = true;
   List<Map<String, dynamic>> _slots = [];
 
@@ -35,7 +39,9 @@ class _AvailabilityCalendarScreenState extends State<AvailabilityCalendarScreen>
   Future<void> _fetchCalendar() async {
     setState(() => _isLoading = true);
     try {
-      final res = await apiClient.get(ApiEndpoints.machineAvailability(widget.machineId));
+      final res = await apiClient.get(
+        ApiEndpoints.machineAvailability(widget.machineId),
+      );
       if (res is List && res.isNotEmpty) {
         _slots = res.map((e) => Map<String, dynamic>.from(e)).toList();
       } else {
@@ -43,13 +49,16 @@ class _AvailabilityCalendarScreenState extends State<AvailabilityCalendarScreen>
         final today = DateTime.now();
         _slots = List.generate(14, (i) {
           final d = today.add(Duration(days: i));
-          final isWeekend = d.weekday == DateTime.saturday || d.weekday == DateTime.sunday;
+          final isWeekend =
+              d.weekday == DateTime.saturday || d.weekday == DateTime.sunday;
           return {
             'date': DateFormat('yyyy-MM-dd').format(d),
             'start_time': '09:00:00',
             'end_time': '18:00:00',
             'is_available': !isWeekend,
-            'reason': !isWeekend ? 'Regular Day Shift (9h Capacity)' : 'Weekend Maintenance',
+            'reason': !isWeekend
+                ? 'Regular Day Shift (9h Capacity)'
+                : 'Weekend Maintenance',
           };
         });
       }
@@ -63,26 +72,35 @@ class _AvailabilityCalendarScreenState extends State<AvailabilityCalendarScreen>
     setState(() {
       final current = _slots[index]['is_available'] ?? true;
       _slots[index]['is_available'] = !current;
-      _slots[index]['reason'] = !current ? 'Regular Day Shift (9h Capacity)' : 'Blocked / Maintenance';
+      _slots[index]['reason'] = !current
+          ? 'Regular Day Shift (9h Capacity)'
+          : 'Blocked / Maintenance';
     });
   }
 
   Future<void> _saveSchedule() async {
-    final success = await providerState.setAvailability(widget.machineId, _slots);
+    final success = await providerState.setAvailability(
+      widget.machineId,
+      _slots,
+    );
     if (!mounted) return;
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Capacity schedule successfully updated and published!'),
+          content: Text(
+            'Capacity schedule successfully updated and published!',
+          ),
           backgroundColor: AppColors.emerald,
         ),
       );
-      context.go('/provider-dashboard');
+      context.go(widget.returnPath);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(providerState.errorMessage ?? 'Failed to update schedule.'),
+          content: Text(
+            providerState.errorMessage ?? 'Failed to update schedule.',
+          ),
           backgroundColor: AppColors.errorRed,
         ),
       );
@@ -91,12 +109,14 @@ class _AvailabilityCalendarScreenState extends State<AvailabilityCalendarScreen>
 
   @override
   Widget build(BuildContext context) {
-    final availableCount = _slots.where((s) => s['is_available'] == true).length;
+    final availableCount = _slots
+        .where((s) => s['is_available'] == true)
+        .length;
     final totalCount = _slots.isNotEmpty ? _slots.length : 14;
     final idleCapacityPct = ((availableCount / totalCount) * 100).toInt();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(28),
         child: Center(
@@ -107,23 +127,37 @@ class _AvailabilityCalendarScreenState extends State<AvailabilityCalendarScreen>
               children: [
                 MachPageHeader(
                   title: 'Machine Availability & Idle Capacity',
-                  subtitle: 'Define working hours, idle shifts, and maintenance windows for ${widget.machineName}.',
-                  onBack: () => context.go('/provider-dashboard'),
+                  subtitle:
+                      'Define working hours, idle shifts, and maintenance windows for ${widget.machineName}.',
+                  onBack: () => context.go(widget.returnPath),
                   badge: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFECFDF5),
                       borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: AppColors.emerald.withValues(alpha: 0.3)),
+                      border: Border.all(
+                        color: AppColors.emerald.withValues(alpha: 0.3),
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.flash_on_rounded, size: 14, color: AppColors.emerald),
+                        const Icon(
+                          Icons.flash_on_rounded,
+                          size: 14,
+                          color: AppColors.emerald,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           '$idleCapacityPct% IDLE CAPACITY AVAILABLE',
-                          style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.emerald),
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.emerald,
+                          ),
                         ),
                       ],
                     ),
@@ -154,7 +188,11 @@ class _AvailabilityCalendarScreenState extends State<AvailabilityCalendarScreen>
                           color: const Color(0xFFEFF6FF),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Icon(Icons.schedule, color: AppColors.steelBlue, size: 22),
+                        child: const Icon(
+                          Icons.schedule,
+                          color: AppColors.steelBlue,
+                          size: 22,
+                        ),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
@@ -163,12 +201,19 @@ class _AvailabilityCalendarScreenState extends State<AvailabilityCalendarScreen>
                           children: [
                             Text(
                               'Visual Capacity Status: Click any date slot to toggle between Idle Available and Blocked.',
-                              style: GoogleFonts.inter(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppColors.navyIndustrial),
+                              style: GoogleFonts.inter(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.navyIndustrial,
+                              ),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               'Green slots broadcast immediate availability to capacity seekers in AI matching.',
-                              style: GoogleFonts.inter(fontSize: 12.5, color: AppColors.slate500),
+                              style: GoogleFonts.inter(
+                                fontSize: 12.5,
+                                color: AppColors.slate500,
+                              ),
                             ),
                           ],
                         ),
@@ -179,19 +224,26 @@ class _AvailabilityCalendarScreenState extends State<AvailabilityCalendarScreen>
                 const SizedBox(height: 24),
 
                 if (_isLoading)
-                  const MachLoadingState(message: 'Loading shift schedule...', height: 300)
+                  const MachLoadingState(
+                    message: 'Loading shift schedule...',
+                    height: 300,
+                  )
                 else
                   // Grid of Date Slots
                   LayoutBuilder(
                     builder: (context, constraints) {
-                      final columns = constraints.maxWidth > 900 ? 3 : (constraints.maxWidth > 600 ? 2 : 1);
+                      final columns = constraints.maxWidth > 900
+                          ? 3
+                          : (constraints.maxWidth > 600 ? 2 : 1);
                       return Wrap(
                         spacing: 14,
                         runSpacing: 14,
                         children: [
                           for (int i = 0; i < _slots.length; i++)
                             SizedBox(
-                              width: (constraints.maxWidth - (columns - 1) * 14) / columns,
+                              width:
+                                  (constraints.maxWidth - (columns - 1) * 14) /
+                                  columns,
                               child: _buildSlotCard(i),
                             ),
                         ],
@@ -223,7 +275,9 @@ class _AvailabilityCalendarScreenState extends State<AvailabilityCalendarScreen>
         ),
         boxShadow: [
           BoxShadow(
-            color: isAvail ? AppColors.emerald.withValues(alpha: 0.04) : Colors.transparent,
+            color: isAvail
+                ? AppColors.emerald.withValues(alpha: 0.04)
+                : Colors.transparent,
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -237,7 +291,11 @@ class _AvailabilityCalendarScreenState extends State<AvailabilityCalendarScreen>
             children: [
               Text(
                 dateStr,
-                style: GoogleFonts.inter(fontSize: 14.5, fontWeight: FontWeight.w800, color: AppColors.navyIndustrial),
+                style: GoogleFonts.inter(
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.navyIndustrial,
+                ),
               ),
               MachStatusBadge(status: isAvail ? 'AVAILABLE' : 'BLOCKED'),
             ],
@@ -265,7 +323,9 @@ class _AvailabilityCalendarScreenState extends State<AvailabilityCalendarScreen>
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: isAvail ? const Color(0xFF166534) : AppColors.slate500,
+                      color: isAvail
+                          ? const Color(0xFF166534)
+                          : AppColors.slate500,
                     ),
                   ),
                 ),
@@ -278,7 +338,10 @@ class _AvailabilityCalendarScreenState extends State<AvailabilityCalendarScreen>
             children: [
               Text(
                 '09:00 - 18:00 (9h Shift)',
-                style: GoogleFonts.inter(fontSize: 11.5, color: AppColors.slate400),
+                style: GoogleFonts.inter(
+                  fontSize: 11.5,
+                  color: AppColors.slate400,
+                ),
               ),
               InkWell(
                 onTap: () => _toggleSlot(index),

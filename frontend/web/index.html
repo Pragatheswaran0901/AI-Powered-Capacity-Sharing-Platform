@@ -31,6 +31,19 @@
 
   <title>machhunt</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- Google Maps JavaScript API - Configurable via window.GOOGLE_MAPS_API_KEY or query param -->
+  <script>
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const apiKey = urlParams.get('maps_api_key') || window.GOOGLE_MAPS_API_KEY || 'AIzaSyDGAgFJPu2uAoNa6RSQ5VbWhseZyppxfYw';
+      const script = document.createElement('script');
+      script.src = 'https://maps.googleapis.com/maps/api/js?key=' + apiKey + '&v=weekly';
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  </script>
 </head>
 <body>
   <!--

@@ -33,8 +33,10 @@ class AdminMetricsModel {
       totalBookings: json['total_bookings'] ?? 0,
       completedJobs: json['completed_jobs'] ?? 0,
       totalGmvInr: (json['total_gmv_inr'] as num?)?.toDouble() ?? 0.0,
-      platformRevenueInr: (json['platform_revenue_inr'] as num?)?.toDouble() ?? 0.0,
-      matchSuccessRatePercent: (json['match_success_rate_percent'] as num?)?.toDouble() ?? 0.0,
+      platformRevenueInr:
+          (json['platform_revenue_inr'] as num?)?.toDouble() ?? 0.0,
+      matchSuccessRatePercent:
+          (json['match_success_rate_percent'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }

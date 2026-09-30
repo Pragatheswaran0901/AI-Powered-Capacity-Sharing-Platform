@@ -20,7 +20,9 @@ class LandingScreen extends StatelessWidget {
         child: Container(
           decoration: const BoxDecoration(
             color: Colors.white,
-            border: Border(bottom: BorderSide(color: AppColors.slate200, width: 1)),
+            border: Border(
+              bottom: BorderSide(color: AppColors.slate200, width: 1),
+            ),
           ),
           padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 40),
           child: SafeArea(
@@ -43,7 +45,11 @@ class LandingScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: const Icon(Icons.precision_manufacturing, color: Colors.white, size: 22),
+                      child: const Icon(
+                        Icons.precision_manufacturing,
+                        color: Colors.white,
+                        size: 22,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Column(
@@ -121,12 +127,17 @@ class LandingScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFF0F172A),
                 image: const DecorationImage(
-                  image: NetworkImage('https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=1600'),
+                  image: NetworkImage(
+                    'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=1600',
+                  ),
                   fit: BoxFit.cover,
                   opacity: 0.12,
                 ),
               ),
-              padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 64, vertical: isMobile ? 48 : 80),
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 20 : 64,
+                vertical: isMobile ? 48 : 80,
+              ),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 1200),
@@ -134,7 +145,10 @@ class LandingScreen extends StatelessWidget {
                       ? Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Expanded(flex: 6, child: _buildHeroLeft(context, isMobile)),
+                            Expanded(
+                              flex: 6,
+                              child: _buildHeroLeft(context, isMobile),
+                            ),
                             const SizedBox(width: 48),
                             Expanded(flex: 5, child: _buildHeroRight(context)),
                           ],
@@ -153,7 +167,10 @@ class LandingScreen extends StatelessWidget {
             // 4 PRODUCT VALUE POINTS SECTION
             Container(
               color: AppColors.slate50,
-              padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 64, vertical: 64),
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 20 : 64,
+                vertical: 64,
+              ),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 1200),
@@ -194,38 +211,56 @@ class LandingScreen extends StatelessWidget {
                       // 4 Pillars Grid
                       LayoutBuilder(
                         builder: (context, constraints) {
-                          final columns = constraints.maxWidth > 900 ? 4 : (constraints.maxWidth > 600 ? 2 : 1);
+                          final columns = constraints.maxWidth > 900
+                              ? 4
+                              : (constraints.maxWidth > 600 ? 2 : 1);
                           return Wrap(
                             spacing: 20,
                             runSpacing: 20,
                             children: [
                               _buildValueCard(
-                                width: (constraints.maxWidth - (columns - 1) * 20) / columns,
+                                width:
+                                    (constraints.maxWidth -
+                                        (columns - 1) * 20) /
+                                    columns,
                                 icon: Icons.verified_user_outlined,
                                 iconColor: AppColors.emerald,
                                 title: 'Verified Manufacturers',
-                                description: 'Every shop floor and machine is vetted with GSTIN, UDYAM registration, and verified precision specifications.',
+                                description:
+                                    'Every shop floor and machine is vetted with GSTIN, UDYAM registration, and verified precision specifications.',
                               ),
                               _buildValueCard(
-                                width: (constraints.maxWidth - (columns - 1) * 20) / columns,
+                                width:
+                                    (constraints.maxWidth -
+                                        (columns - 1) * 20) /
+                                    columns,
                                 icon: Icons.psychology_outlined,
                                 iconColor: AppColors.steelBlue,
                                 title: 'AI-Powered Matching',
-                                description: 'Natural language parsing maps technical blueprints and tolerances to verified machines across 5 deterministic criteria.',
+                                description:
+                                    'Natural language parsing maps technical blueprints and tolerances to verified machines across 5 deterministic criteria.',
                               ),
                               _buildValueCard(
-                                width: (constraints.maxWidth - (columns - 1) * 20) / columns,
+                                width:
+                                    (constraints.maxWidth -
+                                        (columns - 1) * 20) /
+                                    columns,
                                 icon: Icons.lock_outline,
                                 iconColor: AppColors.orangeAccent,
                                 title: 'Secure Transactions',
-                                description: 'Milestone escrow payment protection ensures buyer peace of mind and guaranteed provider payouts upon completion.',
+                                description:
+                                    'Milestone escrow payment protection ensures buyer peace of mind and guaranteed provider payouts upon completion.',
                               ),
                               _buildValueCard(
-                                width: (constraints.maxWidth - (columns - 1) * 20) / columns,
+                                width:
+                                    (constraints.maxWidth -
+                                        (columns - 1) * 20) /
+                                    columns,
                                 icon: Icons.factory_outlined,
                                 iconColor: AppColors.navyIndustrial,
                                 title: 'Built for MSMEs',
-                                description: 'Zero fixed overheads. Monetize idle machine hours and source urgent production capacity on flexible hourly terms.',
+                                description:
+                                    'Zero fixed overheads. Monetize idle machine hours and source urgent production capacity on flexible hourly terms.',
                               ),
                             ],
                           );
@@ -240,7 +275,10 @@ class LandingScreen extends StatelessWidget {
             // HOW IT WORKS - DUAL FLOW
             Container(
               color: Colors.white,
-              padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 64, vertical: 64),
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 20 : 64,
+                vertical: 64,
+              ),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 1200),
@@ -272,36 +310,108 @@ class LandingScreen extends StatelessWidget {
                           ? Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(child: _buildFlowColumn('FOR CAPACITY SEEKERS', Icons.search, [
-                                  _FlowStep('1. Describe Your Requirement', 'Type in plain English: "Need 4-axis VMC for 150 aluminium enclosures in Coimbatore."'),
-                                  _FlowStep('2. AI Extraction & Blueprint Mapping', 'Platform extracts material, process, tolerance, deadline, and quantity automatically.'),
-                                  _FlowStep('3. 5-Dimension AI Matching', 'Inspect ranked matches scored on capability, availability, distance, cost, and reliability.'),
-                                  _FlowStep('4. Compare & Escrow Booking', 'Compare technical specs side-by-side, lock dates, and fund protected escrow.'),
-                                ], AppColors.steelBlue)),
+                                Expanded(
+                                  child: _buildFlowColumn(
+                                    'FOR CAPACITY SEEKERS',
+                                    Icons.search,
+                                    [
+                                      _FlowStep(
+                                        '1. Describe Your Requirement',
+                                        'Type in plain English: "Need 4-axis VMC for 150 aluminium enclosures in Coimbatore."',
+                                      ),
+                                      _FlowStep(
+                                        '2. AI Extraction & Blueprint Mapping',
+                                        'Platform extracts material, process, tolerance, deadline, and quantity automatically.',
+                                      ),
+                                      _FlowStep(
+                                        '3. 5-Dimension AI Matching',
+                                        'Inspect ranked matches scored on capability, availability, distance, cost, and reliability.',
+                                      ),
+                                      _FlowStep(
+                                        '4. Compare & Escrow Booking',
+                                        'Compare technical specs side-by-side, lock dates, and fund protected escrow.',
+                                      ),
+                                    ],
+                                    AppColors.steelBlue,
+                                  ),
+                                ),
                                 const SizedBox(width: 32),
-                                Expanded(child: _buildFlowColumn('FOR CAPACITY PROVIDERS', Icons.precision_manufacturing, [
-                                  _FlowStep('1. List Your Machinery', 'Register CNC milling, VMC, laser, or turning equipment with technical envelope and rates.'),
-                                  _FlowStep('2. Set Calendar & Idle Shifts', 'Visual schedule builder clearly highlights available operating hours and idle capacity.'),
-                                  _FlowStep('3. Receive High-Intent Orders', 'Direct notifications when verified seekers need your exact tooling and capability.'),
-                                  _FlowStep('4. Execute & Guaranteed Payout', 'Produce parts, update order milestones, and receive instant platform payouts upon delivery.'),
-                                ], AppColors.orangeAccent)),
+                                Expanded(
+                                  child: _buildFlowColumn(
+                                    'FOR CAPACITY PROVIDERS',
+                                    Icons.precision_manufacturing,
+                                    [
+                                      _FlowStep(
+                                        '1. List Your Machinery',
+                                        'Register CNC milling, VMC, laser, or turning equipment with technical envelope and rates.',
+                                      ),
+                                      _FlowStep(
+                                        '2. Set Calendar & Idle Shifts',
+                                        'Visual schedule builder clearly highlights available operating hours and idle capacity.',
+                                      ),
+                                      _FlowStep(
+                                        '3. Receive High-Intent Orders',
+                                        'Direct notifications when verified seekers need your exact tooling and capability.',
+                                      ),
+                                      _FlowStep(
+                                        '4. Execute & Guaranteed Payout',
+                                        'Produce parts, update order milestones, and receive instant platform payouts upon delivery.',
+                                      ),
+                                    ],
+                                    AppColors.orangeAccent,
+                                  ),
+                                ),
                               ],
                             )
                           : Column(
                               children: [
-                                _buildFlowColumn('FOR CAPACITY SEEKERS', Icons.search, [
-                                  _FlowStep('1. Describe Your Requirement', 'Type in plain English: "Need 4-axis VMC for 150 aluminium enclosures in Coimbatore."'),
-                                  _FlowStep('2. AI Extraction & Blueprint Mapping', 'Platform extracts material, process, tolerance, deadline, and quantity automatically.'),
-                                  _FlowStep('3. 5-Dimension AI Matching', 'Inspect ranked matches scored on capability, availability, distance, cost, and reliability.'),
-                                  _FlowStep('4. Compare & Escrow Booking', 'Compare technical specs side-by-side, lock dates, and fund protected escrow.'),
-                                ], AppColors.steelBlue),
+                                _buildFlowColumn(
+                                  'FOR CAPACITY SEEKERS',
+                                  Icons.search,
+                                  [
+                                    _FlowStep(
+                                      '1. Describe Your Requirement',
+                                      'Type in plain English: "Need 4-axis VMC for 150 aluminium enclosures in Coimbatore."',
+                                    ),
+                                    _FlowStep(
+                                      '2. AI Extraction & Blueprint Mapping',
+                                      'Platform extracts material, process, tolerance, deadline, and quantity automatically.',
+                                    ),
+                                    _FlowStep(
+                                      '3. 5-Dimension AI Matching',
+                                      'Inspect ranked matches scored on capability, availability, distance, cost, and reliability.',
+                                    ),
+                                    _FlowStep(
+                                      '4. Compare & Escrow Booking',
+                                      'Compare technical specs side-by-side, lock dates, and fund protected escrow.',
+                                    ),
+                                  ],
+                                  AppColors.steelBlue,
+                                ),
                                 const SizedBox(height: 32),
-                                _buildFlowColumn('FOR CAPACITY PROVIDERS', Icons.precision_manufacturing, [
-                                  _FlowStep('1. List Your Machinery', 'Register CNC milling, VMC, laser, or turning equipment with technical envelope and rates.'),
-                                  _FlowStep('2. Set Calendar & Idle Shifts', 'Visual schedule builder clearly highlights available operating hours and idle capacity.'),
-                                  _FlowStep('3. Receive High-Intent Orders', 'Direct notifications when verified seekers need your exact tooling and capability.'),
-                                  _FlowStep('4. Execute & Guaranteed Payout', 'Produce parts, update order milestones, and receive instant platform payouts upon delivery.'),
-                                ], AppColors.orangeAccent),
+                                _buildFlowColumn(
+                                  'FOR CAPACITY PROVIDERS',
+                                  Icons.precision_manufacturing,
+                                  [
+                                    _FlowStep(
+                                      '1. List Your Machinery',
+                                      'Register CNC milling, VMC, laser, or turning equipment with technical envelope and rates.',
+                                    ),
+                                    _FlowStep(
+                                      '2. Set Calendar & Idle Shifts',
+                                      'Visual schedule builder clearly highlights available operating hours and idle capacity.',
+                                    ),
+                                    _FlowStep(
+                                      '3. Receive High-Intent Orders',
+                                      'Direct notifications when verified seekers need your exact tooling and capability.',
+                                    ),
+                                    _FlowStep(
+                                      '4. Execute & Guaranteed Payout',
+                                      'Produce parts, update order milestones, and receive instant platform payouts upon delivery.',
+                                    ),
+                                  ],
+                                  AppColors.orangeAccent,
+                                ),
                               ],
                             ),
                     ],
@@ -314,7 +424,10 @@ class LandingScreen extends StatelessWidget {
             Container(
               width: double.infinity,
               color: AppColors.navyIndustrial,
-              padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 64, vertical: 60),
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 20 : 64,
+                vertical: 60,
+              ),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 800),
@@ -394,7 +507,10 @@ class LandingScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.steelBlue.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.steelBlue.withValues(alpha: 0.4), width: 1),
+            border: Border.all(
+              color: AppColors.steelBlue.withValues(alpha: 0.4),
+              width: 1,
+            ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -472,7 +588,11 @@ class LandingScreen extends StatelessWidget {
       children: [
         Text(
           value,
-          style: GoogleFonts.inter(fontSize: 19, fontWeight: FontWeight.w800, color: Colors.white),
+          style: GoogleFonts.inter(
+            fontSize: 19,
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+          ),
         ),
         Text(
           label,
@@ -508,26 +628,47 @@ class LandingScreen extends StatelessWidget {
                   Container(
                     width: 10,
                     height: 10,
-                    decoration: const BoxDecoration(color: AppColors.emerald, shape: BoxShape.circle),
+                    decoration: const BoxDecoration(
+                      color: AppColors.emerald,
+                      shape: BoxShape.circle,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   Text(
                     'LIVE MATCH ENGINE',
-                    style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: Colors.white),
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.8,
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(color: AppColors.emerald.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(6)),
-                child: Text('98% CONFIDENCE', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w800, color: AppColors.emeraldLight)),
+                decoration: BoxDecoration(
+                  color: AppColors.emerald.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  '98% CONFIDENCE',
+                  style: GoogleFonts.inter(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.emeraldLight,
+                  ),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 18),
           Container(
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: AppColors.navyIndustrial, borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(
+              color: AppColors.navyIndustrial,
+              borderRadius: BorderRadius.circular(8),
+            ),
             child: Row(
               children: [
                 const Icon(Icons.bolt, size: 16, color: AppColors.amberWarm),
@@ -535,7 +676,10 @@ class LandingScreen extends StatelessWidget {
                 Expanded(
                   child: Text(
                     '"Need 4-axis VMC milling for 150 aluminium 6061 enclosures in Coimbatore by next Friday."',
-                    style: GoogleFonts.jetBrainsMono(fontSize: 11.5, color: AppColors.slate300),
+                    style: GoogleFonts.jetBrainsMono(
+                      fontSize: 11.5,
+                      color: AppColors.slate300,
+                    ),
                   ),
                 ),
               ],
@@ -548,7 +692,10 @@ class LandingScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.emerald.withValues(alpha: 0.5), width: 1.5),
+              border: Border.all(
+                color: AppColors.emerald.withValues(alpha: 0.5),
+                width: 1.5,
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -556,26 +703,70 @@ class LandingScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Kovai Precision Works', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.navyIndustrial)),
+                    Text(
+                      'Kovai Precision Works',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.navyIndustrial,
+                      ),
+                    ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(color: AppColors.emerald, borderRadius: BorderRadius.circular(4)),
-                      child: Text('92% MATCH', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.white)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.emerald,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        '92% MATCH',
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text('HAAS VF-4SS Super-Speed 4-Axis VMC · Coimbatore', style: GoogleFonts.inter(fontSize: 11.5, color: AppColors.slate600)),
+                Text(
+                  'HAAS VF-4SS Super-Speed 4-Axis VMC · Coimbatore',
+                  style: GoogleFonts.inter(
+                    fontSize: 11.5,
+                    color: AppColors.slate600,
+                  ),
+                ),
                 const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('₹1,200 / hr', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.steelBlue)),
+                    Text(
+                      '₹1,200 / hr',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.steelBlue,
+                      ),
+                    ),
                     Row(
                       children: [
-                        const Icon(Icons.check_circle, size: 13, color: AppColors.emerald),
+                        const Icon(
+                          Icons.check_circle,
+                          size: 13,
+                          color: AppColors.emerald,
+                        ),
                         const SizedBox(width: 4),
-                        Text('Available Tomorrow', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.emerald)),
+                        Text(
+                          'Available Tomorrow',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.emerald,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -653,7 +844,12 @@ class LandingScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFlowColumn(String title, IconData icon, List<_FlowStep> steps, Color color) {
+  Widget _buildFlowColumn(
+    String title,
+    IconData icon,
+    List<_FlowStep> steps,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -668,13 +864,21 @@ class LandingScreen extends StatelessWidget {
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 child: Icon(icon, size: 20, color: color),
               ),
               const SizedBox(width: 10),
               Text(
                 title,
-                style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: 0.5, color: color),
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.5,
+                  color: color,
+                ),
               ),
             ],
           ),
@@ -687,12 +891,20 @@ class LandingScreen extends StatelessWidget {
                 children: [
                   Text(
                     step.title,
-                    style: GoogleFonts.inter(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppColors.navyIndustrial),
+                    style: GoogleFonts.inter(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.navyIndustrial,
+                    ),
                   ),
                   const SizedBox(height: 3),
                   Text(
                     step.desc,
-                    style: GoogleFonts.inter(fontSize: 12.5, color: AppColors.slate500, height: 1.4),
+                    style: GoogleFonts.inter(
+                      fontSize: 12.5,
+                      color: AppColors.slate500,
+                      height: 1.4,
+                    ),
                   ),
                 ],
               ),

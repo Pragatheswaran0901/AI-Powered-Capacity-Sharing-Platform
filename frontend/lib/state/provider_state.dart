@@ -1,10 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:machhunt/core/constants/api_endpoints.dart';
 import 'package:machhunt/core/network/api_client.dart';
 import 'package:machhunt/models/machine_model.dart';
 import 'package:machhunt/models/booking_model.dart';
 
 class ProviderState extends ChangeNotifier {
+  @override
+  void notifyListeners() {
+    if (WidgetsBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        super.notifyListeners();
+      });
+    } else {
+      super.notifyListeners();
+    }
+  }
+
   List<MachineModel> _myMachines = [];
   List<BookingModel> _incomingRequests = [];
   bool _isLoading = false;
@@ -18,7 +31,9 @@ class ProviderState extends ChangeNotifier {
   double get totalEarnings {
     double total = 0.0;
     for (var b in _incomingRequests) {
-      if (b.status == 'COMPLETED' || b.status == 'CONFIRMED' || b.status == 'IN_PROGRESS') {
+      if (b.status == 'COMPLETED' ||
+          b.status == 'CONFIRMED' ||
+          b.status == 'IN_PROGRESS') {
         total += b.providerPayout;
       }
     }
@@ -26,7 +41,9 @@ class ProviderState extends ChangeNotifier {
   }
 
   int get activeJobCount {
-    return _incomingRequests.where((b) => b.status == 'IN_PROGRESS' || b.status == 'CONFIRMED').length;
+    return _incomingRequests
+        .where((b) => b.status == 'IN_PROGRESS' || b.status == 'CONFIRMED')
+        .length;
   }
 
   Future<void> fetchMyMachines() async {
@@ -117,7 +134,31 @@ class ProviderState extends ChangeNotifier {
     }
   }
 
-  Future<bool> setAvailability(String machineId, List<Map<String, dynamic>> slots) async {
+  Future<bool> updateMachine(
+    String machineId,
+    Map<String, dynamic> updateData,
+  ) async {
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await apiClient.put(
+        ApiEndpoints.machineDetail(machineId),
+        data: updateData,
+      );
+      await fetchMyMachines();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> setAvailability(
+    String machineId,
+    List<Map<String, dynamic>> slots,
+  ) async {
     _isLoading = true;
     notifyListeners();
 
@@ -126,6 +167,7 @@ class ProviderState extends ChangeNotifier {
         ApiEndpoints.machineAvailability(machineId),
         data: {'slots': slots},
       );
+      await fetchMyMachines();
       _isLoading = false;
       notifyListeners();
       return true;
@@ -151,7 +193,10 @@ class ProviderState extends ChangeNotifier {
 
   Future<bool> rejectRequest(String bookingId, {String? reason}) async {
     try {
-      await apiClient.post(ApiEndpoints.rejectBooking(bookingId), data: {'reason': reason});
+      await apiClient.post(
+        ApiEndpoints.rejectBooking(bookingId),
+        data: {'reason': reason},
+      );
       await fetchIncomingRequests();
       return true;
     } catch (e) {

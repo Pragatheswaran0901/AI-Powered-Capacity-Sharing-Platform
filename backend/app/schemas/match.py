@@ -21,6 +21,9 @@ class MatchResultOut(BaseModel):
     business_name: str
     machine_name: str
     machine_category: str
+    manufacturer: Optional[str] = None
+    model: Optional[str] = None
+    year: Optional[int] = None
     location_address: str
     hourly_price: float
     overall_score: float  # 0.0 to 1.0 (or percentage 0 to 100)
@@ -28,9 +31,14 @@ class MatchResultOut(BaseModel):
     score_breakdown: MatchScoreBreakdown
     match_reasons: List[str]
     photos: List[str] = []
+    capabilities: List[Dict[str, Any]] = []
+    operator_available: bool = True
+    status: str = "ACTIVE"
     average_rating: float = 4.5
     completed_jobs: int = 0
     verification_status: str = "VERIFIED"
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
 
 class CompareRequest(BaseModel):

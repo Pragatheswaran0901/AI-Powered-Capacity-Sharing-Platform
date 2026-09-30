@@ -34,7 +34,9 @@ class AdminState extends ChangeNotifier {
     try {
       final res = await apiClient.get(ApiEndpoints.adminVerifications);
       if (res is List) {
-        _queue = res.map((e) => VerificationQueueItemModel.fromJson(e)).toList();
+        _queue = res
+            .map((e) => VerificationQueueItemModel.fromJson(e))
+            .toList();
       }
       notifyListeners();
     } catch (e) {
@@ -43,7 +45,11 @@ class AdminState extends ChangeNotifier {
     }
   }
 
-  Future<bool> verifyBusiness(String id, String status, {String? remarks}) async {
+  Future<bool> verifyBusiness(
+    String id,
+    String status, {
+    String? remarks,
+  }) async {
     try {
       await apiClient.post(
         ApiEndpoints.verifyBusiness(id),
@@ -59,7 +65,11 @@ class AdminState extends ChangeNotifier {
     }
   }
 
-  Future<bool> verifyMachine(String id, String status, {String? remarks}) async {
+  Future<bool> verifyMachine(
+    String id,
+    String status, {
+    String? remarks,
+  }) async {
     try {
       await apiClient.post(
         ApiEndpoints.verifyMachine(id),

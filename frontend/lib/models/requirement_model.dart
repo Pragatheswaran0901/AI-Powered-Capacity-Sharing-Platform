@@ -107,7 +107,8 @@ class InterpretedRequirementModel {
       toleranceMm: (json['tolerance_mm'] as num?)?.toDouble(),
       deadlineDays: json['deadline_days'] ?? 5,
       preferredLocation: json['preferred_location'] ?? 'Coimbatore',
-      estimatedBudget: (json['estimated_budget'] as num?)?.toDouble() ?? 25000.0,
+      estimatedBudget:
+          (json['estimated_budget'] as num?)?.toDouble() ?? 25000.0,
       confidenceScore: (json['confidence_score'] as num?)?.toDouble() ?? 0.94,
     );
   }

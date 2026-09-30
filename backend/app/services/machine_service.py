@@ -4,9 +4,11 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from app.models.machine import Machine, MachineCapability, MachineStatus
 from app.models.business import Business, VerificationStatus
+from app.models.booking import Booking, BookingStatus
 from app.schemas.machine import MachineCreate, MachineUpdate
 from app.repositories.machine_repo import MachineRepository
 from app.repositories.business_repo import BusinessRepository
+from app.repositories.review_repo import ReviewRepository
 
 
 class MachineService:
@@ -14,6 +16,21 @@ class MachineService:
         self.db = db
         self.machine_repo = MachineRepository(db)
         self.biz_repo = BusinessRepository(db)
+        self.review_repo = ReviewRepository(db)
+
+    def _enrich_machine(self, m: Machine) -> Machine:
+        if m.business:
+            m.business_name = m.business.name
+            m.average_rating = self.review_repo.get_average_rating(m.business.user_id)
+        else:
+            m.average_rating = 4.5
+        completed = (
+            self.db.query(Booking)
+            .filter(Booking.machine_id == m.id, Booking.status == BookingStatus.COMPLETED)
+            .count()
+        )
+        m.completed_jobs = completed
+        return m
 
     def create_machine(self, user_id: str, machine_in: MachineCreate) -> Machine:
         biz = self.biz_repo.get_by_user_id(user_id)
@@ -59,13 +76,14 @@ class MachineService:
             )
             self.machine_repo.add_capability(c)
 
-        return self.machine_repo.get_with_details(saved.id)
+        return self._enrich_machine(self.machine_repo.get_with_details(saved.id))
 
     def get_my_machines(self, user_id: str) -> List[Machine]:
         biz = self.biz_repo.get_by_user_id(user_id)
         if not biz:
             return []
-        return self.machine_repo.get_by_business_id(biz.id)
+        machines = self.machine_repo.get_by_business_id(biz.id)
+        return [self._enrich_machine(m) for m in machines]
 
     def get_machine(self, machine_id: str) -> Machine:
         m = self.machine_repo.get_with_details(machine_id)
@@ -74,7 +92,7 @@ class MachineService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Machine listing not found.",
             )
-        return m
+        return self._enrich_machine(m)
 
     def update_machine(self, user_id: str, machine_id: str, update_in: MachineUpdate) -> Machine:
         m = self.machine_repo.get(machine_id)
@@ -94,7 +112,8 @@ class MachineService:
         for k, v in update_data.items():
             setattr(m, k, v)
 
-        return self.machine_repo.update(m)
+        self.machine_repo.update(m)
+        return self._enrich_machine(self.machine_repo.get_with_details(m.id))
 
     def delete_machine(self, user_id: str, machine_id: str):
         m = self.machine_repo.get(machine_id)
@@ -116,11 +135,14 @@ class MachineService:
         material: Optional[str] = None,
         max_rate: Optional[float] = None,
         verified_only: bool = False,
+        location: Optional[str] = None,
     ) -> List[Machine]:
-        return self.machine_repo.search_active_machines(
+        machines = self.machine_repo.search_active_machines(
             category=category,
             process=process,
             material=material,
             max_rate=max_rate,
             verified_only=verified_only,
+            location=location,
         )
+        return [self._enrich_machine(m) for m in machines]

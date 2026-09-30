@@ -20,7 +20,8 @@ class BookingsListScreen extends StatefulWidget {
   State<BookingsListScreen> createState() => _BookingsListScreenState();
 }
 
-class _BookingsListScreenState extends State<BookingsListScreen> with SingleTickerProviderStateMixin {
+class _BookingsListScreenState extends State<BookingsListScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool _isLoading = true;
 
@@ -69,7 +70,8 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
         providerPayout: 21660.0,
         status: 'IN_PROGRESS',
         escrowStatus: 'HELD_IN_ESCROW',
-        notes: 'Tooling setup complete. First article inspection (FAI) report verified against CMM ±0.005mm.',
+        notes:
+            'Tooling setup complete. First article inspection (FAI) report verified against CMM ±0.005mm.',
         createdAt: '2026-09-24',
       ),
       BookingModel(
@@ -92,7 +94,8 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
         providerPayout: 28262.5,
         status: isProvider ? 'PENDING' : 'ACCEPTED',
         escrowStatus: 'PENDING_DEPOSIT',
-        notes: 'SS316 material supplied by seeker. Awaiting final tooling schedule verification.',
+        notes:
+            'SS316 material supplied by seeker. Awaiting final tooling schedule verification.',
         createdAt: '2026-09-25',
       ),
       BookingModel(
@@ -115,7 +118,8 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
         providerPayout: 18240.0,
         status: 'COMPLETED',
         escrowStatus: 'RELEASED_TO_PROVIDER',
-        notes: 'Nitrogen clean cutting delivered. Batch inspected and signed off by quality lead.',
+        notes:
+            'Nitrogen clean cutting delivered. Batch inspected and signed off by quality lead.',
         createdAt: '2026-09-17',
       ),
     ];
@@ -124,7 +128,8 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
   void _showReviewDialog(BookingModel booking) {
     int rating = 5;
     final reviewController = TextEditingController(
-      text: 'Superb precision machining quality. Held tight tolerances of ±0.005mm and dispatched 1 day ahead of schedule.',
+      text:
+          'Superb precision machining quality. Held tight tolerances of ±0.005mm and dispatched 1 day ahead of schedule.',
     );
 
     showDialog(
@@ -133,14 +138,20 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
         builder: (ctx, setDlgState) {
           return AlertDialog(
             backgroundColor: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             title: Row(
               children: [
                 const Icon(Icons.star, color: Colors.amber, size: 24),
                 const SizedBox(width: 10),
                 Text(
                   'Rate & Review MSME Partner',
-                  style: GoogleFonts.inter(fontSize: 16.5, fontWeight: FontWeight.w700, color: AppColors.navyIndustrial),
+                  style: GoogleFonts.inter(
+                    fontSize: 16.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.navyIndustrial,
+                  ),
                 ),
               ],
             ),
@@ -152,17 +163,28 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
                 children: [
                   Text(
                     'Order #${booking.id.substring(0, booking.id.length > 8 ? 8 : booking.id.length)}: ${booking.requirementTitle ?? "Manufacturing Order"}',
-                    style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.slate700),
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.slate700,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Machine: ${booking.machineName ?? "Shop Machine"}',
-                    style: GoogleFonts.inter(fontSize: 12, color: AppColors.slate500),
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: AppColors.slate500,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'Overall Performance Score:',
-                    style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.navyIndustrial),
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.navyIndustrial,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Row(
@@ -182,7 +204,8 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
                   const SizedBox(height: 14),
                   MachTextField(
                     controller: reviewController,
-                    label: 'Feedback on Precision, Speed, Tolerance & Reliability',
+                    label:
+                        'Feedback on Precision, Speed, Tolerance & Reliability',
                     maxLines: 3,
                   ),
                 ],
@@ -208,7 +231,9 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
                   if (ok && mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Review published! MSME partner reliability index updated.'),
+                        content: Text(
+                          'Review published! MSME partner reliability index updated.',
+                        ),
                         backgroundColor: AppColors.success,
                       ),
                     );
@@ -237,12 +262,20 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
                 color: AppColors.steelBlue.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.shield_outlined, color: AppColors.steelBlue, size: 22),
+              child: const Icon(
+                Icons.shield_outlined,
+                color: AppColors.steelBlue,
+                size: 22,
+              ),
             ),
             const SizedBox(width: 12),
             Text(
               'Lock & Deposit Escrow',
-              style: GoogleFonts.inter(fontSize: 16.5, fontWeight: FontWeight.w700, color: AppColors.navyIndustrial),
+              style: GoogleFonts.inter(
+                fontSize: 16.5,
+                fontWeight: FontWeight.w700,
+                color: AppColors.navyIndustrial,
+              ),
             ),
           ],
         ),
@@ -254,7 +287,10 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
             children: [
               Text(
                 'Contract Ref: #${booking.id.substring(0, booking.id.length > 8 ? 8 : booking.id.length)}',
-                style: GoogleFonts.inter(fontSize: 12, color: AppColors.slate500),
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: AppColors.slate500,
+                ),
               ),
               const SizedBox(height: 14),
               Container(
@@ -269,26 +305,62 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Machine Capacity Fee:', style: GoogleFonts.inter(fontSize: 13, color: AppColors.slate600)),
-                        Text(Formatters.currency(booking.totalAmount), style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.navyIndustrial)),
+                        Text(
+                          'Machine Capacity Fee:',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            color: AppColors.slate600,
+                          ),
+                        ),
+                        Text(
+                          Formatters.currency(booking.totalAmount),
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.navyIndustrial,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Platform Protection Fee:', style: GoogleFonts.inter(fontSize: 12, color: AppColors.slate500)),
-                        Text(Formatters.currency(booking.commissionAmount), style: GoogleFonts.inter(fontSize: 12, color: AppColors.slate500)),
+                        Text(
+                          'Platform Protection Fee:',
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: AppColors.slate500,
+                          ),
+                        ),
+                        Text(
+                          Formatters.currency(booking.commissionAmount),
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: AppColors.slate500,
+                          ),
+                        ),
                       ],
                     ),
                     const Divider(height: 20, color: AppColors.slate200),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Total Escrow Commitment:', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.navyIndustrial)),
+                        Text(
+                          'Total Escrow Commitment:',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.navyIndustrial,
+                          ),
+                        ),
                         Text(
                           Formatters.currency(booking.totalAmount),
-                          style: GoogleFonts.inter(fontSize: 17, fontWeight: FontWeight.w900, color: AppColors.steelBlue),
+                          style: GoogleFonts.inter(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.steelBlue,
+                          ),
                         ),
                       ],
                     ),
@@ -301,12 +373,18 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
                 decoration: BoxDecoration(
                   color: AppColors.emeraldBg,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.emeraldLight.withValues(alpha: 0.5)),
+                  border: Border.all(
+                    color: AppColors.emeraldLight.withValues(alpha: 0.5),
+                  ),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.verified_user, color: AppColors.emeraldVerified, size: 18),
+                    const Icon(
+                      Icons.verified_user,
+                      color: AppColors.emeraldVerified,
+                      size: 18,
+                    ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Column(
@@ -314,12 +392,20 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
                         children: [
                           Text(
                             'Payment Protection Guarantee',
-                            style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.emeraldDark),
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.emeraldDark,
+                            ),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             'Your funds remain locked in platform escrow until the manufactured batch passes quality inspection.',
-                            style: GoogleFonts.inter(fontSize: 11.5, height: 1.4, color: AppColors.emeraldDark),
+                            style: GoogleFonts.inter(
+                              fontSize: 11.5,
+                              height: 1.4,
+                              color: AppColors.emeraldDark,
+                            ),
                           ),
                         ],
                       ),
@@ -346,7 +432,9 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
               if (ok && mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Escrow funded! Provider has been notified to set up machine and begin production.'),
+                    content: Text(
+                      'Escrow funded! Provider has been notified to set up machine and begin production.',
+                    ),
                     backgroundColor: AppColors.success,
                   ),
                 );
@@ -359,16 +447,29 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
     );
   }
 
-  List<BookingModel> _getFilteredBookings(List<BookingModel> list, int tabIndex, bool isProvider) {
+  List<BookingModel> _getFilteredBookings(
+    List<BookingModel> list,
+    int tabIndex,
+    bool isProvider,
+  ) {
     switch (tabIndex) {
       case 1: // Action Required
         if (isProvider) {
-          return list.where((b) => b.status == 'PENDING' || b.status == 'REQUESTED' || b.status == 'CONFIRMED').toList();
+          return list
+              .where(
+                (b) =>
+                    b.status == 'PENDING' ||
+                    b.status == 'REQUESTED' ||
+                    b.status == 'CONFIRMED',
+              )
+              .toList();
         } else {
           return list.where((b) => b.status == 'ACCEPTED').toList();
         }
       case 2: // In Production
-        return list.where((b) => b.status == 'IN_PROGRESS' || b.status == 'CONFIRMED').toList();
+        return list
+            .where((b) => b.status == 'IN_PROGRESS' || b.status == 'CONFIRMED')
+            .toList();
       case 3: // Completed
         return list.where((b) => b.status == 'COMPLETED').toList();
       default:
@@ -379,8 +480,12 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
   @override
   Widget build(BuildContext context) {
     final isProvider = authState.isProvider;
-    final List<BookingModel> rawBookings = isProvider ? providerState.incomingRequests : seekerState.myBookings;
-    final List<BookingModel> allBookings = rawBookings.isNotEmpty ? rawBookings : _getFallbackDemoBookings(isProvider);
+    final List<BookingModel> rawBookings = isProvider
+        ? providerState.incomingRequests
+        : seekerState.myBookings;
+    final List<BookingModel> allBookings = rawBookings.isNotEmpty
+        ? rawBookings
+        : _getFallbackDemoBookings(isProvider);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
@@ -388,8 +493,11 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           MachPageHeader(
-            title: isProvider ? 'Incoming Production Bookings' : 'My Capacity Contracts',
-            subtitle: 'Track lifecycle progress, milestone inspection sign-offs, and escrow payment protection.',
+            title: isProvider
+                ? 'Incoming Production Bookings'
+                : 'My Capacity Contracts',
+            subtitle:
+                'Track lifecycle progress, milestone inspection sign-offs, and escrow payment protection.',
             primaryAction: MachButton(
               label: 'Refresh',
               icon: Icons.refresh,
@@ -411,8 +519,14 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
               ),
               labelColor: Colors.white,
               unselectedLabelColor: AppColors.slate600,
-              labelStyle: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700),
-              unselectedLabelStyle: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500),
+              labelStyle: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+              unselectedLabelStyle: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
               tabs: const [
                 Tab(text: 'All Contracts'),
                 Tab(text: 'Action Required'),
@@ -425,16 +539,23 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
           const SizedBox(height: 24),
 
           if (_isLoading)
-            const MachLoadingState(message: 'Retrieving capacity contracts and escrow records...')
+            const MachLoadingState(
+              message: 'Retrieving capacity contracts and escrow records...',
+            )
           else ...[
             Builder(
               builder: (context) {
-                final filtered = _getFilteredBookings(allBookings, _tabController.index, isProvider);
+                final filtered = _getFilteredBookings(
+                  allBookings,
+                  _tabController.index,
+                  isProvider,
+                );
                 if (filtered.isEmpty) {
                   return MachEmptyState(
                     icon: Icons.receipt_long_outlined,
                     title: 'No Contracts Found',
-                    message: 'No capacity bookings currently match this filter. When orders progress, they will appear here.',
+                    message:
+                        'No capacity bookings currently match this filter. When orders progress, they will appear here.',
                     actionLabel: 'Refresh Bookings',
                     onAction: _loadBookings,
                   );
@@ -449,30 +570,51 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
                     final b = filtered[idx];
                     return MachBookingCard(
                       bookingId: b.id,
-                      requirementTitle: b.requirementTitle ?? 'Precision Machining Contract',
+                      requirementTitle:
+                          b.requirementTitle ?? 'Precision Machining Contract',
                       machineName: b.machineName ?? 'Machinery',
-                      partnerName: isProvider ? (b.seekerName ?? 'MSME Buyer') : (b.businessName ?? b.providerName ?? 'MSME Partner'),
+                      partnerName: isProvider
+                          ? (b.seekerName ?? 'MSME Buyer')
+                          : (b.businessName ??
+                                b.providerName ??
+                                'MSME Partner'),
                       isProvider: isProvider,
                       startDate: b.startDate,
                       endDate: b.endDate,
                       totalHours: b.totalHours,
-                      totalAmount: isProvider ? b.providerPayout : b.totalAmount,
+                      totalAmount: isProvider
+                          ? b.providerPayout
+                          : b.totalAmount,
                       status: b.status,
                       escrowStatus: b.escrowStatus,
-                      onAccept: (isProvider && (b.status == 'PENDING' || b.status == 'REQUESTED'))
+                      onAccept:
+                          (isProvider &&
+                              (b.status == 'PENDING' ||
+                                  b.status == 'REQUESTED'))
                           ? () async {
-                              final ok = await providerState.acceptRequest(b.id);
+                              final ok = await providerState.acceptRequest(
+                                b.id,
+                              );
                               if (ok && context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Order accepted!'), backgroundColor: AppColors.success),
+                                  const SnackBar(
+                                    content: Text('Order accepted!'),
+                                    backgroundColor: AppColors.success,
+                                  ),
                                 );
                                 _loadBookings();
                               }
                             }
                           : null,
-                      onReject: (isProvider && (b.status == 'PENDING' || b.status == 'REQUESTED'))
+                      onReject:
+                          (isProvider &&
+                              (b.status == 'PENDING' ||
+                                  b.status == 'REQUESTED'))
                           ? () async {
-                              final ok = await providerState.rejectRequest(b.id, reason: 'Capacity occupied');
+                              final ok = await providerState.rejectRequest(
+                                b.id,
+                                reason: 'Capacity occupied',
+                              );
                               if (ok && context.mounted) _loadBookings();
                             }
                           : null,
@@ -481,10 +623,17 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
                           : null,
                       onStartProduction: (isProvider && b.status == 'CONFIRMED')
                           ? () async {
-                              final ok = await providerState.startProduction(b.id);
+                              final ok = await providerState.startProduction(
+                                b.id,
+                              );
                               if (ok && context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Production started on machine bed!'), backgroundColor: AppColors.info),
+                                  const SnackBar(
+                                    content: Text(
+                                      'Production started on machine bed!',
+                                    ),
+                                    backgroundColor: AppColors.info,
+                                  ),
                                 );
                                 _loadBookings();
                               }
@@ -495,7 +644,12 @@ class _BookingsListScreenState extends State<BookingsListScreen> with SingleTick
                               final ok = await seekerState.markCompleted(b.id);
                               if (ok && context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Job marked completed and escrow released!'), backgroundColor: AppColors.success),
+                                  const SnackBar(
+                                    content: Text(
+                                      'Job marked completed and escrow released!',
+                                    ),
+                                    backgroundColor: AppColors.success,
+                                  ),
                                 );
                                 _loadBookings();
                               }

@@ -34,7 +34,11 @@ class MachPageHeader extends StatelessWidget {
           children: [
             if (onBack != null) ...[
               IconButton(
-                icon: const Icon(Icons.arrow_back, size: 20, color: AppColors.slate700),
+                icon: const Icon(
+                  Icons.arrow_back,
+                  size: 20,
+                  color: AppColors.slate700,
+                ),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
                 onPressed: onBack,
@@ -46,16 +50,13 @@ class MachPageHeader extends StatelessWidget {
                 title,
                 style: GoogleFonts.inter(
                   fontSize: isMobile ? 20 : 24,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w700,
                   letterSpacing: -0.4,
-                  color: AppColors.navyIndustrial,
+                  color: AppColors.primaryNavy,
                 ),
               ),
             ),
-            if (badge != null) ...[
-              const SizedBox(width: 10),
-              badge!,
-            ],
+            if (badge != null) ...[const SizedBox(width: 10), badge!],
           ],
         ),
         if (subtitle != null) ...[
@@ -65,7 +66,7 @@ class MachPageHeader extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 13.5,
               fontWeight: FontWeight.w400,
-              color: AppColors.slate500,
+              color: AppColors.secondarySlate,
             ),
           ),
         ],
@@ -85,8 +86,9 @@ class MachPageHeader extends StatelessWidget {
       ],
     );
 
+    final Widget headerContent;
     if (isMobile) {
-      return Column(
+      headerContent = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           titleBlock,
@@ -99,16 +101,33 @@ class MachPageHeader extends StatelessWidget {
           ],
         ],
       );
+    } else {
+      headerContent = Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(child: titleBlock),
+          const SizedBox(width: 16),
+          actionsBlock,
+        ],
+      );
     }
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(child: titleBlock),
-        const SizedBox(width: 16),
-        actionsBlock,
-      ],
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.lightBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 6,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: headerContent,
     );
   }
 }

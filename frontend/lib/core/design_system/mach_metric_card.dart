@@ -33,7 +33,7 @@ class MachMetricCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.slate200, width: 1),
+        border: Border.all(color: AppColors.lightBorder, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -53,8 +53,8 @@ class MachMetricCard extends StatelessWidget {
                 title.toUpperCase(),
                 style: GoogleFonts.inter(
                   fontSize: 11.5,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.slate500,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.secondarySlate,
                   letterSpacing: 0.6,
                 ),
               ),
@@ -73,8 +73,8 @@ class MachMetricCard extends StatelessWidget {
             value,
             style: GoogleFonts.inter(
               fontSize: 26,
-              fontWeight: FontWeight.w800,
-              color: AppColors.navyIndustrial,
+              fontWeight: FontWeight.w700,
+              color: AppColors.primaryNavy,
               letterSpacing: -0.5,
             ),
           ),
@@ -86,7 +86,9 @@ class MachMetricCard extends StatelessWidget {
                   Icon(
                     isPositiveTrend ? Icons.trending_up : Icons.trending_flat,
                     size: 14,
-                    color: isPositiveTrend ? AppColors.emerald : AppColors.slate500,
+                    color: isPositiveTrend
+                        ? AppColors.successGreen
+                        : AppColors.mutedSlate,
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -94,7 +96,9 @@ class MachMetricCard extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w600,
-                      color: isPositiveTrend ? AppColors.emerald : AppColors.slate500,
+                      color: isPositiveTrend
+                          ? AppColors.successGreen
+                          : AppColors.mutedSlate,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -107,7 +111,8 @@ class MachMetricCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
                         fontSize: 11.5,
-                        color: AppColors.slate400,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.mutedSlate,
                       ),
                     ),
                   ),

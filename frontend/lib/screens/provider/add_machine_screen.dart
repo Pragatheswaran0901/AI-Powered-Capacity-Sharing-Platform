@@ -8,6 +8,7 @@ import 'package:machhunt/core/design_system/mach_page_header.dart';
 import 'package:machhunt/core/design_system/mach_text_field.dart';
 import 'package:machhunt/state/provider_state.dart';
 import 'package:machhunt/state/auth_state.dart';
+import 'package:machhunt/core/config/maps_config.dart';
 
 class AddMachineScreen extends StatefulWidget {
   const AddMachineScreen({super.key});
@@ -19,10 +20,14 @@ class AddMachineScreen extends StatefulWidget {
 class _AddMachineScreenState extends State<AddMachineScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _manufacturerController = TextEditingController(text: 'HAAS Automation');
+  final _manufacturerController = TextEditingController(
+    text: 'HAAS Automation',
+  );
   final _modelController = TextEditingController(text: 'VF-2SS');
   final _yearController = TextEditingController(text: '2023');
-  final _dimensionsController = TextEditingController(text: '762 x 406 x 508 mm');
+  final _dimensionsController = TextEditingController(
+    text: '762 x 406 x 508 mm',
+  );
   final _toleranceController = TextEditingController(text: '±0.005 mm');
   final _hourlyRateController = TextEditingController(text: '950');
   final _minJobController = TextEditingController(text: '2500');
@@ -98,9 +103,18 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
       operatorAvailable: _operatorAvailable,
       locationAddress: _addressController.text.trim().isNotEmpty
           ? _addressController.text.trim()
-          : (authState.currentBusiness?.address ?? 'SIDCO Industrial Estate, Coimbatore'),
-      latitude: authState.currentBusiness?.latitude ?? 11.0168,
-      longitude: authState.currentBusiness?.longitude ?? 76.9558,
+          : (authState.currentBusiness?.address ??
+                'SIDCO Industrial Estate, Coimbatore'),
+      latitude:
+          authState.currentBusiness?.latitude ??
+          MapsConfig.getCoordinatesForLocation(
+            authState.currentBusiness?.district ?? 'Coimbatore',
+          ).latitude,
+      longitude:
+          authState.currentBusiness?.longitude ??
+          MapsConfig.getCoordinatesForLocation(
+            authState.currentBusiness?.district ?? 'Coimbatore',
+          ).longitude,
       photos: [
         'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800',
       ],
@@ -148,7 +162,8 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
             children: [
               MachPageHeader(
                 title: 'Add Manufacturing Machine',
-                subtitle: 'List your idle shop-floor capacity so seekers can discover and book production slots.',
+                subtitle:
+                    'List your idle shop-floor capacity so seekers can discover and book production slots.',
                 primaryAction: MachButton(
                   label: 'Back to Fleet',
                   icon: Icons.arrow_back,
@@ -180,8 +195,13 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                         label: 'Machine Name / Listing Title',
                         hint: 'e.g. HAAS VF-2SS Super-Speed 4-Axis VMC',
                         controller: _nameController,
-                        prefixIcon: const Icon(Icons.precision_manufacturing_outlined, size: 18),
-                        validator: (val) => val == null || val.isEmpty ? 'Machine title is required.' : null,
+                        prefixIcon: const Icon(
+                          Icons.precision_manufacturing_outlined,
+                          size: 18,
+                        ),
+                        validator: (val) => val == null || val.isEmpty
+                            ? 'Machine title is required.'
+                            : null,
                       ),
                       const SizedBox(height: 16),
 
@@ -193,22 +213,45 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                               children: [
                                 Text(
                                   'Machine Category',
-                                  style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.navyIndustrial),
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.navyIndustrial,
+                                  ),
                                 ),
                                 const SizedBox(height: 6),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: AppColors.slate200),
+                                    border: Border.all(
+                                      color: AppColors.slate200,
+                                    ),
                                   ),
                                   child: DropdownButtonHideUnderline(
                                     child: DropdownButton<String>(
                                       value: _selectedCategory,
                                       isExpanded: true,
-                                      items: _categories.map((c) => DropdownMenuItem(value: c, child: Text(c, style: GoogleFonts.inter(fontSize: 13.5)))).toList(),
-                                      onChanged: (val) => setState(() => _selectedCategory = val ?? 'CNC Milling'),
+                                      items: _categories
+                                          .map(
+                                            (c) => DropdownMenuItem(
+                                              value: c,
+                                              child: Text(
+                                                c,
+                                                style: GoogleFonts.inter(
+                                                  fontSize: 13.5,
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                          .toList(),
+                                      onChanged: (val) => setState(
+                                        () => _selectedCategory =
+                                            val ?? 'CNC Milling',
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -222,22 +265,45 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                               children: [
                                 Text(
                                   'Primary Material Supported',
-                                  style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.navyIndustrial),
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.navyIndustrial,
+                                  ),
                                 ),
                                 const SizedBox(height: 6),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: AppColors.slate200),
+                                    border: Border.all(
+                                      color: AppColors.slate200,
+                                    ),
                                   ),
                                   child: DropdownButtonHideUnderline(
                                     child: DropdownButton<String>(
                                       value: _selectedMaterial,
                                       isExpanded: true,
-                                      items: _materials.map((m) => DropdownMenuItem(value: m, child: Text(m, style: GoogleFonts.inter(fontSize: 13.5)))).toList(),
-                                      onChanged: (val) => setState(() => _selectedMaterial = val ?? 'Aluminium 6061'),
+                                      items: _materials
+                                          .map(
+                                            (m) => DropdownMenuItem(
+                                              value: m,
+                                              child: Text(
+                                                m,
+                                                style: GoogleFonts.inter(
+                                                  fontSize: 13.5,
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                          .toList(),
+                                      onChanged: (val) => setState(
+                                        () => _selectedMaterial =
+                                            val ?? 'Aluminium 6061',
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -296,7 +362,10 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                               label: 'Bed Envelope (X x Y x Z)',
                               hint: '762 x 406 x 508 mm',
                               controller: _dimensionsController,
-                              prefixIcon: const Icon(Icons.aspect_ratio, size: 18),
+                              prefixIcon: const Icon(
+                                Icons.aspect_ratio,
+                                size: 18,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -305,7 +374,10 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                               label: 'Precision Tolerance',
                               hint: '±0.005 mm',
                               controller: _toleranceController,
-                              prefixIcon: const Icon(Icons.straighten, size: 18),
+                              prefixIcon: const Icon(
+                                Icons.straighten,
+                                size: 18,
+                              ),
                             ),
                           ),
                         ],
@@ -331,8 +403,13 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                               hint: '950',
                               controller: _hourlyRateController,
                               keyboardType: TextInputType.number,
-                              prefixIcon: const Icon(Icons.currency_rupee, size: 18),
-                              validator: (val) => val == null || val.isEmpty ? 'Hourly rate is required.' : null,
+                              prefixIcon: const Icon(
+                                Icons.currency_rupee,
+                                size: 18,
+                              ),
+                              validator: (val) => val == null || val.isEmpty
+                                  ? 'Hourly rate is required.'
+                                  : null,
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -342,7 +419,10 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                               hint: '2500',
                               controller: _minJobController,
                               keyboardType: TextInputType.number,
-                              prefixIcon: const Icon(Icons.payments_outlined, size: 18),
+                              prefixIcon: const Icon(
+                                Icons.payments_outlined,
+                                size: 18,
+                              ),
                             ),
                           ),
                         ],
@@ -353,20 +433,27 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                         label: 'Workshop / Shop Floor Location',
                         hint: 'Plot No., Industrial Estate, Coimbatore',
                         controller: _addressController,
-                        prefixIcon: const Icon(Icons.location_on_outlined, size: 18),
+                        prefixIcon: const Icon(
+                          Icons.location_on_outlined,
+                          size: 18,
+                        ),
                       ),
                       const SizedBox(height: 16),
 
                       MachTextField(
                         label: 'Technical Description & Tooling Notes',
-                        hint: 'Spindle RPM, magazine capacity, tool probe type, coolant setup, CAD/CAM support...',
+                        hint:
+                            'Spindle RPM, magazine capacity, tool probe type, coolant setup, CAD/CAM support...',
                         controller: _descController,
                         maxLines: 3,
                       ),
                       const SizedBox(height: 16),
 
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.slate50,
                           borderRadius: BorderRadius.circular(8),
@@ -374,14 +461,22 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                         ),
                         child: SwitchListTile(
                           value: _operatorAvailable,
-                          onChanged: (val) => setState(() => _operatorAvailable = val),
+                          onChanged: (val) =>
+                              setState(() => _operatorAvailable = val),
                           title: Text(
                             'Dedicated Machinist / Operator Included',
-                            style: GoogleFonts.inter(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppColors.navyIndustrial),
+                            style: GoogleFonts.inter(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.navyIndustrial,
+                            ),
                           ),
                           subtitle: Text(
                             'Experienced CAM programmer & machinist will operate the machine during booked slots',
-                            style: GoogleFonts.inter(fontSize: 12, color: AppColors.slate500),
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: AppColors.slate500,
+                            ),
                           ),
                           contentPadding: EdgeInsets.zero,
                           activeColor: AppColors.steelBlue,

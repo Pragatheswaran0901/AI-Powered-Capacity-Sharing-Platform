@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:machhunt/core/constants/app_colors.dart';
 import 'package:machhunt/core/design_system/mach_navigation.dart';
+import 'package:machhunt/core/widgets/app_background.dart';
 import 'package:machhunt/state/auth_state.dart';
 
 class MainShell extends StatefulWidget {
@@ -18,10 +19,14 @@ class _MainShellState extends State<MainShell> {
 
   int _calculateSelectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
-    if (location.startsWith('/provider-dashboard') || location.startsWith('/seeker-dashboard')) {
+    if (location.startsWith('/provider-dashboard') ||
+        location.startsWith('/seeker-dashboard')) {
       return 0;
     }
-    if (location.startsWith('/add-machine') || location.startsWith('/create-requirement') || location.startsWith('/my-machines')) {
+    if (location.startsWith('/add-machine') ||
+        location.startsWith('/create-requirement') ||
+        location.startsWith('/my-requirements') ||
+        location.startsWith('/my-machines')) {
       return 1;
     }
     if (location.startsWith('/bookings')) {
@@ -73,7 +78,7 @@ class _MainShellState extends State<MainShell> {
         if (isProvider) {
           context.go('/my-machines');
         } else {
-          context.go('/create-requirement');
+          context.go('/my-requirements');
         }
         break;
       case 2:
@@ -127,7 +132,7 @@ class _MainShellState extends State<MainShell> {
       builder: (context, _) {
         return Scaffold(
           key: _scaffoldKey,
-          backgroundColor: AppColors.background,
+          backgroundColor: Colors.transparent,
           drawer: !isDesktop
               ? Drawer(
                   child: MachSidebar(
@@ -149,12 +154,21 @@ class _MainShellState extends State<MainShell> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.swap_horiz, color: AppColors.navyIndustrial),
-                        tooltip: isProvider ? 'Switch to Seeker' : 'Switch to Provider',
+                        icon: const Icon(
+                          Icons.swap_horiz,
+                          color: AppColors.navyIndustrial,
+                        ),
+                        tooltip: isProvider
+                            ? 'Switch to Seeker'
+                            : 'Switch to Provider',
                         onPressed: () => _handleRoleSwitch(context),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.logout, size: 20, color: AppColors.slate600),
+                        icon: const Icon(
+                          Icons.logout,
+                          size: 20,
+                          color: AppColors.slate600,
+                        ),
                         tooltip: 'Sign Out',
                         onPressed: () async {
                           await authState.logout();
@@ -175,9 +189,13 @@ class _MainShellState extends State<MainShell> {
                   onSwitchRole: () => _handleRoleSwitch(context),
                 ),
               Expanded(
-                child: Container(
-                  color: AppColors.background,
-                  child: widget.child,
+                child: AppBackground(
+                  child: Theme(
+                    data: Theme.of(
+                      context,
+                    ).copyWith(scaffoldBackgroundColor: Colors.transparent),
+                    child: widget.child,
+                  ),
                 ),
               ),
             ],
@@ -191,21 +209,51 @@ class _MainShellState extends State<MainShell> {
                   elevation: 4,
                   destinations: isAdmin
                       ? const [
-                          NavigationDestination(icon: Icon(Icons.dashboard_outlined), selectedIcon: Icon(Icons.dashboard), label: 'Admin'),
-                          NavigationDestination(icon: Icon(Icons.receipt_long_outlined), selectedIcon: Icon(Icons.receipt_long), label: 'Bookings'),
-                          NavigationDestination(icon: Icon(Icons.notifications_outlined), selectedIcon: Icon(Icons.notifications), label: 'Alerts'),
-                          NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: 'Profile'),
+                          NavigationDestination(
+                            icon: Icon(Icons.dashboard_outlined),
+                            selectedIcon: Icon(Icons.dashboard),
+                            label: 'Admin',
+                          ),
+                          NavigationDestination(
+                            icon: Icon(Icons.receipt_long_outlined),
+                            selectedIcon: Icon(Icons.receipt_long),
+                            label: 'Bookings',
+                          ),
+                          NavigationDestination(
+                            icon: Icon(Icons.notifications_outlined),
+                            selectedIcon: Icon(Icons.notifications),
+                            label: 'Alerts',
+                          ),
+                          NavigationDestination(
+                            icon: Icon(Icons.person_outline),
+                            selectedIcon: Icon(Icons.person),
+                            label: 'Profile',
+                          ),
                         ]
                       : [
                           NavigationDestination(
-                            icon: Icon(isProvider ? Icons.precision_manufacturing_outlined : Icons.explore_outlined),
-                            selectedIcon: Icon(isProvider ? Icons.precision_manufacturing : Icons.explore),
+                            icon: Icon(
+                              isProvider
+                                  ? Icons.precision_manufacturing_outlined
+                                  : Icons.explore_outlined,
+                            ),
+                            selectedIcon: Icon(
+                              isProvider
+                                  ? Icons.precision_manufacturing
+                                  : Icons.explore,
+                            ),
                             label: isProvider ? 'Capacity' : 'Discovery',
                           ),
                           NavigationDestination(
-                            icon: Icon(isProvider ? Icons.list_alt_outlined : Icons.post_add_outlined),
-                            selectedIcon: Icon(isProvider ? Icons.list_alt : Icons.post_add),
-                            label: isProvider ? 'Machines' : 'Post Need',
+                            icon: Icon(
+                              isProvider
+                                  ? Icons.list_alt_outlined
+                                  : Icons.assignment_outlined,
+                            ),
+                            selectedIcon: Icon(
+                              isProvider ? Icons.list_alt : Icons.assignment,
+                            ),
+                            label: isProvider ? 'Machines' : 'Requirements',
                           ),
                           const NavigationDestination(
                             icon: Icon(Icons.calendar_today_outlined),

@@ -1,10 +1,11 @@
 from datetime import date, time
 from typing import Optional, List
+from sqlalchemy import or_
 from sqlalchemy.orm import Session, joinedload
 from app.models.machine import (
     Machine, MachineCapability, MachineAvailability, MachineStatus
 )
-from app.models.business import VerificationStatus
+from app.models.business import Business, VerificationStatus
 from app.repositories.base import BaseRepository
 
 
@@ -27,7 +28,11 @@ class MachineRepository(BaseRepository[Machine]):
     def get_by_business_id(self, business_id: str) -> List[Machine]:
         return (
             self.db.query(Machine)
-            .options(joinedload(Machine.capabilities))
+            .options(
+                joinedload(Machine.capabilities),
+                joinedload(Machine.availabilities),
+                joinedload(Machine.business),
+            )
             .filter(Machine.business_id == business_id)
             .all()
         )
@@ -39,11 +44,16 @@ class MachineRepository(BaseRepository[Machine]):
         material: Optional[str] = None,
         max_rate: Optional[float] = None,
         verified_only: bool = False,
+        location: Optional[str] = None,
     ) -> List[Machine]:
         query = (
             self.db.query(Machine)
-            .options(joinedload(Machine.capabilities), joinedload(Machine.business))
-            .filter(Machine.status == MachineStatus.ACTIVE)
+            .options(
+                joinedload(Machine.capabilities),
+                joinedload(Machine.availabilities),
+                joinedload(Machine.business),
+            )
+            .filter(Machine.status.in_([MachineStatus.ACTIVE, MachineStatus.AVAILABLE]))
         )
 
         if category:
@@ -52,6 +62,23 @@ class MachineRepository(BaseRepository[Machine]):
             query = query.filter(Machine.hourly_price <= max_rate)
         if verified_only:
             query = query.filter(Machine.verification_status == VerificationStatus.VERIFIED)
+
+        if location:
+            loc_clean = location.strip().lower()
+            if "tirup" in loc_clean:
+                term = "%tirup%"
+            elif "coimbatore" in loc_clean or "kovai" in loc_clean:
+                term = "%coimbatore%"
+            else:
+                term = f"%{loc_clean}%"
+
+            query = query.join(Machine.business).filter(
+                or_(
+                    Machine.location_address.ilike(term),
+                    Business.district.ilike(term),
+                    Business.address.ilike(term),
+                )
+            )
 
         machines = query.all()
 
@@ -67,7 +94,11 @@ class MachineRepository(BaseRepository[Machine]):
         return machines
 
     def count_active(self) -> int:
-        return self.db.query(Machine).filter(Machine.status == MachineStatus.ACTIVE).count()
+        return (
+            self.db.query(Machine)
+            .filter(Machine.status.in_([MachineStatus.ACTIVE, MachineStatus.AVAILABLE]))
+            .count()
+        )
 
     # Capabilities
     def add_capability(self, capability: MachineCapability) -> MachineCapability:

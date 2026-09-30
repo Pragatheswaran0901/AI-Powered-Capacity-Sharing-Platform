@@ -27,7 +27,10 @@ class TokenStorage {
       await _secureStorage.write(key: _keyUserId, value: userId);
       await _secureStorage.write(key: _keyUserRole, value: role);
       await _secureStorage.write(key: _keyFullName, value: fullName);
-      await _secureStorage.write(key: _keyIsOnboarded, value: isOnboarded.toString());
+      await _secureStorage.write(
+        key: _keyIsOnboarded,
+        value: isOnboarded.toString(),
+      );
       if (businessId != null) {
         await _secureStorage.write(key: _keyBusinessId, value: businessId);
       } else {
@@ -114,7 +117,10 @@ class TokenStorage {
 
   Future<void> setIsOnboarded(bool isOnboarded) async {
     try {
-      await _secureStorage.write(key: _keyIsOnboarded, value: isOnboarded.toString());
+      await _secureStorage.write(
+        key: _keyIsOnboarded,
+        value: isOnboarded.toString(),
+      );
     } catch (_) {}
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyIsOnboarded, isOnboarded);

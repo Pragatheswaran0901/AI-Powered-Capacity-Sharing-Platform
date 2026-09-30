@@ -1,24 +1,80 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:machhunt/core/constants/api_endpoints.dart';
 import 'package:machhunt/core/network/api_client.dart';
 import 'package:machhunt/models/requirement_model.dart';
 import 'package:machhunt/models/match_model.dart';
 import 'package:machhunt/models/booking_model.dart';
+import 'package:machhunt/models/machine_model.dart';
 
 class SeekerState extends ChangeNotifier {
+  @override
+  void notifyListeners() {
+    if (WidgetsBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        super.notifyListeners();
+      });
+    } else {
+      super.notifyListeners();
+    }
+  }
+
   List<RequirementModel> _myRequirements = [];
+  RequirementModel? _activeRequirement;
   List<MatchResultModel> _currentMatches = [];
+  List<MachineModel> _availableMachines = [];
   ComparisonMatrixModel? _comparisonMatrix;
   List<BookingModel> _myBookings = [];
   bool _isLoading = false;
   String? _errorMessage;
+  String _selectedLocation = 'Coimbatore';
 
   List<RequirementModel> get myRequirements => _myRequirements;
+  RequirementModel? get activeRequirement => _activeRequirement;
   List<MatchResultModel> get currentMatches => _currentMatches;
+  List<MachineModel> get availableMachines => _availableMachines;
   ComparisonMatrixModel? get comparisonMatrix => _comparisonMatrix;
   List<BookingModel> get myBookings => _myBookings;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  String get selectedLocation => _selectedLocation;
+
+  void setSelectedLocation(String location) {
+    if (_selectedLocation != location) {
+      _selectedLocation = location;
+      notifyListeners();
+    }
+  }
+
+  void setActiveRequirement(RequirementModel? req) {
+    _activeRequirement = req;
+    notifyListeners();
+  }
+
+  Future<RequirementModel?> fetchRequirementDetail(String requirementId) async {
+    try {
+      final res = await apiClient.get(
+        ApiEndpoints.requirementDetail(requirementId),
+      );
+      if (res is Map<String, dynamic>) {
+        final req = RequirementModel.fromJson(res);
+        _activeRequirement = req;
+        notifyListeners();
+        return req;
+      }
+    } catch (_) {
+      // Check in cached myRequirements
+      for (final r in _myRequirements) {
+        if (r.id == requirementId) {
+          _activeRequirement = r;
+          notifyListeners();
+          return r;
+        }
+      }
+    }
+    return null;
+  }
 
   Future<void> fetchMyRequirements() async {
     _isLoading = true;
@@ -29,6 +85,9 @@ class SeekerState extends ChangeNotifier {
       final res = await apiClient.get(ApiEndpoints.myRequirements);
       if (res is List) {
         _myRequirements = res.map((e) => RequirementModel.fromJson(e)).toList();
+        if (_activeRequirement == null && _myRequirements.isNotEmpty) {
+          _activeRequirement = _myRequirements.first;
+        }
       }
       _isLoading = false;
       notifyListeners();
@@ -80,6 +139,7 @@ class SeekerState extends ChangeNotifier {
     try {
       final res = await apiClient.post(ApiEndpoints.requirements, data: data);
       final newReq = RequirementModel.fromJson(res);
+      _activeRequirement = newReq;
       await fetchMyRequirements();
       _isLoading = false;
       notifyListeners();
@@ -92,15 +152,23 @@ class SeekerState extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchMatches(String requirementId) async {
+  Future<void> fetchMatches(String requirementId, {String? location}) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final res = await apiClient.get(ApiEndpoints.requirementMatches(requirementId));
+      final loc = location ?? _selectedLocation;
+      final queryParam = loc.isNotEmpty
+          ? '?location=${Uri.encodeComponent(loc)}'
+          : '';
+      final res = await apiClient.get(
+        '${ApiEndpoints.requirementMatches(requirementId)}$queryParam',
+      );
       if (res is List) {
         _currentMatches = res.map((e) => MatchResultModel.fromJson(e)).toList();
+      } else {
+        _currentMatches = [];
       }
       _isLoading = false;
       notifyListeners();
@@ -111,7 +179,35 @@ class SeekerState extends ChangeNotifier {
     }
   }
 
-  Future<bool> compareMachines(String requirementId, List<String> machineIds) async {
+  Future<void> fetchAvailableMachines({String? location}) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final loc = location ?? _selectedLocation;
+      final queryParam = loc.isNotEmpty
+          ? '?location=${Uri.encodeComponent(loc)}'
+          : '';
+      final res = await apiClient.get('${ApiEndpoints.machines}$queryParam');
+      if (res is List) {
+        _availableMachines = res.map((e) => MachineModel.fromJson(e)).toList();
+      } else {
+        _availableMachines = [];
+      }
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = e.toString();
+      notifyListeners();
+    }
+  }
+
+  Future<bool> compareMachines(
+    String requirementId,
+    List<String> machineIds,
+  ) async {
     _isLoading = true;
     notifyListeners();
 

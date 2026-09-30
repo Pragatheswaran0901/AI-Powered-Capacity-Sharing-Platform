@@ -31,9 +31,19 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     final status = approve ? 'VERIFIED' : 'REJECTED';
     bool ok = false;
     if (item.entityType == 'BUSINESS') {
-      ok = await adminState.verifyBusiness(item.id, status, remarks: approve ? 'Verified by Admin' : 'Documents incomplete');
+      ok = await adminState.verifyBusiness(
+        item.id,
+        status,
+        remarks: approve ? 'Verified by Admin' : 'Documents incomplete',
+      );
     } else {
-      ok = await adminState.verifyMachine(item.id, status, remarks: approve ? 'Inspection approved' : 'Calibration certificate missing');
+      ok = await adminState.verifyMachine(
+        item.id,
+        status,
+        remarks: approve
+            ? 'Inspection approved'
+            : 'Calibration certificate missing',
+      );
     }
 
     if (mounted && ok) {
@@ -68,7 +78,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Platform Administration & Oversight', style: AppTypography.displayMedium),
+                        Text(
+                          'Platform Administration & Oversight',
+                          style: AppTypography.displayMedium,
+                        ),
                         SizedBox(height: 4),
                         Text(
                           'Mach-Hunt MSME Ecosystem Metrics, Auditing & Verification Queue',
@@ -106,7 +119,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                           value: '${m.totalMsmes}',
                           icon: Icons.business,
                           color: AppColors.primary,
-                          subtitle: '${m.totalProviders} providers, ${m.totalSeekers} seekers',
+                          subtitle:
+                              '${m.totalProviders} providers, ${m.totalSeekers} seekers',
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -116,7 +130,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                           value: '${m.activeMachines}',
                           icon: Icons.precision_manufacturing,
                           color: AppColors.secondary,
-                          subtitle: '${m.activeRequirements} active requirements',
+                          subtitle:
+                              '${m.activeRequirements} active requirements',
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -140,20 +155,33 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Verification & Compliance Queue (${queue.length})', style: AppTypography.titleLarge),
+                    Text(
+                      'Verification & Compliance Queue (${queue.length})',
+                      style: AppTypography.titleLarge,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
 
                 if (queue.isEmpty)
                   AppCard(
-                    padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 40,
+                      horizontal: 24,
+                    ),
                     child: Center(
                       child: Column(
                         children: [
-                          const Icon(Icons.verified_user, size: 48, color: AppColors.success),
+                          const Icon(
+                            Icons.verified_user,
+                            size: 48,
+                            color: AppColors.success,
+                          ),
                           const SizedBox(height: 12),
-                          const Text('All Verification Requests Cleared', style: AppTypography.titleMedium),
+                          const Text(
+                            'All Verification Requests Cleared',
+                            style: AppTypography.titleMedium,
+                          ),
                           const SizedBox(height: 4),
                           const Text(
                             'No pending MSME businesses or machine listings require compliance verification.',
@@ -178,12 +206,20 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: (item.entityType == 'BUSINESS' ? AppColors.primary : AppColors.secondary).withOpacity(0.1),
+                                color:
+                                    (item.entityType == 'BUSINESS'
+                                            ? AppColors.primary
+                                            : AppColors.secondary)
+                                        .withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Icon(
-                                item.entityType == 'BUSINESS' ? Icons.storefront : Icons.precision_manufacturing,
-                                color: item.entityType == 'BUSINESS' ? AppColors.primary : AppColors.secondary,
+                                item.entityType == 'BUSINESS'
+                                    ? Icons.storefront
+                                    : Icons.precision_manufacturing,
+                                color: item.entityType == 'BUSINESS'
+                                    ? AppColors.primary
+                                    : AppColors.secondary,
                               ),
                             ),
                             const SizedBox(width: 16),
@@ -193,21 +229,35 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                 children: [
                                   Row(
                                     children: [
-                                      Text(item.entityName, style: AppTypography.titleSmall),
+                                      Text(
+                                        item.entityName,
+                                        style: AppTypography.titleSmall,
+                                      ),
                                       const SizedBox(width: 8),
                                       Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 2,
+                                        ),
                                         decoration: BoxDecoration(
                                           color: const Color(0xFFF1F5F9),
-                                          borderRadius: BorderRadius.circular(4),
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
                                         ),
                                         child: Text(
                                           item.entityType,
-                                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.textSecondary,
+                                          ),
                                         ),
                                       ),
                                       const SizedBox(width: 8),
-                                      StatusBadge(status: item.verificationStatus),
+                                      StatusBadge(
+                                        status: item.verificationStatus,
+                                      ),
                                     ],
                                   ),
                                   const SizedBox(height: 4),
@@ -216,7 +266,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                     style: AppTypography.bodySmall,
                                   ),
                                   const SizedBox(height: 2),
-                                  Text('Submitted: ${item.submittedAt}', style: AppTypography.caption),
+                                  Text(
+                                    'Submitted: ${item.submittedAt}',
+                                    style: AppTypography.caption,
+                                  ),
                                 ],
                               ),
                             ),
@@ -224,8 +277,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                               children: [
                                 OutlinedButton.icon(
                                   onPressed: () => _verifyItem(item, false),
-                                  icon: const Icon(Icons.close, size: 16, color: AppColors.error),
-                                  label: const Text('Reject', style: TextStyle(color: AppColors.error)),
+                                  icon: const Icon(
+                                    Icons.close,
+                                    size: 16,
+                                    color: AppColors.error,
+                                  ),
+                                  label: const Text(
+                                    'Reject',
+                                    style: TextStyle(color: AppColors.error),
+                                  ),
                                 ),
                                 const SizedBox(width: 10),
                                 AppButton(
@@ -266,7 +326,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               Text(title, style: AppTypography.bodySmall),
               Container(
                 padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 child: Icon(icon, color: color, size: 20),
               ),
             ],

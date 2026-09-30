@@ -107,7 +107,7 @@ def calculate_availability_score(requirement: Requirement, machine: Machine) -> 
         days_span = 1
 
     # Check machine status
-    if machine.status != MachineStatus.ACTIVE:
+    if machine.status not in (MachineStatus.ACTIVE, MachineStatus.AVAILABLE):
         return 0.0, ["Machine is currently inactive or in scheduled maintenance"]
 
     # Check unblocked availability slots in range
@@ -130,17 +130,23 @@ def calculate_availability_score(requirement: Requirement, machine: Machine) -> 
     return round(score, 4), reasons
 
 
-def calculate_distance_score(requirement: Requirement, machine: Machine) -> Tuple[float, float, List[str]]:
+def calculate_distance_score(
+    requirement: Requirement,
+    machine: Machine,
+    search_location: Optional[str] = None,
+) -> Tuple[float, float, List[str]]:
     """
     Distance match (15% total weight):
     Calculates true Haversine distance between seeker coordinates and provider machine.
     """
     reasons = []
-    req_lat = requirement.latitude
-    req_lon = requirement.longitude
-
-    if req_lat is None or req_lon is None:
-        req_lat, req_lon = resolve_coordinates(requirement.preferred_location)
+    if search_location:
+        req_lat, req_lon = resolve_coordinates(search_location)
+    else:
+        req_lat = requirement.latitude
+        req_lon = requirement.longitude
+        if req_lat is None or req_lon is None:
+            req_lat, req_lon = resolve_coordinates(requirement.preferred_location)
 
     dist_km = haversine_distance_km(req_lat, req_lon, machine.latitude, machine.longitude)
     max_dist = requirement.max_distance_km or 100.0

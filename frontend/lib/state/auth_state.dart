@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter/widgets.dart';
 import 'package:machhunt/core/constants/api_endpoints.dart';
 import 'package:machhunt/core/network/api_client.dart';
 import 'package:machhunt/core/network/api_exception.dart';
@@ -7,6 +8,18 @@ import 'package:machhunt/models/user_model.dart';
 import 'package:machhunt/models/business_model.dart';
 
 class AuthState extends ChangeNotifier {
+  @override
+  void notifyListeners() {
+    if (WidgetsBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        super.notifyListeners();
+      });
+    } else {
+      super.notifyListeners();
+    }
+  }
+
   UserModel? _currentUser;
   BusinessModel? _currentBusiness;
   bool _isLoading = false;
@@ -34,6 +47,11 @@ class AuthState extends ChangeNotifier {
 
   void clearError() {
     _errorMessage = null;
+    notifyListeners();
+  }
+
+  void setCurrentUserForTesting(UserModel? user) {
+    _currentUser = user;
     notifyListeners();
   }
 
@@ -349,7 +367,8 @@ class AuthState extends ChangeNotifier {
       final status = error.statusCode;
 
       // 401 Unauthorized: Invalid credentials
-      if (status == 401 || msg.toLowerCase().contains("invalid email or password")) {
+      if (status == 401 ||
+          msg.toLowerCase().contains("invalid email or password")) {
         return "Invalid email or password.";
       }
 

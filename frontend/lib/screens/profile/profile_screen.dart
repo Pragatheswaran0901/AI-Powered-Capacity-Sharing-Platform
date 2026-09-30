@@ -26,7 +26,10 @@ class ProfileScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('MSME Profile & Account', style: AppTypography.displayMedium),
+                  const Text(
+                    'MSME Profile & Account',
+                    style: AppTypography.displayMedium,
+                  ),
                   const SizedBox(height: 4),
                   const Text(
                     'Manage your industrial credentials, GST verification, and portal session',
@@ -44,10 +47,19 @@ class ProfileScreen extends StatelessWidget {
                           children: [
                             CircleAvatar(
                               radius: 32,
-                              backgroundColor: AppColors.primary.withOpacity(0.1),
+                              backgroundColor: AppColors.primary.withOpacity(
+                                0.1,
+                              ),
                               child: Text(
-                                (user?.fullName.isNotEmpty == true ? user!.fullName[0] : 'U').toUpperCase(),
-                                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.primary),
+                                (user?.fullName.isNotEmpty == true
+                                        ? user!.fullName[0]
+                                        : 'U')
+                                    .toUpperCase(),
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 16),
@@ -55,19 +67,32 @@ class ProfileScreen extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(user?.fullName ?? 'MSME User', style: AppTypography.titleLarge),
+                                  Text(
+                                    user?.fullName ?? 'MSME User',
+                                    style: AppTypography.titleLarge,
+                                  ),
                                   const SizedBox(height: 4),
-                                  Text(user?.email ?? '', style: AppTypography.bodySmall),
+                                  Text(
+                                    user?.email ?? '',
+                                    style: AppTypography.bodySmall,
+                                  ),
                                   const SizedBox(height: 6),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 2,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: AppColors.primary.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Text(
                                       'Role: ${user?.role ?? "SEEKER"}',
-                                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primary),
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primary,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -79,8 +104,14 @@ class ProfileScreen extends StatelessWidget {
                         const Divider(color: AppColors.border),
                         const SizedBox(height: 16),
 
-                        _buildProfileField('Phone Number', user?.phone ?? 'Not provided'),
-                        _buildProfileField('Account Status', user?.isActive == true ? 'Active' : 'Suspended'),
+                        _buildProfileField(
+                          'Phone Number',
+                          user?.phone ?? 'Not provided',
+                        ),
+                        _buildProfileField(
+                          'Account Status',
+                          user?.isActive == true ? 'Active' : 'Suspended',
+                        ),
                         _buildProfileField('User ID', user?.id ?? ''),
                       ],
                     ),
@@ -100,9 +131,15 @@ class ProfileScreen extends StatelessWidget {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(biz.name, style: AppTypography.titleLarge),
+                                  Text(
+                                    biz.name,
+                                    style: AppTypography.titleLarge,
+                                  ),
                                   const SizedBox(height: 2),
-                                  Text('${biz.industry} • ${biz.district}, ${biz.state}', style: AppTypography.bodySmall),
+                                  Text(
+                                    '${biz.industry} • ${biz.district}, ${biz.state}',
+                                    style: AppTypography.bodySmall,
+                                  ),
                                 ],
                               ),
                               StatusBadge(status: biz.verificationStatus),
@@ -112,13 +149,26 @@ class ProfileScreen extends StatelessWidget {
                           const Divider(color: AppColors.border),
                           const SizedBox(height: 14),
 
-                          _buildProfileField('GSTIN', biz.gstin ?? 'Unregistered MSME'),
+                          _buildProfileField(
+                            'GSTIN',
+                            biz.gstin ?? 'Unregistered MSME',
+                          ),
                           _buildProfileField('Registered Office', biz.address),
-                          _buildProfileField('District & Pincode', '${biz.district} - ${biz.pincode}'),
+                          _buildProfileField(
+                            'District & Pincode',
+                            '${biz.district} - ${biz.pincode}',
+                          ),
                           _buildProfileField('State', biz.state),
-                          _buildProfileField('Coordinates', '${biz.latitude.toStringAsFixed(4)}° N, ${biz.longitude.toStringAsFixed(4)}° E'),
-                          if (biz.description != null && biz.description!.isNotEmpty)
-                            _buildProfileField('Profile Description', biz.description!),
+                          _buildProfileField(
+                            'Coordinates',
+                            '${biz.latitude.toStringAsFixed(4)}° N, ${biz.longitude.toStringAsFixed(4)}° E',
+                          ),
+                          if (biz.description != null &&
+                              biz.description!.isNotEmpty)
+                            _buildProfileField(
+                              'Profile Description',
+                              biz.description!,
+                            ),
                         ],
                       ),
                     )
@@ -128,7 +178,10 @@ class ProfileScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('No MSME Business Registered', style: AppTypography.titleMedium),
+                          const Text(
+                            'No MSME Business Registered',
+                            style: AppTypography.titleMedium,
+                          ),
                           const SizedBox(height: 8),
                           const Text(
                             'Register your manufacturing unit or company to list machinery and receive payments.',
@@ -152,16 +205,34 @@ class ProfileScreen extends StatelessWidget {
                       children: [
                         ListTile(
                           contentPadding: EdgeInsets.zero,
-                          leading: const Icon(Icons.security, color: AppColors.primary),
-                          title: const Text('Security & Access', style: AppTypography.labelMedium),
-                          subtitle: const Text('JWT 60-min access tokens with refresh token rotation', style: AppTypography.caption),
+                          leading: const Icon(
+                            Icons.security,
+                            color: AppColors.primary,
+                          ),
+                          title: const Text(
+                            'Security & Access',
+                            style: AppTypography.labelMedium,
+                          ),
+                          subtitle: const Text(
+                            'JWT 60-min access tokens with refresh token rotation',
+                            style: AppTypography.caption,
+                          ),
                         ),
                         const Divider(color: AppColors.border),
                         ListTile(
                           contentPadding: EdgeInsets.zero,
-                          leading: const Icon(Icons.cloud_done_outlined, color: AppColors.success),
-                          title: const Text('Backend API Connected', style: AppTypography.labelMedium),
-                          subtitle: const Text('FastAPI Engine with PostgreSQL database', style: AppTypography.caption),
+                          leading: const Icon(
+                            Icons.cloud_done_outlined,
+                            color: AppColors.success,
+                          ),
+                          title: const Text(
+                            'Backend API Connected',
+                            style: AppTypography.labelMedium,
+                          ),
+                          subtitle: const Text(
+                            'FastAPI Engine with PostgreSQL database',
+                            style: AppTypography.caption,
+                          ),
                         ),
                         const Divider(color: AppColors.border),
                         const SizedBox(height: 12),
@@ -201,12 +272,19 @@ class ProfileScreen extends StatelessWidget {
         children: [
           SizedBox(
             width: 160,
-            child: Text(label, style: const TextStyle(fontSize: 13, color: AppColors.textMuted)),
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 13, color: AppColors.textMuted),
+            ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
             ),
           ),
         ],

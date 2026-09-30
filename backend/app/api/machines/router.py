@@ -33,6 +33,7 @@ def search_machines(
     material: Optional[str] = Query(None, description="e.g. Aluminium, Steel"),
     max_rate: Optional[float] = Query(None, description="Maximum hourly rate in INR"),
     verified_only: bool = Query(False, description="Filter only verified machines"),
+    location: Optional[str] = Query(None, description="Filter machines by location e.g. Coimbatore, Tiruppur"),
     db: Session = Depends(get_db),
 ):
     """Search and filter machines across the platform."""
@@ -42,6 +43,7 @@ def search_machines(
         material=material,
         max_rate=max_rate,
         verified_only=verified_only,
+        location=location,
     )
 
 

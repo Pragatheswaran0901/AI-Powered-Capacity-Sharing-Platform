@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:machhunt/core/theme/app_colors.dart';
+import 'package:machhunt/core/widgets/app_background.dart';
 import 'package:machhunt/state/auth_state.dart';
 
 class BusinessOnboardingScreen extends StatefulWidget {
   const BusinessOnboardingScreen({super.key});
 
   @override
-  State<BusinessOnboardingScreen> createState() => _BusinessOnboardingScreenState();
+  State<BusinessOnboardingScreen> createState() =>
+      _BusinessOnboardingScreenState();
 }
 
 class _BusinessOnboardingScreenState extends State<BusinessOnboardingScreen> {
@@ -19,23 +21,39 @@ class _BusinessOnboardingScreenState extends State<BusinessOnboardingScreen> {
   final _contactPersonController = TextEditingController();
   final _phoneController = TextEditingController();
   final _gstinController = TextEditingController();
-  final _industryController = TextEditingController(text: 'Precision Machining & Fabrication');
+  final _industryController = TextEditingController(
+    text: 'Precision Machining & Fabrication',
+  );
   final _addressController = TextEditingController();
   final _pincodeController = TextEditingController(text: '641006');
   final _descriptionController = TextEditingController();
   String _selectedDistrict = 'Coimbatore';
 
   final List<String> _districts = [
-    'Coimbatore', 'Chennai', 'Hosur', 'Salem', 'Tiruppur',
-    'Erode', 'Madurai', 'Trichy', 'Kanchipuram'
+    'Coimbatore',
+    'Chennai',
+    'Hosur',
+    'Salem',
+    'Tiruppur',
+    'Erode',
+    'Madurai',
+    'Trichy',
+    'Kanchipuram',
   ];
 
   // Provider specific tags
   final List<String> _availableCategories = [
-    'CNC Milling', 'VMC (Vertical Machining)', 'CNC Turning',
-    'Fiber Laser Cutting', 'Wire EDM', 'Surface Grinding'
+    'CNC Milling',
+    'VMC (Vertical Machining)',
+    'CNC Turning',
+    'Fiber Laser Cutting',
+    'Wire EDM',
+    'Surface Grinding',
   ];
-  final Set<String> _selectedCategories = {'CNC Milling', 'VMC (Vertical Machining)'};
+  final Set<String> _selectedCategories = {
+    'CNC Milling',
+    'VMC (Vertical Machining)',
+  };
 
   bool _isSubmitting = false;
   String? _errorMessage;
@@ -45,7 +63,9 @@ class _BusinessOnboardingScreenState extends State<BusinessOnboardingScreen> {
     super.initState();
     final user = authState.currentUser;
     if (user != null) {
-      _contactPersonController.text = user.fullName.isNotEmpty ? user.fullName : user.email.split('@')[0];
+      _contactPersonController.text = user.fullName.isNotEmpty
+          ? user.fullName
+          : user.email.split('@')[0];
       _phoneController.text = user.phone;
       if (user.isProvider) {
         _selectedRole = 'PROVIDER';
@@ -94,9 +114,15 @@ class _BusinessOnboardingScreenState extends State<BusinessOnboardingScreen> {
           ? _addressController.text.trim()
           : "Industrial Estate, $_selectedDistrict",
       description: _descriptionController.text.trim(),
-      gstin: _gstinController.text.trim().isNotEmpty ? _gstinController.text.trim() : null,
-      machineCategories: _selectedRole == 'PROVIDER' ? _selectedCategories.toList() : null,
-      primaryProcesses: _selectedRole == 'PROVIDER' ? ['Milling', 'Turning'] : null,
+      gstin: _gstinController.text.trim().isNotEmpty
+          ? _gstinController.text.trim()
+          : null,
+      machineCategories: _selectedRole == 'PROVIDER'
+          ? _selectedCategories.toList()
+          : null,
+      primaryProcesses: _selectedRole == 'PROVIDER'
+          ? ['Milling', 'Turning']
+          : null,
     );
 
     if (!mounted) return;
@@ -113,7 +139,9 @@ class _BusinessOnboardingScreenState extends State<BusinessOnboardingScreen> {
       }
     } else {
       setState(() {
-        _errorMessage = authState.errorMessage ?? "Failed to complete onboarding. Please try again.";
+        _errorMessage =
+            authState.errorMessage ??
+            "Failed to complete onboarding. Please try again.";
       });
     }
   }
@@ -123,66 +151,89 @@ class _BusinessOnboardingScreenState extends State<BusinessOnboardingScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.navyDark : AppColors.slateLight,
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 580),
-              child: Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(
-                    color: isDark ? AppColors.slate700 : AppColors.slate200,
+      backgroundColor: Colors.transparent,
+      body: AppBackground(
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 580),
+                child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: BorderSide(
+                      color: isDark ? AppColors.slate700 : AppColors.slate200,
+                    ),
                   ),
-                ),
-                color: isDark ? AppColors.navyCard : Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.all(32),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Header Progress
-                      Row(
-                        children: [
-                          _buildStepIndicator(0, "1. Intent", _currentStep >= 0),
-                          Expanded(
-                            child: Container(
-                              height: 2,
-                              color: _currentStep >= 1 ? AppColors.steelBlue : AppColors.slate300,
-                              margin: const EdgeInsets.symmetric(horizontal: 8),
+                  color: isDark ? AppColors.navyCard : Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Header Progress
+                        Row(
+                          children: [
+                            _buildStepIndicator(
+                              0,
+                              "1. Intent",
+                              _currentStep >= 0,
                             ),
-                          ),
-                          _buildStepIndicator(1, "2. Profile", _currentStep >= 1),
-                        ],
-                      ),
-                      const SizedBox(height: 28),
-
-                      if (_errorMessage != null) ...[
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: AppColors.errorRed.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: AppColors.errorRed.withValues(alpha: 0.3),
+                            Expanded(
+                              child: Container(
+                                height: 2,
+                                color: _currentStep >= 1
+                                    ? AppColors.steelBlue
+                                    : AppColors.slate300,
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                ),
+                              ),
                             ),
-                          ),
-                          child: Text(
-                            _errorMessage!,
-                            style: const TextStyle(fontSize: 13, color: AppColors.errorRed),
-                          ),
+                            _buildStepIndicator(
+                              1,
+                              "2. Profile",
+                              _currentStep >= 1,
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 20),
-                      ],
+                        const SizedBox(height: 28),
 
-                      // Step Content
-                      if (_currentStep == 0) _buildStep1RoleSelection(isDark),
-                      if (_currentStep == 1) _buildStep2BusinessProfile(isDark),
-                    ],
+                        if (_errorMessage != null) ...[
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.errorRed.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: AppColors.errorRed.withValues(
+                                  alpha: 0.3,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              _errorMessage!,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: AppColors.errorRed,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+
+                        // Step Content
+                        if (_currentStep == 0) _buildStep1RoleSelection(isDark),
+                        if (_currentStep == 1)
+                          _buildStep2BusinessProfile(isDark),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -206,7 +257,11 @@ class _BusinessOnboardingScreenState extends State<BusinessOnboardingScreen> {
           child: Center(
             child: Text(
               "${step + 1}",
-              style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
@@ -248,7 +303,8 @@ class _BusinessOnboardingScreenState extends State<BusinessOnboardingScreen> {
         _buildRoleCard(
           role: 'SEEKER',
           title: "I need manufacturing capacity",
-          subtitle: "Outsource components, request quotes, and access idle CNC, VMC, and laser cutting machines with verified precision.",
+          subtitle:
+              "Outsource components, request quotes, and access idle CNC, VMC, and laser cutting machines with verified precision.",
           icon: Icons.search,
           isDark: isDark,
         ),
@@ -258,7 +314,8 @@ class _BusinessOnboardingScreenState extends State<BusinessOnboardingScreen> {
         _buildRoleCard(
           role: 'PROVIDER',
           title: "I have manufacturing capacity",
-          subtitle: "List your idle machines, monetize downtime, receive verified job requests, and grow MSME revenue in Tamil Nadu.",
+          subtitle:
+              "List your idle machines, monetize downtime, receive verified job requests, and grow MSME revenue in Tamil Nadu.",
           icon: Icons.precision_manufacturing,
           isDark: isDark,
         ),
@@ -274,9 +331,14 @@ class _BusinessOnboardingScreenState extends State<BusinessOnboardingScreen> {
             backgroundColor: AppColors.steelBlue,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
-          child: const Text("Continue to Profile", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+          child: const Text(
+            "Continue to Profile",
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+          ),
         ),
       ],
     );
@@ -303,12 +365,16 @@ class _BusinessOnboardingScreenState extends State<BusinessOnboardingScreen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? AppColors.steelBlue : (isDark ? AppColors.slate700 : AppColors.slate300),
+            color: isSelected
+                ? AppColors.steelBlue
+                : (isDark ? AppColors.slate700 : AppColors.slate300),
             width: isSelected ? 2 : 1,
           ),
           color: isSelected
               ? AppColors.steelBlue.withValues(alpha: 0.08)
-              : (isDark ? AppColors.navyDark.withValues(alpha: 0.4) : AppColors.slate100),
+              : (isDark
+                    ? AppColors.navyDark.withValues(alpha: 0.4)
+                    : AppColors.slate100),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -337,7 +403,11 @@ class _BusinessOnboardingScreenState extends State<BusinessOnboardingScreen> {
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: const TextStyle(fontSize: 12, color: AppColors.slate500, height: 1.4),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.slate500,
+                      height: 1.4,
+                    ),
                   ),
                 ],
               ),
@@ -374,21 +444,40 @@ class _BusinessOnboardingScreenState extends State<BusinessOnboardingScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            "Complete your MSME profile for ${ _selectedRole == 'PROVIDER' ? 'capacity listing' : 'procurement' }.",
+            "Complete your MSME profile for ${_selectedRole == 'PROVIDER' ? 'capacity listing' : 'procurement'}.",
             style: const TextStyle(fontSize: 13, color: AppColors.slate500),
           ),
           const SizedBox(height: 20),
 
           // Business Name
-          _buildTextField("Company / Business Name", _businessNameController, "e.g. Precision Components Ltd", Icons.business),
+          _buildTextField(
+            "Company / Business Name",
+            _businessNameController,
+            "e.g. Precision Components Ltd",
+            Icons.business,
+          ),
           const SizedBox(height: 14),
 
           // Contact Person & Phone
           Row(
             children: [
-              Expanded(child: _buildTextField("Contact Person", _contactPersonController, "Full name", Icons.person)),
+              Expanded(
+                child: _buildTextField(
+                  "Contact Person",
+                  _contactPersonController,
+                  "Full name",
+                  Icons.person,
+                ),
+              ),
               const SizedBox(width: 12),
-              Expanded(child: _buildTextField("Phone Number", _phoneController, "9876543210", Icons.phone)),
+              Expanded(
+                child: _buildTextField(
+                  "Phone Number",
+                  _phoneController,
+                  "9876543210",
+                  Icons.phone,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 14),
@@ -400,25 +489,49 @@ class _BusinessOnboardingScreenState extends State<BusinessOnboardingScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("District", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.slate500)),
+                    const Text(
+                      "District",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.slate500,
+                      ),
+                    ),
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String>(
                       value: _selectedDistrict,
-                      items: _districts.map((d) => DropdownMenuItem(value: d, child: Text(d))).toList(),
+                      items: _districts
+                          .map(
+                            (d) => DropdownMenuItem(value: d, child: Text(d)),
+                          )
+                          .toList(),
                       onChanged: (val) {
-                        if (val != null) setState(() => _selectedDistrict = val);
+                        if (val != null) {
+                          setState(() => _selectedDistrict = val);
+                        }
                       },
                       decoration: InputDecoration(
                         filled: true,
-                        fillColor: isDark ? AppColors.navyDark.withValues(alpha: 0.6) : AppColors.slate100,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        fillColor: isDark
+                            ? AppColors.navyDark.withValues(alpha: 0.6)
+                            : AppColors.slate100,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(width: 12),
-              Expanded(child: _buildTextField("Pincode", _pincodeController, "641006", Icons.location_on)),
+              Expanded(
+                child: _buildTextField(
+                  "Pincode",
+                  _pincodeController,
+                  "641006",
+                  Icons.location_on,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 14),
@@ -426,20 +539,42 @@ class _BusinessOnboardingScreenState extends State<BusinessOnboardingScreen> {
           // GSTIN & Industry
           Row(
             children: [
-              Expanded(child: _buildTextField("GSTIN (Optional)", _gstinController, "33AAAAA0000A1Z5", Icons.receipt_long)),
+              Expanded(
+                child: _buildTextField(
+                  "GSTIN (Optional)",
+                  _gstinController,
+                  "33AAAAA0000A1Z5",
+                  Icons.receipt_long,
+                ),
+              ),
               const SizedBox(width: 12),
-              Expanded(child: _buildTextField("Industry Sector", _industryController, "Precision Engineering", Icons.category)),
+              Expanded(
+                child: _buildTextField(
+                  "Industry Sector",
+                  _industryController,
+                  "Precision Engineering",
+                  Icons.category,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 14),
 
           // Address
-          _buildTextField("Factory / Office Address", _addressController, "Plot / Street / Industrial Area", Icons.place),
+          _buildTextField(
+            "Factory / Office Address",
+            _addressController,
+            "Plot / Street / Industrial Area",
+            Icons.place,
+          ),
           const SizedBox(height: 14),
 
           // If Provider: Machine categories
           if (_selectedRole == 'PROVIDER') ...[
-            const Text("Your Machine Capabilities", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+            const Text(
+              "Your Machine Capabilities",
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -447,7 +582,13 @@ class _BusinessOnboardingScreenState extends State<BusinessOnboardingScreen> {
               children: _availableCategories.map((cat) {
                 final isSelected = _selectedCategories.contains(cat);
                 return FilterChip(
-                  label: Text(cat, style: TextStyle(fontSize: 12, color: isSelected ? Colors.white : null)),
+                  label: Text(
+                    cat,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isSelected ? Colors.white : null,
+                    ),
+                  ),
                   selected: isSelected,
                   selectedColor: AppColors.steelBlue,
                   onSelected: (selected) {
@@ -472,30 +613,59 @@ class _BusinessOnboardingScreenState extends State<BusinessOnboardingScreen> {
               backgroundColor: AppColors.steelBlue,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
             child: _isSubmitting
-                ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                : const Text("Complete Setup & Enter Platform", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : const Text(
+                    "Complete Setup & Enter Platform",
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  ),
           ),
           const SizedBox(height: 10),
 
           // Progressive Skip
           TextButton(
-            onPressed: _isSubmitting ? null : () => _submitOnboarding(isSkipping: true),
-            child: const Text("Set up details later →", style: TextStyle(fontSize: 13, color: AppColors.slate500)),
+            onPressed: _isSubmitting
+                ? null
+                : () => _submitOnboarding(isSkipping: true),
+            child: const Text(
+              "Set up details later →",
+              style: TextStyle(fontSize: 13, color: AppColors.slate500),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, String hint, IconData icon) {
+  Widget _buildTextField(
+    String label,
+    TextEditingController controller,
+    String hint,
+    IconData icon,
+  ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.slate500)),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: AppColors.slate500,
+          ),
+        ),
         const SizedBox(height: 6),
         TextFormField(
           controller: controller,
@@ -503,9 +673,14 @@ class _BusinessOnboardingScreenState extends State<BusinessOnboardingScreen> {
             hintText: hint,
             prefixIcon: Icon(icon, size: 18),
             filled: true,
-            fillColor: isDark ? AppColors.navyDark.withValues(alpha: 0.6) : AppColors.slate100,
+            fillColor: isDark
+                ? AppColors.navyDark.withValues(alpha: 0.6)
+                : AppColors.slate100,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 12,
+            ),
           ),
         ),
       ],

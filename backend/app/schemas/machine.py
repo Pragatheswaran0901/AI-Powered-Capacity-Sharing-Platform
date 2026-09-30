@@ -122,11 +122,12 @@ class MachineOut(MachineBase):
     created_at: datetime
     updated_at: datetime
     capabilities: List[CapabilityOut] = []
+    availabilities: List[AvailabilityOut] = []
+    average_rating: float = 4.5
+    completed_jobs: int = 0
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class MachineDetail(MachineOut):
-    availabilities: List[AvailabilityOut] = []
-    average_rating: float = 4.5
-    completed_jobs: int = 0
+    pass

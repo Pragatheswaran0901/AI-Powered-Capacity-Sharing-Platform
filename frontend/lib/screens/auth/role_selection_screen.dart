@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:machhunt/core/constants/app_colors.dart';
 import 'package:machhunt/core/design_system/mach_design_system.dart';
+import 'package:machhunt/core/widgets/app_background.dart';
 import 'package:machhunt/state/auth_state.dart';
 
 class RoleSelectionScreen extends StatefulWidget {
@@ -23,17 +24,24 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
     if (user != null) {
       if (!user.isOnboarded) {
         // Auto-initialize base MSME profile for the selected role
-        final defaultBizName = "${user.fullName.isNotEmpty ? user.fullName : user.email.split('@')[0]} Works";
+        final defaultBizName =
+            "${user.fullName.isNotEmpty ? user.fullName : user.email.split('@')[0]} Works";
         await authState.completeOnboarding(
           role: role,
-          fullName: user.fullName.isNotEmpty ? user.fullName : user.email.split('@')[0],
+          fullName: user.fullName.isNotEmpty
+              ? user.fullName
+              : user.email.split('@')[0],
           phone: user.phone.isNotEmpty ? user.phone : "9876543210",
           businessName: defaultBizName,
-          industry: role == 'PROVIDER' ? 'Precision Machining & Tooling' : 'Component Sourcing & Assembly',
+          industry: role == 'PROVIDER'
+              ? 'Precision Machining & Tooling'
+              : 'Component Sourcing & Assembly',
           district: 'Coimbatore',
           pincode: '641006',
           address: 'SIDCO Industrial Estate, Coimbatore',
-          machineCategories: role == 'PROVIDER' ? ['CNC Milling', 'VMC (Vertical Machining)'] : null,
+          machineCategories: role == 'PROVIDER'
+              ? ['CNC Milling', 'VMC (Vertical Machining)']
+              : null,
         );
       } else if (user.role != role) {
         await authState.switchRole(role);
@@ -55,7 +63,8 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
     final isDesktop = MediaQuery.of(context).size.width >= 800;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -71,152 +80,182 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                 await authState.logout();
                 if (context.mounted) context.go('/login');
               },
-              icon: const Icon(Icons.logout, size: 16, color: AppColors.slate500),
-              label: Text('Sign Out', style: GoogleFonts.inter(fontSize: 12.5, color: AppColors.slate500)),
+              icon: const Icon(
+                Icons.logout,
+                size: 16,
+                color: AppColors.slate500,
+              ),
+              label: Text(
+                'Sign Out',
+                style: GoogleFonts.inter(
+                  fontSize: 12.5,
+                  color: AppColors.slate500,
+                ),
+              ),
             ),
           ),
         ],
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 880),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Brand pill
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: AppColors.steelBlue.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.steelBlue.withValues(alpha: 0.25)),
-                  ),
-                  child: Text(
-                    "ONBOARDING & INTENT",
-                    style: GoogleFonts.inter(
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.8,
-                      color: AppColors.steelBlue,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Headline
-                Text(
-                  "How will you use Mach-Hunt?",
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.6,
-                    color: AppColors.navyIndustrial,
-                  ),
-                ),
-                const SizedBox(height: 8),
-
-                // Supporting text
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 540),
-                  child: Text(
-                    "Choose the option that best describes what you want to do. You can switch roles at any time from your sidebar.",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w400,
-                      height: 1.45,
-                      color: AppColors.slate500,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 40),
-
-                if (_isLoading)
-                  const MachLoadingState(message: "Setting up your MSME workspace...", height: 160)
-                else
-                  // Two Large Distinct Cards
-                  isDesktop
-                      ? Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: _buildRoleCard(
-                              roleId: 'PROVIDER',
-                              title: 'Capacity Provider',
-                              subtitle: 'Monetize Idle Machinery',
-                              description: 'I have manufacturing capacity available and want to offer it to other MSMEs.',
-                              icon: Icons.factory_outlined,
-                              accentColor: AppColors.orangeAccent,
-                              features: [
-                                'List CNC, VMC, Turning & Laser equipment',
-                                'Publish idle shift calendars',
-                                'Receive verified procurement orders',
-                                'Guaranteed milestone escrow payouts',
-                              ],
-                            )),
-                            const SizedBox(width: 24),
-                            Expanded(child: _buildRoleCard(
-                              roleId: 'SEEKER',
-                              title: 'Capacity Seeker',
-                              subtitle: 'Source Precision Parts',
-                              description: 'I need manufacturing capacity and want to find a suitable manufacturer.',
-                              icon: Icons.search_rounded,
-                              accentColor: AppColors.steelBlue,
-                              features: [
-                                'Describe requirements in plain English',
-                                'AI blueprint extraction & matching',
-                                'Compare 5 deterministic score dimensions',
-                                'Protected escrow payment milestones',
-                              ],
-                            )),
-                          ],
-                        )
-                      : Column(
-                          children: [
-                            _buildRoleCard(
-                              roleId: 'PROVIDER',
-                              title: 'Capacity Provider',
-                              subtitle: 'Monetize Idle Machinery',
-                              description: 'I have manufacturing capacity available and want to offer it to other MSMEs.',
-                              icon: Icons.factory_outlined,
-                              accentColor: AppColors.orangeAccent,
-                              features: [
-                                'List CNC, VMC, Turning & Laser equipment',
-                                'Publish idle shift calendars',
-                                'Receive verified procurement orders',
-                                'Guaranteed milestone escrow payouts',
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            _buildRoleCard(
-                              roleId: 'SEEKER',
-                              title: 'Capacity Seeker',
-                              subtitle: 'Source Precision Parts',
-                              description: 'I need manufacturing capacity and want to find a suitable manufacturer.',
-                              icon: Icons.search_rounded,
-                              accentColor: AppColors.steelBlue,
-                              features: [
-                                'Describe requirements in plain English',
-                                'AI blueprint extraction & matching',
-                                'Compare 5 deterministic score dimensions',
-                                'Protected escrow payment milestones',
-                              ],
-                            ),
-                          ],
+      body: AppBackground(
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 880),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Brand pill
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.steelBlue.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: AppColors.steelBlue.withValues(alpha: 0.25),
                         ),
+                      ),
+                      child: Text(
+                        "ONBOARDING & INTENT",
+                        style: GoogleFonts.inter(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.8,
+                          color: AppColors.steelBlue,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
 
-                const SizedBox(height: 32),
-                Text(
-                  "Both roles have access to the unified MSME manufacturing network.",
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.slate400,
-                  ),
+                    // Headline
+                    Text(
+                      "How will you use Mach-Hunt?",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.6,
+                        color: AppColors.navyIndustrial,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Supporting text
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 540),
+                      child: Text(
+                        "Choose the option that best describes what you want to do. You can switch roles at any time from your sidebar.",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w400,
+                          height: 1.45,
+                          color: AppColors.slate500,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+
+                    if (_isLoading)
+                      const MachLoadingState(
+                        message: "Setting up your MSME workspace...",
+                        height: 160,
+                      )
+                    else
+                      // Two Large Distinct Cards
+                      isDesktop
+                          ? Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: _buildRoleCard(
+                                    roleId: 'PROVIDER',
+                                    title: 'Capacity Provider',
+                                    subtitle: 'Monetize Idle Machinery',
+                                    description:
+                                        'I have manufacturing capacity available and want to offer it to other MSMEs.',
+                                    icon: Icons.factory_outlined,
+                                    accentColor: AppColors.orangeAccent,
+                                    features: [
+                                      'List CNC, VMC, Turning & Laser equipment',
+                                      'Publish idle shift calendars',
+                                      'Receive verified procurement orders',
+                                      'Guaranteed milestone escrow payouts',
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 24),
+                                Expanded(
+                                  child: _buildRoleCard(
+                                    roleId: 'SEEKER',
+                                    title: 'Capacity Seeker',
+                                    subtitle: 'Source Precision Parts',
+                                    description:
+                                        'I need manufacturing capacity and want to find a suitable manufacturer.',
+                                    icon: Icons.search_rounded,
+                                    accentColor: AppColors.steelBlue,
+                                    features: [
+                                      'Describe requirements in plain English',
+                                      'AI blueprint extraction & matching',
+                                      'Compare 5 deterministic score dimensions',
+                                      'Protected escrow payment milestones',
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Column(
+                              children: [
+                                _buildRoleCard(
+                                  roleId: 'PROVIDER',
+                                  title: 'Capacity Provider',
+                                  subtitle: 'Monetize Idle Machinery',
+                                  description:
+                                      'I have manufacturing capacity available and want to offer it to other MSMEs.',
+                                  icon: Icons.factory_outlined,
+                                  accentColor: AppColors.orangeAccent,
+                                  features: [
+                                    'List CNC, VMC, Turning & Laser equipment',
+                                    'Publish idle shift calendars',
+                                    'Receive verified procurement orders',
+                                    'Guaranteed milestone escrow payouts',
+                                  ],
+                                ),
+                                const SizedBox(height: 20),
+                                _buildRoleCard(
+                                  roleId: 'SEEKER',
+                                  title: 'Capacity Seeker',
+                                  subtitle: 'Source Precision Parts',
+                                  description:
+                                      'I need manufacturing capacity and want to find a suitable manufacturer.',
+                                  icon: Icons.search_rounded,
+                                  accentColor: AppColors.steelBlue,
+                                  features: [
+                                    'Describe requirements in plain English',
+                                    'AI blueprint extraction & matching',
+                                    'Compare 5 deterministic score dimensions',
+                                    'Protected escrow payment milestones',
+                                  ],
+                                ),
+                              ],
+                            ),
+
+                    const SizedBox(height: 32),
+                    Text(
+                      "Both roles have access to the unified MSME manufacturing network.",
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.slate400,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -248,7 +287,9 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
           ),
           boxShadow: [
             BoxShadow(
-              color: isHovered ? accentColor.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.03),
+              color: isHovered
+                  ? accentColor.withValues(alpha: 0.1)
+                  : Colors.black.withValues(alpha: 0.03),
               blurRadius: isHovered ? 20 : 10,
               offset: const Offset(0, 4),
             ),
@@ -315,7 +356,11 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.check_circle_rounded, size: 15, color: accentColor),
+                      Icon(
+                        Icons.check_circle_rounded,
+                        size: 15,
+                        color: accentColor,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -338,7 +383,9 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               MachButton(
                 label: 'Continue as $title →',
                 icon: Icons.arrow_forward_rounded,
-                variant: roleId == 'PROVIDER' ? MachButtonVariant.accent : MachButtonVariant.primary,
+                variant: roleId == 'PROVIDER'
+                    ? MachButtonVariant.accent
+                    : MachButtonVariant.primary,
                 size: MachButtonSize.large,
                 isFullWidth: true,
                 onPressed: () => _selectRole(roleId),

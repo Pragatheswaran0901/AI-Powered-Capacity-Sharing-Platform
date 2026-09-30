@@ -14,30 +14,41 @@ class CreateRequirementScreen extends StatefulWidget {
   const CreateRequirementScreen({super.key, this.initialData});
 
   @override
-  State<CreateRequirementScreen> createState() => _CreateRequirementScreenState();
+  State<CreateRequirementScreen> createState() =>
+      _CreateRequirementScreenState();
 }
 
-class _CreateRequirementScreenState extends State<CreateRequirementScreen> with SingleTickerProviderStateMixin {
+class _CreateRequirementScreenState extends State<CreateRequirementScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   // AI Prompt controller
   final _aiPromptController = TextEditingController(
-    text: 'Need 4-axis VMC milling for 150 aluminium 6061 enclosures in Coimbatore by next Friday.',
+    text:
+        'Need 4-axis VMC milling for 150 aluminium 6061 enclosures in Coimbatore by next Friday.',
   );
   bool _isAnalyzingWithAi = false;
   InterpretedRequirementModel? _aiInterpreted;
 
   // Structured Form
   final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController(text: '4-Axis VMC Aluminium Enclosures');
-  final _descriptionController = TextEditingController(text: 'High precision enclosures for electronic sub-assembly.');
+  final _titleController = TextEditingController(
+    text: '4-Axis VMC Aluminium Enclosures',
+  );
+  final _descriptionController = TextEditingController(
+    text: 'High precision enclosures for electronic sub-assembly.',
+  );
   final _quantityController = TextEditingController(text: '150');
-  final _dimensionsController = TextEditingController(text: '180 x 120 x 45 mm');
+  final _dimensionsController = TextEditingController(
+    text: '180 x 120 x 45 mm',
+  );
   final _toleranceController = TextEditingController(text: '0.01');
   final _budgetController = TextEditingController(text: '25000');
   final _locationController = TextEditingController(text: 'Coimbatore');
   final _maxDistanceController = TextEditingController(text: '50');
-  final _qualityReqController = TextEditingController(text: 'CMM Inspection Certificate & Material Test Report required');
+  final _qualityReqController = TextEditingController(
+    text: 'CMM Inspection Certificate & Material Test Report required',
+  );
 
   String _selectedProcess = 'CNC Milling';
   String _selectedMaterial = 'Aluminium 6061';
@@ -82,7 +93,9 @@ class _CreateRequirementScreenState extends State<CreateRequirementScreen> with 
 
   void _populateFromData(Map<String, dynamic> data) {
     setState(() {
-      if (data['title'] != null) _titleController.text = data['title'].toString();
+      if (data['title'] != null) {
+        _titleController.text = data['title'].toString();
+      }
       if (data['process'] != null) {
         final p = data['process'].toString();
         for (var item in _processes) {
@@ -101,10 +114,18 @@ class _CreateRequirementScreenState extends State<CreateRequirementScreen> with 
           }
         }
       }
-      if (data['quantity'] != null) _quantityController.text = data['quantity'].toString();
-      if (data['tolerance_mm'] != null) _toleranceController.text = data['tolerance_mm'].toString();
-      if (data['budget'] != null) _budgetController.text = data['budget'].toString();
-      if (data['preferred_location'] != null) _locationController.text = data['preferred_location'].toString();
+      if (data['quantity'] != null) {
+        _quantityController.text = data['quantity'].toString();
+      }
+      if (data['tolerance_mm'] != null) {
+        _toleranceController.text = data['tolerance_mm'].toString();
+      }
+      if (data['budget'] != null) {
+        _budgetController.text = data['budget'].toString();
+      }
+      if (data['preferred_location'] != null) {
+        _locationController.text = data['preferred_location'].toString();
+      }
       if (data['deadline_days'] != null) {
         final days = int.tryParse(data['deadline_days'].toString()) ?? 7;
         _deliveryDeadline = DateTime.now().add(Duration(days: days));
@@ -175,7 +196,8 @@ class _CreateRequirementScreenState extends State<CreateRequirementScreen> with 
       'required_date': DateFormat('yyyy-MM-dd').format(DateTime.now()),
       'delivery_deadline': DateFormat('yyyy-MM-dd').format(_deliveryDeadline),
       'preferred_location': _locationController.text.trim(),
-      'max_distance_km': double.tryParse(_maxDistanceController.text.trim()) ?? 100.0,
+      'max_distance_km':
+          double.tryParse(_maxDistanceController.text.trim()) ?? 100.0,
       'budget': double.tryParse(_budgetController.text.trim()) ?? 25000.0,
       'quality_requirements': _qualityReqController.text.trim(),
       'operator_required': _operatorRequired,
@@ -187,18 +209,22 @@ class _CreateRequirementScreenState extends State<CreateRequirementScreen> with 
     setState(() => _isSubmitting = false);
 
     if (newReq != null) {
-      context.go('/matches/${newReq.id}?title=${Uri.encodeComponent(newReq.title)}');
+      context.go(
+        '/matches/${newReq.id}?title=${Uri.encodeComponent(newReq.title)}',
+      );
     } else {
       // Fallback demo match ID if server simulated
       final fallbackId = "req-1";
-      context.go('/matches/$fallbackId?title=${Uri.encodeComponent(_titleController.text.trim())}');
+      context.go(
+        '/matches/$fallbackId?title=${Uri.encodeComponent(_titleController.text.trim())}',
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(28),
         child: Center(
@@ -210,7 +236,8 @@ class _CreateRequirementScreenState extends State<CreateRequirementScreen> with 
                 // Page Header
                 MachPageHeader(
                   title: 'What do you need manufactured?',
-                  subtitle: 'Describe requirements in your own words or provide exact engineering parameters.',
+                  subtitle:
+                      'Describe requirements in your own words or provide exact engineering parameters.',
                   onBack: () => context.go('/seeker-dashboard'),
                 ),
                 const SizedBox(height: 24),
@@ -228,11 +255,23 @@ class _CreateRequirementScreenState extends State<CreateRequirementScreen> with 
                     indicatorWeight: 3,
                     labelColor: AppColors.navyIndustrial,
                     unselectedLabelColor: AppColors.slate500,
-                    labelStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700),
-                    unselectedLabelStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500),
+                    labelStyle: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    unselectedLabelStyle: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
                     tabs: const [
-                      Tab(icon: Icon(Icons.auto_awesome), text: 'AI Natural Language Input'),
-                      Tab(icon: Icon(Icons.tune), text: 'Structured Blueprint Input'),
+                      Tab(
+                        icon: Icon(Icons.auto_awesome),
+                        text: 'AI Natural Language Input',
+                      ),
+                      Tab(
+                        icon: Icon(Icons.tune),
+                        text: 'Structured Blueprint Input',
+                      ),
                     ],
                   ),
                 ),
@@ -290,12 +329,22 @@ class _CreateRequirementScreenState extends State<CreateRequirementScreen> with 
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.steelBlue.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: Text('NATURAL LANGUAGE ENGINE', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.steelBlue)),
+                    child: Text(
+                      'NATURAL LANGUAGE ENGINE',
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.steelBlue,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -311,10 +360,18 @@ class _CreateRequirementScreenState extends State<CreateRequirementScreen> with 
                 child: TextField(
                   controller: _aiPromptController,
                   maxLines: 4,
-                  style: GoogleFonts.inter(fontSize: 14.5, color: AppColors.navyIndustrial, height: 1.5),
+                  style: GoogleFonts.inter(
+                    fontSize: 14.5,
+                    color: AppColors.navyIndustrial,
+                    height: 1.5,
+                  ),
                   decoration: const InputDecoration(
-                    hintText: 'Describe what you need in your own words...\ne.g. Need 4-axis VMC milling for 150 aluminium 6061 enclosures in Coimbatore by next Friday.',
-                    hintStyle: TextStyle(color: AppColors.slate400, fontSize: 14),
+                    hintText:
+                        'Describe what you need in your own words...\ne.g. Need 4-axis VMC milling for 150 aluminium 6061 enclosures in Coimbatore by next Friday.',
+                    hintStyle: TextStyle(
+                      color: AppColors.slate400,
+                      fontSize: 14,
+                    ),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.all(16),
                   ),
@@ -326,16 +383,27 @@ class _CreateRequirementScreenState extends State<CreateRequirementScreen> with 
               // Example Prompt Chips
               Text(
                 'QUICK EXAMPLES (CLICK TO PASTE):',
-                style: GoogleFonts.inter(fontSize: 10.5, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: AppColors.slate400),
+                style: GoogleFonts.inter(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
+                  color: AppColors.slate400,
+                ),
               ),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  _buildExampleChip('Need 4-axis VMC milling for 150 aluminium 6061 enclosures in Coimbatore by next Friday.'),
-                  _buildExampleChip('Require 4kW fiber laser cutting for 50 mild steel panels in Peelamedu.'),
-                  _buildExampleChip('Need CNC turning for 200 EN8 steel shafts with 0.01mm tolerance.'),
+                  _buildExampleChip(
+                    'Need 4-axis VMC milling for 150 aluminium 6061 enclosures in Coimbatore by next Friday.',
+                  ),
+                  _buildExampleChip(
+                    'Require 4kW fiber laser cutting for 50 mild steel panels in Peelamedu.',
+                  ),
+                  _buildExampleChip(
+                    'Need CNC turning for 200 EN8 steel shafts with 0.01mm tolerance.',
+                  ),
                 ],
               ),
 
@@ -359,14 +427,21 @@ class _CreateRequirementScreenState extends State<CreateRequirementScreen> with 
 
         // AI UNDERSTOOD SECTION
         if (_isAnalyzingWithAi)
-          const MachLoadingState(message: 'AI is analyzing blueprint parameters and extracting tooling requirements...', height: 180)
+          const MachLoadingState(
+            message:
+                'AI is analyzing blueprint parameters and extracting tooling requirements...',
+            height: 180,
+          )
         else if (_aiInterpreted != null)
           Container(
             padding: const EdgeInsets.all(28),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.emerald.withValues(alpha: 0.5), width: 1.5),
+              border: Border.all(
+                color: AppColors.emerald.withValues(alpha: 0.5),
+                width: 1.5,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.emerald.withValues(alpha: 0.05),
@@ -383,7 +458,11 @@ class _CreateRequirementScreenState extends State<CreateRequirementScreen> with 
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.check_circle_rounded, color: AppColors.emerald, size: 20),
+                        const Icon(
+                          Icons.check_circle_rounded,
+                          color: AppColors.emerald,
+                          size: 20,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           'AI UNDERSTOOD & STRUCTURED',
@@ -397,14 +476,21 @@ class _CreateRequirementScreenState extends State<CreateRequirementScreen> with 
                       ],
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 9,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.emerald.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         '${(_aiInterpreted!.confidenceScore * 100).toInt()}% CONFIDENCE',
-                        style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.emerald),
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.emerald,
+                        ),
                       ),
                     ),
                   ],
@@ -423,25 +509,72 @@ class _CreateRequirementScreenState extends State<CreateRequirementScreen> with 
                     children: [
                       Row(
                         children: [
-                          Expanded(child: _buildUnderstoodField('PROCESS', _aiInterpreted!.process)),
-                          Expanded(child: _buildUnderstoodField('REQUIRED MACHINE', '4-Axis VMC')),
-                          Expanded(child: _buildUnderstoodField('MATERIAL', _aiInterpreted!.material)),
+                          Expanded(
+                            child: _buildUnderstoodField(
+                              'PROCESS',
+                              _aiInterpreted!.process,
+                            ),
+                          ),
+                          Expanded(
+                            child: _buildUnderstoodField(
+                              'REQUIRED MACHINE',
+                              '4-Axis VMC',
+                            ),
+                          ),
+                          Expanded(
+                            child: _buildUnderstoodField(
+                              'MATERIAL',
+                              _aiInterpreted!.material,
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 14),
                       Row(
                         children: [
-                          Expanded(child: _buildUnderstoodField('QUANTITY', '${_aiInterpreted!.quantity} units')),
-                          Expanded(child: _buildUnderstoodField('LOCATION', _aiInterpreted!.preferredLocation)),
-                          Expanded(child: _buildUnderstoodField('DEADLINE', 'Next Friday (${_aiInterpreted!.deadlineDays} days)')),
+                          Expanded(
+                            child: _buildUnderstoodField(
+                              'QUANTITY',
+                              '${_aiInterpreted!.quantity} units',
+                            ),
+                          ),
+                          Expanded(
+                            child: _buildUnderstoodField(
+                              'LOCATION',
+                              _aiInterpreted!.preferredLocation,
+                            ),
+                          ),
+                          Expanded(
+                            child: _buildUnderstoodField(
+                              'DEADLINE',
+                              'Next Friday (${_aiInterpreted!.deadlineDays} days)',
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 14),
                       Row(
                         children: [
-                          Expanded(child: _buildUnderstoodField('ESTIMATED BUDGET', Formatters.currency(_aiInterpreted!.estimatedBudget))),
-                          Expanded(child: _buildUnderstoodField('TOLERANCE', '±${_aiInterpreted!.toleranceMm ?? 0.01} mm')),
-                          Expanded(child: _buildUnderstoodField('OPERATOR', 'Required (Included)')),
+                          Expanded(
+                            child: _buildUnderstoodField(
+                              'ESTIMATED BUDGET',
+                              Formatters.currency(
+                                _aiInterpreted!.estimatedBudget,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: _buildUnderstoodField(
+                              'TOLERANCE',
+                              '±${_aiInterpreted!.toleranceMm ?? 0.01} mm',
+                            ),
+                          ),
+                          Expanded(
+                            child: _buildUnderstoodField(
+                              'OPERATOR',
+                              'Required (Included)',
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -474,12 +607,19 @@ class _CreateRequirementScreenState extends State<CreateRequirementScreen> with 
             ),
             child: Row(
               children: [
-                const Icon(Icons.info_outline, size: 20, color: AppColors.steelBlue),
+                const Icon(
+                  Icons.info_outline,
+                  size: 20,
+                  color: AppColors.steelBlue,
+                ),
                 const SizedBox(width: 14),
                 Expanded(
                   child: Text(
                     'Click "Understand Requirement with AI →" to parse your technical needs and generate immediate verified machine matches.',
-                    style: GoogleFonts.inter(fontSize: 13, color: AppColors.slate600),
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: AppColors.slate600,
+                    ),
                   ),
                 ),
               ],
@@ -495,12 +635,21 @@ class _CreateRequirementScreenState extends State<CreateRequirementScreen> with 
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.6, color: AppColors.slate400),
+          style: GoogleFonts.inter(
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.6,
+            color: AppColors.slate400,
+          ),
         ),
         const SizedBox(height: 3),
         Text(
           value,
-          style: GoogleFonts.inter(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppColors.navyIndustrial),
+          style: GoogleFonts.inter(
+            fontSize: 13.5,
+            fontWeight: FontWeight.w700,
+            color: AppColors.navyIndustrial,
+          ),
         ),
       ],
     );
@@ -524,11 +673,19 @@ class _CreateRequirementScreenState extends State<CreateRequirementScreen> with 
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.arrow_outward, size: 12, color: AppColors.steelBlue),
+            const Icon(
+              Icons.arrow_outward,
+              size: 12,
+              color: AppColors.steelBlue,
+            ),
             const SizedBox(width: 5),
             Text(
               text.length > 55 ? '${text.substring(0, 52)}...' : text,
-              style: GoogleFonts.inter(fontSize: 11.5, fontWeight: FontWeight.w500, color: AppColors.slate700),
+              style: GoogleFonts.inter(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w500,
+                color: AppColors.slate700,
+              ),
             ),
           ],
         ),
@@ -551,7 +708,12 @@ class _CreateRequirementScreenState extends State<CreateRequirementScreen> with 
           children: [
             Text(
               'STRUCTURED SPECIFICATIONS',
-              style: GoogleFonts.inter(fontSize: 11.5, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: AppColors.slate500),
+              style: GoogleFonts.inter(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.8,
+                color: AppColors.slate500,
+              ),
             ),
             const SizedBox(height: 18),
 
@@ -569,19 +731,48 @@ class _CreateRequirementScreenState extends State<CreateRequirementScreen> with 
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Manufacturing Process', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+                      Text(
+                        'Manufacturing Process',
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
                       const SizedBox(height: 6),
                       DropdownButtonFormField<String>(
                         value: _selectedProcess,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.slate200)),
-                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.slate200)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(
+                              color: AppColors.slate200,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(
+                              color: AppColors.slate200,
+                            ),
+                          ),
                         ),
-                        items: _processes.map((p) => DropdownMenuItem(value: p, child: Text(p, style: GoogleFonts.inter(fontSize: 13.5)))).toList(),
+                        items: _processes
+                            .map(
+                              (p) => DropdownMenuItem(
+                                value: p,
+                                child: Text(
+                                  p,
+                                  style: GoogleFonts.inter(fontSize: 13.5),
+                                ),
+                              ),
+                            )
+                            .toList(),
                         onChanged: (val) {
-                          if (val != null) setState(() => _selectedProcess = val);
+                          if (val != null) {
+                            setState(() => _selectedProcess = val);
+                          }
                         },
                       ),
                     ],
@@ -592,19 +783,48 @@ class _CreateRequirementScreenState extends State<CreateRequirementScreen> with 
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Material Specification', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+                      Text(
+                        'Material Specification',
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
                       const SizedBox(height: 6),
                       DropdownButtonFormField<String>(
                         value: _selectedMaterial,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.slate200)),
-                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.slate200)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(
+                              color: AppColors.slate200,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(
+                              color: AppColors.slate200,
+                            ),
+                          ),
                         ),
-                        items: _materials.map((m) => DropdownMenuItem(value: m, child: Text(m, style: GoogleFonts.inter(fontSize: 13.5)))).toList(),
+                        items: _materials
+                            .map(
+                              (m) => DropdownMenuItem(
+                                value: m,
+                                child: Text(
+                                  m,
+                                  style: GoogleFonts.inter(fontSize: 13.5),
+                                ),
+                              ),
+                            )
+                            .toList(),
                         onChanged: (val) {
-                          if (val != null) setState(() => _selectedMaterial = val);
+                          if (val != null) {
+                            setState(() => _selectedMaterial = val);
+                          }
                         },
                       ),
                     ],
@@ -661,7 +881,8 @@ class _CreateRequirementScreenState extends State<CreateRequirementScreen> with 
             MachTextField(
               controller: _qualityReqController,
               label: 'Quality & Inspection Requirements',
-              hint: 'e.g. CMM Inspection, Material Test Report, Surface Finish Ra 0.8',
+              hint:
+                  'e.g. CMM Inspection, Material Test Report, Surface Finish Ra 0.8',
             ),
             const SizedBox(height: 24),
 

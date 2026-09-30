@@ -57,11 +57,7 @@ class MachStatusBadge extends StatelessWidget {
   final String status;
   final bool showDot;
 
-  const MachStatusBadge({
-    super.key,
-    required this.status,
-    this.showDot = true,
-  });
+  const MachStatusBadge({super.key, required this.status, this.showDot = true});
 
   @override
   Widget build(BuildContext context) {
@@ -71,21 +67,32 @@ class MachStatusBadge extends StatelessWidget {
 
     final upper = status.toUpperCase();
 
-    if (upper == 'AVAILABLE' || upper == 'ACTIVE' || upper == 'VERIFIED' || upper == 'CONFIRMED' || upper == 'COMPLETED') {
+    if (upper == 'AVAILABLE' ||
+        upper == 'ACTIVE' ||
+        upper == 'VERIFIED' ||
+        upper == 'CONFIRMED' ||
+        upper == 'COMPLETED') {
       bg = const Color(0xFFECFDF5);
       fg = const Color(0xFF059669);
       if (upper == 'AVAILABLE') displayLabel = 'AVAILABLE';
-    } else if (upper == 'BUSY' || upper == 'PENDING' || upper == 'REQUESTED' || upper == 'IN REVIEW') {
+    } else if (upper == 'BUSY' ||
+        upper == 'PENDING' ||
+        upper == 'REQUESTED' ||
+        upper == 'IN REVIEW') {
       bg = const Color(0xFFFFFBEB);
       fg = const Color(0xFFD97706);
-    } else if (upper == 'IN_PROGRESS' || upper == 'IN PRODUCTION' || upper == 'MATCHES READY') {
+    } else if (upper == 'IN_PROGRESS' ||
+        upper == 'IN PRODUCTION' ||
+        upper == 'MATCHES READY') {
       bg = const Color(0xFFEFF6FF);
       fg = const Color(0xFF2563EB);
       if (upper == 'IN_PROGRESS') displayLabel = 'IN PRODUCTION';
     } else if (upper == 'MAINTENANCE' || upper == 'OFFLINE') {
       bg = const Color(0xFFF1F5F9);
       fg = const Color(0xFF64748B);
-    } else if (upper == 'REJECTED' || upper == 'CANCELLED' || upper == 'FAILED') {
+    } else if (upper == 'REJECTED' ||
+        upper == 'CANCELLED' ||
+        upper == 'FAILED') {
       bg = const Color(0xFFFEF2F2);
       fg = const Color(0xFFDC2626);
     }
@@ -104,10 +111,7 @@ class MachStatusBadge extends StatelessWidget {
             Container(
               width: 6,
               height: 6,
-              decoration: BoxDecoration(
-                color: fg,
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: fg, shape: BoxShape.circle),
             ),
             const SizedBox(width: 5),
           ],
@@ -139,16 +143,26 @@ class MachVerifiedBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: isCompact ? 7 : 9, vertical: isCompact ? 2 : 4),
+      padding: EdgeInsets.symmetric(
+        horizontal: isCompact ? 7 : 9,
+        vertical: isCompact ? 2 : 4,
+      ),
       decoration: BoxDecoration(
         color: const Color(0xFFECFDF5),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.35), width: 1),
+        border: Border.all(
+          color: const Color(0xFF10B981).withValues(alpha: 0.35),
+          width: 1,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.check_circle_rounded, size: 13, color: Color(0xFF059669)),
+          const Icon(
+            Icons.check_circle_rounded,
+            size: 13,
+            color: Color(0xFF059669),
+          ),
           const SizedBox(width: 4.5),
           Text(
             label,

@@ -13,6 +13,10 @@ from app.models.business import VerificationStatus
 
 class MachineStatus(str, Enum):
     ACTIVE = "ACTIVE"
+    AVAILABLE = "AVAILABLE"
+    BUSY = "BUSY"
+    MAINTENANCE = "MAINTENANCE"
+    OFFLINE = "OFFLINE"
     INACTIVE = "INACTIVE"
 
 

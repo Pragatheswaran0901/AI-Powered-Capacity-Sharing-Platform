@@ -37,7 +37,9 @@ class UserModel {
       isActive: json['is_active'] ?? true,
       isVerified: json['is_verified'] ?? false,
       emailVerified: json['email_verified'] ?? false,
-      isOnboarded: json['is_onboarded'] ?? (json['role'] == 'ADMIN' || json['business_id'] != null),
+      isOnboarded:
+          json['is_onboarded'] ??
+          (json['role'] == 'ADMIN' || json['business_id'] != null),
       authenticationProvider: json['authentication_provider'] ?? 'email_otp',
       businessId: json['business_id'],
       businessName: json['business_name'],
@@ -85,7 +87,8 @@ class UserModel {
       isVerified: isVerified ?? this.isVerified,
       emailVerified: emailVerified ?? this.emailVerified,
       isOnboarded: isOnboarded ?? this.isOnboarded,
-      authenticationProvider: authenticationProvider ?? this.authenticationProvider,
+      authenticationProvider:
+          authenticationProvider ?? this.authenticationProvider,
       businessId: businessId ?? this.businessId,
       businessName: businessName ?? this.businessName,
     );

@@ -17,7 +17,9 @@ class CompareMachinesScreen extends StatefulWidget {
 class _CompareMachinesScreenState extends State<CompareMachinesScreen> {
   void _openBookingModal(ComparisonItemModel item, String requirementId) {
     final hoursController = TextEditingController(text: '16');
-    final notesController = TextEditingController(text: 'Procurement decision confirmed via Mach-Hunt comparison matrix.');
+    final notesController = TextEditingController(
+      text: 'Procurement decision confirmed via Mach-Hunt comparison matrix.',
+    );
     DateTime startDate = DateTime.now().add(const Duration(days: 1));
     DateTime endDate = DateTime.now().add(const Duration(days: 3));
 
@@ -32,13 +34,25 @@ class _CompareMachinesScreenState extends State<CompareMachinesScreen> {
 
           return AlertDialog(
             backgroundColor: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
             title: Row(
               children: [
-                const Icon(Icons.flash_on_rounded, color: AppColors.orangeAccent, size: 22),
+                const Icon(
+                  Icons.flash_on_rounded,
+                  color: AppColors.orangeAccent,
+                  size: 22,
+                ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text('Select & Book: ${item.machineName}', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w800)),
+                  child: Text(
+                    'Select & Book: ${item.machineName}',
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -49,8 +63,21 @@ class _CompareMachinesScreenState extends State<CompareMachinesScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Provider: ${item.businessName}', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.navyIndustrial)),
-                    Text('Rate: ${Formatters.currency(item.hourlyPrice)}/hour · ${item.matchPercentage}% Match', style: GoogleFonts.inter(fontSize: 12, color: AppColors.slate500)),
+                    Text(
+                      'Provider: ${item.businessName}',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.navyIndustrial,
+                      ),
+                    ),
+                    Text(
+                      'Rate: ${Formatters.currency(item.hourlyPrice)}/hour · ${item.matchPercentage}% Match',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: AppColors.slate500,
+                      ),
+                    ),
                     const SizedBox(height: 16),
                     MachTextField(
                       controller: hoursController,
@@ -70,8 +97,21 @@ class _CompareMachinesScreenState extends State<CompareMachinesScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Estimated Total:', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700)),
-                        Text(Formatters.currency(grandTotal), style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.steelBlue)),
+                        Text(
+                          'Estimated Total:',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Text(
+                          Formatters.currency(grandTotal),
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.steelBlue,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -81,7 +121,10 @@ class _CompareMachinesScreenState extends State<CompareMachinesScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(),
-                child: Text('Cancel', style: GoogleFonts.inter(color: AppColors.slate500)),
+                child: Text(
+                  'Cancel',
+                  style: GoogleFonts.inter(color: AppColors.slate500),
+                ),
               ),
               MachButton(
                 label: 'Confirm Selection & Book',
@@ -99,7 +142,12 @@ class _CompareMachinesScreenState extends State<CompareMachinesScreen> {
                   );
                   if (mounted && success) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Provider booked successfully! Escrow pending.'), backgroundColor: AppColors.emerald),
+                      const SnackBar(
+                        content: Text(
+                          'Provider booked successfully! Escrow pending.',
+                        ),
+                        backgroundColor: AppColors.emerald,
+                      ),
                     );
                     context.go('/bookings');
                   }
@@ -113,7 +161,8 @@ class _CompareMachinesScreenState extends State<CompareMachinesScreen> {
   }
 
   List<ComparisonItemModel> _getEffectiveItems() {
-    if (seekerState.comparisonMatrix != null && seekerState.comparisonMatrix!.items.isNotEmpty) {
+    if (seekerState.comparisonMatrix != null &&
+        seekerState.comparisonMatrix!.items.isNotEmpty) {
       return seekerState.comparisonMatrix!.items;
     }
 
@@ -132,7 +181,11 @@ class _CompareMachinesScreenState extends State<CompareMachinesScreen> {
         dimensions: '1270 x 508 x 635 mm',
         rating: 4.8,
         verificationStatus: 'VERIFIED',
-        keyReasons: ['Aluminium 6061 certified', '4-axis continuous', 'Within 8.2 km'],
+        keyReasons: [
+          'Aluminium 6061 certified',
+          '4-axis continuous',
+          'Within 8.2 km',
+        ],
       ),
       ComparisonItemModel(
         machineId: 'mach-2',
@@ -147,7 +200,11 @@ class _CompareMachinesScreenState extends State<CompareMachinesScreen> {
         dimensions: '1050 x 610 x 610 mm',
         rating: 4.6,
         verificationStatus: 'VERIFIED',
-        keyReasons: ['Rigid BT-50 spindle', 'High batch throughput', 'Within 14.1 km'],
+        keyReasons: [
+          'Rigid BT-50 spindle',
+          'High batch throughput',
+          'Within 14.1 km',
+        ],
       ),
       ComparisonItemModel(
         machineId: 'mach-3',
@@ -162,7 +219,11 @@ class _CompareMachinesScreenState extends State<CompareMachinesScreen> {
         dimensions: '3000 x 1500 mm',
         rating: 4.4,
         verificationStatus: 'VERIFIED',
-        keyReasons: ['4kW fiber laser source', 'Integrated press brake', 'Certified operators'],
+        keyReasons: [
+          '4kW fiber laser source',
+          'Integrated press brake',
+          'Certified operators',
+        ],
       ),
     ];
   }
@@ -170,10 +231,12 @@ class _CompareMachinesScreenState extends State<CompareMachinesScreen> {
   @override
   Widget build(BuildContext context) {
     final items = _getEffectiveItems();
-    final reqTitle = seekerState.comparisonMatrix?.requirementTitle ?? "Enclosure Machining Order";
+    final reqTitle =
+        seekerState.comparisonMatrix?.requirementTitle ??
+        "Enclosure Machining Order";
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(28),
         child: Center(
@@ -184,15 +247,28 @@ class _CompareMachinesScreenState extends State<CompareMachinesScreen> {
               children: [
                 MachPageHeader(
                   title: 'Provider Comparison Matrix',
-                  subtitle: 'Side-by-side technical and economic evaluation for "$reqTitle".',
+                  subtitle:
+                      'Side-by-side technical and economic evaluation for "$reqTitle".',
                   badge: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.steelBlue.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: AppColors.steelBlue.withValues(alpha: 0.3)),
+                      border: Border.all(
+                        color: AppColors.steelBlue.withValues(alpha: 0.3),
+                      ),
                     ),
-                    child: Text('DECISION MATRIX', style: GoogleFonts.inter(fontSize: 10.5, fontWeight: FontWeight.w800, color: AppColors.steelBlue)),
+                    child: Text(
+                      'DECISION MATRIX',
+                      style: GoogleFonts.inter(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.steelBlue,
+                      ),
+                    ),
                   ),
                   onBack: () => context.go('/seeker-dashboard'),
                 ),
@@ -219,42 +295,65 @@ class _CompareMachinesScreenState extends State<CompareMachinesScreen> {
                       constraints: const BoxConstraints(minWidth: 900),
                       child: Table(
                         border: TableBorder(
-                          horizontalInside: const BorderSide(color: AppColors.slate200, width: 1),
-                          verticalInside: const BorderSide(color: AppColors.slate200, width: 1),
+                          horizontalInside: const BorderSide(
+                            color: AppColors.slate200,
+                            width: 1,
+                          ),
+                          verticalInside: const BorderSide(
+                            color: AppColors.slate200,
+                            width: 1,
+                          ),
                         ),
                         columnWidths: {
                           0: const FixedColumnWidth(180),
-                          for (int i = 1; i <= items.length; i++) i: const FlexColumnWidth(),
+                          for (int i = 1; i <= items.length; i++)
+                            i: const FlexColumnWidth(),
                         },
-                        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                        defaultVerticalAlignment:
+                            TableCellVerticalAlignment.middle,
                         children: [
                           // Header Row (Provider Names)
                           TableRow(
-                            decoration: const BoxDecoration(color: Color(0xFF0F172A)),
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF0F172A),
+                            ),
                             children: [
                               Padding(
                                 padding: const EdgeInsets.all(18),
                                 child: Text(
                                   'METRIC / PARAMETER',
-                                  style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: Colors.white70),
+                                  style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.8,
+                                    color: Colors.white70,
+                                  ),
                                 ),
                               ),
                               for (var item in items)
                                 Padding(
                                   padding: const EdgeInsets.all(18),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         item.businessName,
-                                        style: GoogleFonts.inter(fontSize: 14.5, fontWeight: FontWeight.w800, color: Colors.white),
+                                        style: GoogleFonts.inter(
+                                          fontSize: 14.5,
+                                          fontWeight: FontWeight.w800,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
                                         item.machineName,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
-                                        style: GoogleFonts.inter(fontSize: 11.5, color: AppColors.slate300),
+                                        style: GoogleFonts.inter(
+                                          fontSize: 11.5,
+                                          color: AppColors.slate300,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -265,83 +364,195 @@ class _CompareMachinesScreenState extends State<CompareMachinesScreen> {
                           // Match Score Row
                           _buildTableRow(
                             label: 'Match Score',
-                            values: items.map((i) => Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: i.matchPercentage >= 90 ? AppColors.emerald : AppColors.steelBlue,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text('${i.matchPercentage}% MATCH', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.white)),
-                            )).toList(),
+                            values: items
+                                .map(
+                                  (i) => Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: i.matchPercentage >= 90
+                                          ? AppColors.emerald
+                                          : AppColors.steelBlue,
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(
+                                      '${i.matchPercentage}% MATCH',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
                           ),
 
                           // Capability Match
                           _buildTableRow(
                             label: 'Capability',
-                            values: items.map((i) => Row(
-                              children: [
-                                const Icon(Icons.check_circle, size: 16, color: AppColors.emerald),
-                                const SizedBox(width: 6),
-                                Text('Full Match', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.navyIndustrial)),
-                              ],
-                            )).toList(),
+                            values: items
+                                .map(
+                                  (i) => Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.check_circle,
+                                        size: 16,
+                                        color: AppColors.emerald,
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        'Full Match',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.navyIndustrial,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                                .toList(),
                           ),
 
                           // Availability
                           _buildTableRow(
                             label: 'Availability',
-                            values: items.map((i) => Row(
-                              children: [
-                                const Icon(Icons.schedule, size: 16, color: AppColors.steelBlue),
-                                const SizedBox(width: 6),
-                                Text(i.matchPercentage >= 90 ? 'Immediate (Tomorrow)' : 'Next 48 Hours', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.navyIndustrial)),
-                              ],
-                            )).toList(),
+                            values: items
+                                .map(
+                                  (i) => Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.schedule,
+                                        size: 16,
+                                        color: AppColors.steelBlue,
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        i.matchPercentage >= 90
+                                            ? 'Immediate (Tomorrow)'
+                                            : 'Next 48 Hours',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.navyIndustrial,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                                .toList(),
                           ),
 
                           // Distance
                           _buildTableRow(
                             label: 'Distance Hub',
-                            values: items.map((i) => Text('${i.distanceKm.toStringAsFixed(1)} km', style: GoogleFonts.inter(fontSize: 13.5, fontWeight: FontWeight.w600, color: AppColors.navyIndustrial))).toList(),
+                            values: items
+                                .map(
+                                  (i) => Text(
+                                    '${i.distanceKm.toStringAsFixed(1)} km',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 13.5,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.navyIndustrial,
+                                    ),
+                                  ),
+                                )
+                                .toList(),
                           ),
 
                           // Hourly Cost
                           _buildTableRow(
                             label: 'Hourly Cost',
-                            values: items.map((i) => Text('${Formatters.currency(i.hourlyPrice)}/hr', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.steelBlue))).toList(),
+                            values: items
+                                .map(
+                                  (i) => Text(
+                                    '${Formatters.currency(i.hourlyPrice)}/hr',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppColors.steelBlue,
+                                    ),
+                                  ),
+                                )
+                                .toList(),
                           ),
 
                           // Tolerance
                           _buildTableRow(
                             label: 'Precision Tolerance',
-                            values: items.map((i) => Text(i.tolerance, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.navyIndustrial))).toList(),
+                            values: items
+                                .map(
+                                  (i) => Text(
+                                    i.tolerance,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.navyIndustrial,
+                                    ),
+                                  ),
+                                )
+                                .toList(),
                           ),
 
                           // Rating
                           _buildTableRow(
                             label: 'Customer Rating',
-                            values: items.map((i) => Row(
-                              children: [
-                                const Icon(Icons.star, size: 16, color: Color(0xFFF59E0B)),
-                                const SizedBox(width: 4),
-                                Text('${i.rating} ★', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.navyIndustrial)),
-                              ],
-                            )).toList(),
+                            values: items
+                                .map(
+                                  (i) => Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.star,
+                                        size: 16,
+                                        color: Color(0xFFF59E0B),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '${i.rating} ★',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.navyIndustrial,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                                .toList(),
                           ),
 
                           // Verification
                           _buildTableRow(
                             label: 'Verification',
-                            values: items.map((i) => const MachVerifiedBadge(label: 'Verified Facility', isCompact: true)).toList(),
+                            values: items
+                                .map(
+                                  (i) => const MachVerifiedBadge(
+                                    label: 'Verified Facility',
+                                    isCompact: true,
+                                  ),
+                                )
+                                .toList(),
                           ),
 
                           // Primary Actions Row
                           TableRow(
-                            decoration: const BoxDecoration(color: Color(0xFFF8FAFC)),
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFF8FAFC),
+                            ),
                             children: [
                               Padding(
                                 padding: const EdgeInsets.all(16),
-                                child: Text('DECISION ACTION', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.slate500)),
+                                child: Text(
+                                  'DECISION ACTION',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.slate500,
+                                  ),
+                                ),
                               ),
                               for (var item in items)
                                 Padding(
@@ -349,9 +560,17 @@ class _CompareMachinesScreenState extends State<CompareMachinesScreen> {
                                   child: MachButton(
                                     label: 'Select Provider',
                                     icon: Icons.check_circle_outline,
-                                    variant: item.matchPercentage >= 90 ? MachButtonVariant.accent : MachButtonVariant.primary,
+                                    variant: item.matchPercentage >= 90
+                                        ? MachButtonVariant.accent
+                                        : MachButtonVariant.primary,
                                     size: MachButtonSize.medium,
-                                    onPressed: () => _openBookingModal(item, seekerState.comparisonMatrix?.requirementId ?? "req-1"),
+                                    onPressed: () => _openBookingModal(
+                                      item,
+                                      seekerState
+                                              .comparisonMatrix
+                                              ?.requirementId ??
+                                          "req-1",
+                                    ),
                                   ),
                                 ),
                             ],
@@ -369,7 +588,10 @@ class _CompareMachinesScreenState extends State<CompareMachinesScreen> {
     );
   }
 
-  TableRow _buildTableRow({required String label, required List<Widget> values}) {
+  TableRow _buildTableRow({
+    required String label,
+    required List<Widget> values,
+  }) {
     return TableRow(
       children: [
         Padding(

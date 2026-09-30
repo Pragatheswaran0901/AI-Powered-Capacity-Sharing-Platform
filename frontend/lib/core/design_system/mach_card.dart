@@ -37,10 +37,7 @@ class MachCard extends StatelessWidget {
           header!,
           const Divider(height: 1, color: AppColors.slate200),
         ],
-        Padding(
-          padding: padding,
-          child: child,
-        ),
+        Padding(padding: padding, child: child),
         if (footer != null) ...[
           const Divider(height: 1, color: AppColors.slate200),
           footer!,

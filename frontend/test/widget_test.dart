@@ -8,16 +8,14 @@ import 'package:machhunt/core/widgets/status_badge.dart';
 import 'package:machhunt/screens/auth/login_screen.dart';
 
 void main() {
-  testWidgets('LoginScreen renders sign in fields and button', (WidgetTester tester) async {
+  testWidgets('LoginScreen renders sign in fields and button', (
+    WidgetTester tester,
+  ) async {
     tester.view.physicalSize = const Size(1200, 900);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
 
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: LoginScreen(),
-      ),
-    );
+    await tester.pumpWidget(const MaterialApp(home: LoginScreen()));
 
     expect(find.text('MACH-HUNT'), findsOneWidget);
     expect(find.text('Sign In'), findsOneWidget);
@@ -25,39 +23,35 @@ void main() {
     expect(find.byType(TextField), findsWidgets);
   });
 
-  testWidgets('ScoreChip renders match percentage correctly', (WidgetTester tester) async {
+  testWidgets('ScoreChip renders match percentage correctly', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: ScoreChip(percentage: 94),
-        ),
-      ),
+      const MaterialApp(home: Scaffold(body: ScoreChip(percentage: 94))),
     );
 
     expect(find.text('94% Match'), findsOneWidget);
     expect(find.byIcon(Icons.bolt), findsOneWidget);
   });
 
-  testWidgets('StatusBadge renders status correctly', (WidgetTester tester) async {
+  testWidgets('StatusBadge renders status correctly', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       const MaterialApp(
-        home: Scaffold(
-          body: StatusBadge(status: 'VERIFIED'),
-        ),
+        home: Scaffold(body: StatusBadge(status: 'VERIFIED')),
       ),
     );
 
     expect(find.text('VERIFIED'), findsOneWidget);
   });
 
-  testWidgets('AppCard renders child with appropriate padding', (WidgetTester tester) async {
+  testWidgets('AppCard renders child with appropriate padding', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       const MaterialApp(
-        home: Scaffold(
-          body: AppCard(
-            child: Text('Machining Capacity'),
-          ),
-        ),
+        home: Scaffold(body: AppCard(child: Text('Machining Capacity'))),
       ),
     );
 
@@ -69,10 +63,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: AppTextField(
-            label: 'Machine Name',
-            controller: controller,
-          ),
+          body: AppTextField(label: 'Machine Name', controller: controller),
         ),
       ),
     );

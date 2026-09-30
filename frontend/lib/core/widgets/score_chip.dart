@@ -5,11 +5,7 @@ class ScoreChip extends StatelessWidget {
   final int percentage;
   final VoidCallback? onTap;
 
-  const ScoreChip({
-    super.key,
-    required this.percentage,
-    this.onTap,
-  });
+  const ScoreChip({super.key, required this.percentage, this.onTap});
 
   @override
   Widget build(BuildContext context) {

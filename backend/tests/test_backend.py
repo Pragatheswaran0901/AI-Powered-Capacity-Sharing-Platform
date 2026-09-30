@@ -141,6 +141,63 @@ def test_matching_engine_api():
     assert top_match["score_breakdown"]["distance_km"] > 0
 
 
+def test_location_capacity_discovery():
+    """Verify location-aware machine search and matching for Coimbatore and Tiruppur."""
+    # 1. Search machines in Coimbatore
+    cbe_resp = client.get("/api/v1/machines?location=Coimbatore")
+    assert cbe_resp.status_code == 200
+    cbe_machines = cbe_resp.json()
+    assert len(cbe_machines) >= 4
+    for m in cbe_machines:
+        loc = (m.get("location_address") or "").lower()
+        biz_name = (m.get("business_name") or "").lower()
+        assert "coimbatore" in loc or "kurichi" in loc or "ganapathy" in loc or "peelamedu" in loc or "kovai" in biz_name
+
+    # 2. Search machines in Tiruppur
+    tir_resp = client.get("/api/v1/machines?location=Tiruppur")
+    assert tir_resp.status_code == 200
+    tir_machines = tir_resp.json()
+    assert len(tir_machines) >= 3
+    for m in tir_machines:
+        loc = (m.get("location_address") or "").lower()
+        assert "tirup" in loc
+
+    # 3. Matching with location query parameter
+    login_resp = client.post(
+        "/api/v1/auth/login",
+        json={"email": "karthikeyan@machhunt.demo", "password": "password123"}
+    )
+    token = login_resp.json()["access_token"]
+    reqs = client.get("/api/v1/requirements/my", headers={"Authorization": f"Bearer {token}"}).json()
+    req_id = reqs[0]["id"]
+
+    # Match in Coimbatore
+    cbe_match_resp = client.get(
+        f"/api/v1/matches/requirement/{req_id}?location=Coimbatore",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert cbe_match_resp.status_code == 200
+    cbe_matches = cbe_match_resp.json()
+    assert len(cbe_matches) >= 4
+    for match in cbe_matches:
+        loc = (match.get("location_address") or "").lower()
+        biz = (match.get("business_name") or "").lower()
+        assert "coimbatore" in loc or "kurichi" in loc or "ganapathy" in loc or "peelamedu" in loc or "kovai" in biz
+
+    # Match in Tiruppur
+    tir_match_resp = client.get(
+        f"/api/v1/matches/requirement/{req_id}?location=Tiruppur",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert tir_match_resp.status_code == 200
+    tir_matches = tir_match_resp.json()
+    assert len(tir_matches) >= 3
+    for match in tir_matches:
+        loc = (match.get("location_address") or "").lower()
+        assert "tirup" in loc
+
+
+
 def test_side_by_side_comparison():
     """Verify multi-machine comparison matrix generation."""
     login_resp = client.post(

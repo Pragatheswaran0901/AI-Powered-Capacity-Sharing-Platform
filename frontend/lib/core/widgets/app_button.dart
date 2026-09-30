@@ -91,9 +91,7 @@ class AppButton extends StatelessWidget {
           foregroundColor: fg,
           elevation: 0,
           side: border,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(horizontal: 16),
         ),
         child: content,

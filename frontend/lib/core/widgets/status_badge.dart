@@ -5,11 +5,7 @@ class StatusBadge extends StatelessWidget {
   final String status;
   final bool showDot;
 
-  const StatusBadge({
-    super.key,
-    required this.status,
-    this.showDot = true,
-  });
+  const StatusBadge({super.key, required this.status, this.showDot = true});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +15,10 @@ class StatusBadge extends StatelessWidget {
 
     final upper = status.toUpperCase();
 
-    if (upper == 'VERIFIED' || upper == 'CONFIRMED' || upper == 'COMPLETED' || upper == 'ACTIVE') {
+    if (upper == 'VERIFIED' ||
+        upper == 'CONFIRMED' ||
+        upper == 'COMPLETED' ||
+        upper == 'ACTIVE') {
       bg = AppColors.successBg;
       fg = AppColors.success;
     } else if (upper == 'PENDING' || upper == 'ACCEPTED') {
@@ -29,7 +28,9 @@ class StatusBadge extends StatelessWidget {
       bg = AppColors.infoBg;
       fg = AppColors.info;
       label = upper == 'IN_PROGRESS' ? 'IN PRODUCTION' : label;
-    } else if (upper == 'REJECTED' || upper == 'CANCELLED' || upper == 'DISPUTED') {
+    } else if (upper == 'REJECTED' ||
+        upper == 'CANCELLED' ||
+        upper == 'DISPUTED') {
       bg = AppColors.errorBg;
       fg = AppColors.error;
     }
@@ -48,10 +49,7 @@ class StatusBadge extends StatelessWidget {
             Container(
               width: 6,
               height: 6,
-              decoration: BoxDecoration(
-                color: fg,
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: fg, shape: BoxShape.circle),
             ),
             const SizedBox(width: 6),
           ],

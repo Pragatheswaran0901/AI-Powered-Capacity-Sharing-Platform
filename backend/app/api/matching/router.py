@@ -1,5 +1,5 @@
-from typing import List
-from fastapi import APIRouter, Depends, status
+from typing import List, Optional
+from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.api.deps import get_current_user
@@ -13,6 +13,7 @@ router = APIRouter()
 @router.get("/requirement/{requirement_id}", response_model=List[MatchResultOut])
 def get_matches_for_requirement(
     requirement_id: str,
+    location: Optional[str] = Query(None, description="Manufacturing cluster or city to discover capacity (e.g. Coimbatore, Tiruppur)"),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -26,7 +27,7 @@ def get_matches_for_requirement(
     - Reliability & Trust (10%)
     Returns ranked recommendations with transparent explainability bullet points.
     """
-    return MatchingService(db).find_matches_for_requirement(requirement_id)
+    return MatchingService(db).find_matches_for_requirement(requirement_id, location=location)
 
 
 @router.post("/compare", response_model=ComparisonMatrixOut)
