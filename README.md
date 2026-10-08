@@ -243,4 +243,4 @@ Services exposed:
 
 ## 10. License
 
-Mach-Hunt is licensed under the Apache 2.0 License.
+Mach-Hunt is licensed under the Apache 2.0 License...
