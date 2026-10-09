@@ -8,6 +8,6 @@ for r in c.fetchall():
     print("Booking:", r)
 
 print("\nRequirements count:", c.execute("SELECT count(*) FROM requirements").fetchone()[0])
-c.execute("SELECT r.id, r.title, u.full_name, r.status FROM requirements r JOIN users u ON r.user_id=u.id LIMIT 5")
+c.execute("SELECT r.id, r.title, u.full_name, r.status FROM requirements r JOIN users u ON r.seeker_id=u.id LIMIT 5")
 for r in c.fetchall():
     print("Requirement:", r)

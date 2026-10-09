@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:machhunt/core/constants/app_colors.dart';
 import 'package:machhunt/core/design_system/mach_button.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'mach_hunt_web_map.dart';
 
 /// Normalized data representation for pins placed on the Mach-Hunt map
 class MachMapMarker {
@@ -22,6 +23,8 @@ class MachMapMarker {
   final String? companyName;
   final String? industry;
   final String? city;
+  final String? address;
+  final String? providerName;
   final dynamic originalData; // MachineModel or MatchResultModel
 
   const MachMapMarker({
@@ -39,6 +42,8 @@ class MachMapMarker {
     this.companyName,
     this.industry,
     this.city,
+    this.address,
+    this.providerName,
     this.originalData,
   });
 
@@ -51,14 +56,38 @@ class MachMapMarker {
     }
     return 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    'subtitle': subtitle,
+    'category': category,
+    'hourlyPrice': hourlyPrice,
+    'latitude': latitude,
+    'longitude': longitude,
+    'distanceKm': distanceKm,
+    'matchPercentage': matchPercentage,
+    'isAvailable': isAvailable,
+    'mapsUrl': googleMapsUrl,
+    'companyName': companyName ?? title,
+    'industry': industry ?? '',
+    'city': city ?? '',
+    'address': address ?? '',
+    'providerName': providerName ?? subtitle,
+  };
 }
 
 /// Returns true if GoogleMap is supported on this platform.
-/// On Web (kIsWeb), Android, and iOS: returns true.
-/// On native Windows Desktop (TargetPlatform.windows), macOS, and Linux: strictly returns false.
+/// On Web: returns true (uses dedicated official Google Maps JavaScript API).
+/// On Android and iOS: returns true.
+/// On native Windows, macOS, and Linux desktop: strictly returns false.
 bool get isSupportedMapPlatform {
   if (kIsWeb) return true;
-  if (defaultTargetPlatform == TargetPlatform.windows) return false;
+  if (defaultTargetPlatform == TargetPlatform.windows ||
+      defaultTargetPlatform == TargetPlatform.linux ||
+      defaultTargetPlatform == TargetPlatform.macOS) {
+    return false;
+  }
   return defaultTargetPlatform == TargetPlatform.android ||
       defaultTargetPlatform == TargetPlatform.iOS;
 }
@@ -146,7 +175,11 @@ class MachHuntMapState extends State<MachHuntMap> {
 
   /// Programmatic camera movement to a coordinate (only on supported platforms)
   Future<void> animateToLocation(LatLng target, {double? zoom}) async {
-    if (!isGoogleMapsSupported || _controller == null) return;
+    if (kIsWeb) {
+      MachHuntWebMap.panTo(target.latitude, target.longitude, zoom: zoom ?? widget.initialZoom);
+      return;
+    }
+    if (!isSupportedMapPlatform || _controller == null) return;
     try {
       await _controller!.animateCamera(
         CameraUpdate.newCameraPosition(
@@ -161,7 +194,9 @@ class MachHuntMapState extends State<MachHuntMap> {
   /// Focus and select a specific marker
   void selectMarker(MachMapMarker marker) {
     setState(() => _activeMarker = marker);
-    if (isGoogleMapsSupported) {
+    if (kIsWeb) {
+      MachHuntWebMap.selectMarker(marker.id);
+    } else if (isGoogleMapsSupported) {
       animateToLocation(marker.position, zoom: 13.5);
     }
     widget.onMarkerSelected?.call(marker);
@@ -229,6 +264,22 @@ class MachHuntMapState extends State<MachHuntMap> {
   Widget build(BuildContext context) {
     final isDesktop = MediaQuery.of(context).size.width >= 1024;
     final mapHeight = widget.height ?? (isDesktop ? 440.0 : 320.0);
+
+    // On Web (Chrome/browsers): Render official interactive Google Maps JavaScript API map
+    if (kIsWeb) {
+      return MachHuntWebMap(
+        initialCenter: widget.initialCenter,
+        initialZoom: widget.initialZoom,
+        markers: widget.markers,
+        selectedMarkerId: widget.selectedMarkerId,
+        onMarkerSelected: widget.onMarkerSelected,
+        onBookCapacity: widget.onBookCapacity,
+        onCompareCapacity: widget.onCompareCapacity,
+        height: mapHeight,
+        isLoading: widget.isLoading,
+        locationName: widget.locationName,
+      );
+    }
 
     // CRITICAL: On Windows Desktop, GoogleMap MUST NEVER be instantiated!
     if (!isSupportedMapPlatform) {

@@ -18,7 +18,7 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Mach-Hunt — AI-Powered Manufacturing Capacity-Sharing Platform for MSMEs.">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -32,16 +32,9 @@
   <title>machhunt</title>
   <link rel="manifest" href="manifest.json">
 
-  <!-- Google Maps JavaScript API -->
+  <!-- Google Maps JavaScript API (Single official loader) -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDGAgFJPu2uAoNa6RSQ5VbWhseZyppxfYw"></script>
-  <script>
-    // Safeguard: Ensure window.google.maps exists even if offline or network is restricted
-    if (typeof window.google === 'undefined') {
-      window.google = { maps: {} };
-    } else if (typeof window.google.maps === 'undefined') {
-      window.google.maps = {};
-    }
-  </script>
+  <script src="mach_hunt_web_map.js"></script>
 </head>
 <body>
   <!--

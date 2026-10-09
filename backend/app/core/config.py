@@ -22,8 +22,13 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./machhunt_v2.db"
 
     # AI Configuration
-    AI_PROVIDER: str = "rule_based"  # or 'gemini', 'openai'
-    AI_API_KEY: str = ""
+    AI_PROVIDER: str = Field(default="gemini", validation_alias=AliasChoices("AI_PROVIDER"))
+    AI_API_KEY: str = Field(default="AIzaSyDGAgFJPu2uAoNa6RSQ5VbWhseZyppxfYw", validation_alias=AliasChoices("AI_API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY"))
+    AI_MODEL_NAME: str = Field(default="gemini-1.5-flash", validation_alias=AliasChoices("AI_MODEL_NAME", "GEMINI_MODEL"))
+
+    # Maps Configuration
+    MAPS_PROVIDER: str = Field(default="google_maps", validation_alias=AliasChoices("MAPS_PROVIDER"))
+    MAPS_API_KEY: str = Field(default="AIzaSyDGAgFJPu2uAoNa6RSQ5VbWhseZyppxfYw", validation_alias=AliasChoices("MAPS_API_KEY", "GOOGLE_MAPS_API_KEY"))
 
     # Payment Configuration
     PAYMENT_PROVIDER: str = "escrow_simulated"
